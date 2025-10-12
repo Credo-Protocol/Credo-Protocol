@@ -1697,7 +1697,7 @@ By the end of Wave 2, we should have:
 - Working smart contracts on Moca testnet
 - 3 credential types available
 - Dynamic collateralization working
-- End-to-end user flow complete
+- End-to-end user flow completed
 
 ✅ **Polished Presentation:**
 - Beautiful, intuitive UI
