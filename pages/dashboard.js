@@ -1,108 +1,52 @@
 /**
- * Dashboard Page
+ * Dashboard Page (AIR Kit Version)
  * 
- * Main application page showing:
+ * Main application page using AIR Kit for authentication
+ * Shows:
  * - User's credit score
  * - Credential marketplace
+ * - Lending pool interface
  * - Quick stats
  */
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
 import CreditScoreCard from '@/components/CreditScoreCard';
 import CredentialMarketplace from '@/components/CredentialMarketplace';
+import LendingInterface from '@/components/LendingInterface';
+import ConnectButton from '@/components/auth/ConnectButton';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Droplets } from 'lucide-react';
 import { CONTRACTS, CREDIT_ORACLE_ABI, MOCA_CHAIN } from '@/lib/contracts';
+import { useAirKit } from '@/hooks/useAirKit';
 
 export default function Dashboard() {
-  const [userAddress, setUserAddress] = useState(null);
+  const router = useRouter();
+  const {
+    isConnected,
+    userAddress,
+    userInfo,
+    provider,
+    loading: airKitLoading
+  } = useAirKit();
+
   const [creditScore, setCreditScore] = useState(0);
   const [scoreDetails, setScoreDetails] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [connecting, setConnecting] = useState(false);
-
-  // Connect wallet on mount if already connected
-  useEffect(() => {
-    checkConnection();
-  }, []);
 
   // Fetch credit score when user address changes
   useEffect(() => {
-    if (userAddress) {
+    if (userAddress && provider) {
       fetchCreditScore();
     }
-  }, [userAddress]);
-
-  const checkConnection = async () => {
-    if (typeof window.ethereum !== 'undefined') {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.listAccounts();
-        if (accounts.length > 0) {
-          setUserAddress(accounts[0].address);
-        }
-      } catch (error) {
-        console.error('Error checking connection:', error);
-      }
-    }
-  };
-
-  const connectWallet = async () => {
-    try {
-      setConnecting(true);
-      
-      if (typeof window.ethereum === 'undefined') {
-        alert('Please install MetaMask to use this application');
-        return;
-      }
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      
-      // Request account access
-      const accounts = await provider.send('eth_requestAccounts', []);
-      
-      // Check if we're on the right network
-      const network = await provider.getNetwork();
-      if (Number(network.chainId) !== MOCA_CHAIN.id) {
-        try {
-          // Try to switch to Moca Chain
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: `0x${MOCA_CHAIN.id.toString(16)}` }],
-          });
-        } catch (switchError) {
-          // If network doesn't exist, add it
-          if (switchError.code === 4902) {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: `0x${MOCA_CHAIN.id.toString(16)}`,
-                chainName: MOCA_CHAIN.name,
-                nativeCurrency: MOCA_CHAIN.nativeCurrency,
-                rpcUrls: MOCA_CHAIN.rpcUrls.default.http,
-                blockExplorerUrls: [MOCA_CHAIN.blockExplorers.default.url],
-              }],
-            });
-          } else {
-            throw switchError;
-          }
-        }
-      }
-
-      setUserAddress(accounts[0]);
-    } catch (error) {
-      console.error('Error connecting wallet:', error);
-      alert('Failed to connect wallet: ' + error.message);
-    } finally {
-      setConnecting(false);
-    }
-  };
+  }, [userAddress, provider]);
 
   const fetchCreditScore = async () => {
     try {
       setLoading(true);
       
-      const provider = new ethers.BrowserProvider(window.ethereum);
       const oracleContract = new ethers.Contract(
         CONTRACTS.CREDIT_ORACLE,
         CREDIT_ORACLE_ABI,
@@ -138,7 +82,30 @@ export default function Dashboard() {
     }, 2000); // Wait 2 seconds for transaction to confirm
   };
 
-  if (!userAddress) {
+  // Show loading while initializing AIR Kit
+  if (airKitLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted">
+        <div className="max-w-md w-full p-8 space-y-6 text-center">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold">Credo Protocol</h1>
+            <p className="text-xl text-muted-foreground">
+              Identity-Backed DeFi Lending
+            </p>
+          </div>
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Initializing AIR Kit...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show connect screen if not connected
+  if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted">
         <div className="max-w-md w-full p-8 space-y-6 text-center">
@@ -156,7 +123,7 @@ export default function Dashboard() {
             <ul className="text-sm text-left space-y-2 text-muted-foreground">
               <li className="flex items-start">
                 <span className="text-green-500 mr-2">✓</span>
-                <span>Connect real-world identity</span>
+                <span>Connect with Google, Email, or Wallet</span>
               </li>
               <li className="flex items-start">
                 <span className="text-green-500 mr-2">✓</span>
@@ -169,17 +136,10 @@ export default function Dashboard() {
             </ul>
           </div>
 
-          <Button 
-            size="lg" 
-            className="w-full"
-            onClick={connectWallet}
-            disabled={connecting}
-          >
-            {connecting ? 'Connecting...' : 'Connect Wallet'}
-          </Button>
+          <ConnectButton size="lg" />
 
           <p className="text-xs text-muted-foreground">
-            Moca Chain Devnet • Chain ID: {MOCA_CHAIN.id}
+            Powered by Moca Network AIR Kit • Chain ID: {MOCA_CHAIN.id}
           </p>
         </div>
       </div>
@@ -196,13 +156,17 @@ export default function Dashboard() {
               <h1 className="text-2xl font-bold">Credo Protocol</h1>
               <p className="text-sm text-muted-foreground">Dashboard</p>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground">Connected</p>
-                <p className="text-sm font-mono">
-                  {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
-                </p>
-              </div>
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => router.push('/faucet')}
+                className="flex items-center gap-2"
+              >
+                <Droplets className="h-4 w-4" />
+                Get Test USDC
+              </Button>
+              <ConnectButton size="sm" />
               <Button variant="outline" size="sm" onClick={fetchCreditScore}>
                 Refresh
               </Button>
@@ -243,20 +207,42 @@ export default function Dashboard() {
             </div>
 
             <div className="p-6 border rounded-lg bg-card">
-              <p className="text-sm text-muted-foreground mb-1">Network</p>
-              <p className="text-2xl font-bold">{MOCA_CHAIN.name}</p>
+              <p className="text-sm text-muted-foreground mb-1">Login Method</p>
+              <p className="text-xl font-bold">
+                {userInfo?.user?.email ? 'Email/Google' : 'Moca ID'}
+              </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Chain ID: {MOCA_CHAIN.id}
+                AIR Kit SSO • {MOCA_CHAIN.name}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Credential Marketplace */}
-        <CredentialMarketplace
-          userAddress={userAddress}
-          onCredentialSubmitted={handleCredentialSubmitted}
-        />
+        {/* Main Tabs: Credentials and Lending */}
+        <Tabs defaultValue="credentials" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+            <TabsTrigger value="credentials">Build Credit Score</TabsTrigger>
+            <TabsTrigger value="lending">Lending Pool</TabsTrigger>
+          </TabsList>
+
+          {/* Credentials Tab */}
+          <TabsContent value="credentials">
+            <CredentialMarketplace
+              userAddress={userAddress}
+              onCredentialSubmitted={handleCredentialSubmitted}
+              provider={provider}
+            />
+          </TabsContent>
+
+          {/* Lending Tab */}
+          <TabsContent value="lending">
+            <LendingInterface
+              userAddress={userAddress}
+              creditScore={creditScore}
+              provider={provider}
+            />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
