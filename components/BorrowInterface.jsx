@@ -27,12 +27,12 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
   // Calculate collateral factor from credit score
   const collateralFactor = calculateCollateralFactor(creditScore);
 
-  // Fetch max borrowing capacity
+  // Fetch max borrowing capacity (recalculate when credit score changes)
   useEffect(() => {
-    if (userAddress && provider) {
+    if (userAddress && provider && creditScore >= 0) {
       fetchMaxBorrow();
     }
-  }, [userAddress, provider]);
+  }, [userAddress, provider, creditScore, collateralFactor]);
 
   const fetchMaxBorrow = async () => {
     try {
@@ -44,15 +44,32 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
         provider
       );
 
-      // Get user account data to find available borrows
+      // Get user account data
       const accountData = await lendingPool.getUserAccountData(userAddress);
-      const availableBorrowsUSD = Number(ethers.formatUnits(accountData[2], 8)); // 8 decimals for USD
+      
+      // MockUSDC uses 6 decimals
+      const totalCollateralUSD = Number(ethers.formatUnits(accountData[0], 6));
+      const totalDebtUSD = Number(ethers.formatUnits(accountData[1], 6));
+      
+      // Calculate max borrow based on user's credit score collateral factor
+      // availableBorrowsUSD = (collateral / collateralFactor) - currentDebt
+      const maxBorrowFromCollateral = (totalCollateralUSD / collateralFactor) * 100;
+      const availableBorrowsUSD = maxBorrowFromCollateral - totalDebtUSD;
+      
+      console.log('Max borrow calculation:', {
+        totalCollateral: totalCollateralUSD,
+        totalDebt: totalDebtUSD,
+        creditScore,
+        collateralFactor: collateralFactor + '%',
+        maxBorrow: maxBorrowFromCollateral,
+        available: availableBorrowsUSD
+      });
       
       // For simplicity, assume 1 USDC = 1 USD
-      setMaxBorrow(availableBorrowsUSD);
+      setMaxBorrow(Math.max(0, availableBorrowsUSD));
       
       // Set initial borrow amount to 50% of max
-      setBorrowAmount(availableBorrowsUSD * 0.5);
+      setBorrowAmount(Math.max(0, availableBorrowsUSD * 0.5));
     } catch (error) {
       console.error('Error fetching max borrow:', error);
       setError('Failed to fetch borrowing capacity');

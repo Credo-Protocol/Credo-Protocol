@@ -65,12 +65,13 @@ export default function PositionCard({ userAddress, refresh, provider }) {
       const borrowedFormatted = Number(ethers.formatUnits(borrowed, 6));
 
       // Parse account data
+      // MockUSDC uses 6 decimals, not 8
       const positionData = {
-        totalCollateralInUSD: Number(ethers.formatUnits(accountData[0], 8)), // 8 decimals for USD
-        totalDebtInUSD: Number(ethers.formatUnits(accountData[1], 8)),
-        availableBorrowsInUSD: Number(ethers.formatUnits(accountData[2], 8)),
+        totalCollateralInUSD: Number(ethers.formatUnits(accountData[0], 6)),
+        totalDebtInUSD: Number(ethers.formatUnits(accountData[1], 6)),
+        availableBorrowsInUSD: Number(ethers.formatUnits(accountData[2], 6)),
         currentLiquidationThreshold: Number(accountData[3]),
-        healthFactor: Number(ethers.formatUnits(accountData[4], 18)), // 18 decimals
+        healthFactor: Number(ethers.formatUnits(accountData[4], 18)), // 18 decimals for health factor
         suppliedAmount: suppliedFormatted,
         borrowedAmount: borrowedFormatted,
       };
