@@ -9,6 +9,7 @@
 import { useState, useEffect } from 'react';
 import CredentialCard from './CredentialCard';
 import RequestCredentialModal from './RequestCredentialModal';
+import { Skeleton } from '@/components/ui/skeleton';
 import { BACKEND_URL } from '@/lib/contracts';
 
 export default function CredentialMarketplace({ userAddress, onCredentialSubmitted, provider }) {
@@ -58,14 +59,28 @@ export default function CredentialMarketplace({ userAddress, onCredentialSubmitt
     onCredentialSubmitted && onCredentialSubmitted();
   };
 
+  // Enhanced loading state with skeleton cards
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
-          <p className="text-sm text-muted-foreground">Loading credentials...</p>
+      <div className="space-y-6">
+        <div>
+          <Skeleton className="h-10 w-64 mb-2" />
+          <Skeleton className="h-6 w-96" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="border rounded-lg p-6 space-y-4">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+              <div className="space-y-2 pt-2">
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-5/6" />
+              </div>
+              <Skeleton className="h-10 w-full mt-4" />
+            </div>
+          ))}
         </div>
       </div>
     );

@@ -7,6 +7,7 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { getScoreLabel, getScoreColor } from '@/lib/contracts';
 
 export default function CreditScoreCard({ score = 0, credentialCount = 0, lastUpdated = 0, loading = false }) {
@@ -14,6 +15,7 @@ export default function CreditScoreCard({ score = 0, credentialCount = 0, lastUp
   const scoreColor = getScoreColor(score);
   const scorePercentage = (score / 1000) * 100;
 
+  // Enhanced loading state with skeleton
   if (loading) {
     return (
       <Card>
@@ -21,8 +23,21 @@ export default function CreditScoreCard({ score = 0, credentialCount = 0, lastUp
           <CardTitle>Credit Score</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="flex flex-col items-center justify-center py-6 space-y-4">
+            <Skeleton className="h-20 w-32 rounded-lg" />
+            <Skeleton className="h-6 w-24" />
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-3 w-full mt-6" />
+            <div className="grid grid-cols-2 gap-4 pt-4 w-full">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-5 w-8" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-5 w-16" />
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
