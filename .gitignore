@@ -73,6 +73,6 @@ backend/build/
 # Cursor/IDE
 .cursorignore
 
-# Documentation (keeping but could uncomment to track)
-# PRD.md
-# docs/
+# Documentation
+ PRD.md
+ docs/
