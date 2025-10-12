@@ -1,0 +1,40 @@
+{
+  "name": "@credo-protocol/contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Credo Protocol - Identity-backed DeFi lending on Moca Chain",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "coverage": "hardhat coverage",
+    "clean": "hardhat clean",
+    "setup-issuers": "hardhat run scripts/setup-issuers.ts",
+    "deploy:local": "hardhat run scripts/deploy.ts --network hardhat",
+    "deploy:devnet": "hardhat run scripts/deploy.ts --network moca-devnet",
+    "verify": "hardhat verify --network moca-devnet"
+  },
+  "keywords": [
+    "credo",
+    "defi",
+    "lending",
+    "moca-chain",
+    "smart-contracts",
+    "identity"
+  ],
+  "author": "Credo Protocol Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.1.0",
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@openzeppelin/contracts": "^5.4.0",
+    "@types/chai": "^5.2.2",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.7.2",
+    "dotenv": "^17.2.3",
+    "ethers": "^6.15.0",
+    "hardhat": "^2.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
