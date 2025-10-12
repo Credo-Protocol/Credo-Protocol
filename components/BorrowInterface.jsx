@@ -67,11 +67,14 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
       const maxBorrowFromCollateral = (totalCollateralUSD / collateralFactor) * 100;
       const availableBorrowsFromCredit = maxBorrowFromCollateral - totalDebtUSD;
       
-      // Available to borrow is the MINIMUM of credit limit and pool liquidity
-      const availableBorrowsUSD = Math.min(availableBorrowsFromCredit, poolAvailableLiquidity);
+      // Show credit-based limit in the UI (what user's score allows)
+      const availableBorrowsUSD = Math.max(0, availableBorrowsFromCredit);
       
       // Check if pool liquidity is the limiting factor
       const isLiquidityLimited = poolAvailableLiquidity < availableBorrowsFromCredit;
+      
+      // Actual borrowable amount (limited by pool liquidity)
+      const actualBorrowableAmount = Math.max(0, Math.min(availableBorrowsFromCredit, poolAvailableLiquidity));
       
       console.log('Max borrow calculation:', {
         totalCollateral: totalCollateralUSD,
@@ -80,17 +83,18 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
         collateralFactor: collateralFactor + '%',
         creditLimit: availableBorrowsFromCredit,
         poolLiquidity: poolAvailableLiquidity,
-        actualAvailable: availableBorrowsUSD,
+        displayedLimit: availableBorrowsUSD,
+        actualBorrowable: actualBorrowableAmount,
         liquidityLimited: isLiquidityLimited
       });
       
-      // For simplicity, assume 1 USDC = 1 USD
-      setMaxBorrow(Math.max(0, availableBorrowsUSD));
-      setCreditLimit(Math.max(0, availableBorrowsFromCredit));
+      // Set max borrow to actual borrowable amount (respects pool liquidity)
+      setMaxBorrow(actualBorrowableAmount);
+      setCreditLimit(availableBorrowsUSD);
       setLiquidityLimited(isLiquidityLimited);
       
-      // Set initial borrow amount to 50% of max
-      setBorrowAmount(Math.max(0, availableBorrowsUSD * 0.5));
+      // Set initial borrow amount to 50% of actual borrowable
+      setBorrowAmount(Math.max(0, actualBorrowableAmount * 0.5));
     } catch (error) {
       console.error('Error fetching max borrow:', error);
       setError('Failed to fetch borrowing capacity');
@@ -197,11 +201,11 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
           </div>
         </div>
 
-        {/* Max Borrow Display */}
+        {/* Credit Limit Display */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Available to Borrow</span>
-            <span className="text-lg font-semibold">{maxBorrow.toFixed(2)} USDC</span>
+            <span className="text-sm text-muted-foreground">Credit Limit</span>
+            <span className="text-lg font-semibold">{creditLimit.toFixed(2)} USDC</span>
           </div>
         </div>
 
@@ -210,7 +214,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription className="text-sm">
-              Pool liquidity is limiting your borrow capacity. Your credit score allows up to <strong>{creditLimit.toFixed(2)} USDC</strong>, but only <strong>{maxBorrow.toFixed(2)} USDC</strong> is available in the pool.
+              <strong>Note:</strong> Pool liquidity is currently limiting you to <strong>{maxBorrow.toFixed(2)} USDC</strong>. More will become available as others supply collateral.
             </AlertDescription>
           </Alert>
         )}

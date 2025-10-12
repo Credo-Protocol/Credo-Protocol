@@ -84,8 +84,11 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
       const maxBorrowFromCollateral = (totalCollateralUSD / collateralFactor) * 100;
       const availableBorrowsFromCredit = maxBorrowFromCollateral - totalDebtUSD;
       
-      // Available to borrow is the MINIMUM of credit limit and pool liquidity
-      const availableBorrowsUSD = Math.max(0, Math.min(availableBorrowsFromCredit, poolAvailableLiquidity));
+      // Show credit-based limit in the UI
+      const availableBorrowsUSD = Math.max(0, availableBorrowsFromCredit);
+      
+      // Store actual borrowable amount (limited by pool liquidity) for validation
+      const actualBorrowableAmount = Math.max(0, Math.min(availableBorrowsFromCredit, poolAvailableLiquidity));
       
       const positionData = {
         totalCollateralInUSD: totalCollateralUSD,
@@ -236,10 +239,10 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
           </div>
         )}
 
-        {/* Available to Borrow */}
+        {/* Credit Limit (Based on Score & Collateral) */}
         <div className="pt-4 border-t">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">Available to Borrow</p>
+            <p className="text-sm text-muted-foreground">Credit Limit</p>
             <p className="text-lg font-semibold">${position.availableBorrowsInUSD.toFixed(2)}</p>
           </div>
         </div>
