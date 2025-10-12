@@ -735,7 +735,14 @@ Build a beautiful, intuitive dApp that guides users through the credential → s
 
 **Install Dependencies:**
 ```bash
+# AIR Kit SDK (Moca Network)
+npm install @mocanetwork/airkit
+npm install @mocanetwork/airkit-connector
+
+# Core blockchain & wallet
 npm install ethers@6 wagmi viem @tanstack/react-query
+
+# UI components
 npm install @radix-ui/react-* # shadcn components
 npm install recharts # for charts
 npm install framer-motion # for animations
@@ -775,7 +782,179 @@ components/
     └── ... (shadcn components)
 ```
 
-##### 3.3 Core Pages
+##### 3.3 AIR Kit Integration & Setup
+
+**IMPORTANT:** This section shows how to properly integrate Moca Network's AIR Kit SDK based on official documentation.
+
+**Create `lib/airkit.js`:**
+```javascript
+import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
+
+// Initialize AIR Service
+export const airService = new AirService({
+  partnerId: process.env.NEXT_PUBLIC_PARTNER_ID,
+});
+
+// Initialize AIR Kit
+export async function initializeAirKit() {
+  await airService.init({
+    buildEnv: BUILD_ENV.SANDBOX, // Use SANDBOX for testnet
+    enableLogging: true, // Enable for development
+    skipRehydration: false // Allow automatic re-login
+  });
+}
+
+// Login with AIR Kit (SSO)
+export async function loginWithAirKit() {
+  // This triggers the AIR Kit login dialog with built-in methods:
+  // - Google Login
+  // - Passwordless Email Login
+  // - Wallet Login (coming soon)
+  const loginResult = await airService.login();
+  
+  // Returns: { 
+  //   isLoggedIn: boolean,
+  //   id: string, 
+  //   abstractAccountAddress: string,
+  //   token: string,
+  //   isMFASetup: boolean
+  // }
+  return loginResult;
+}
+
+// Check if user is logged in
+export function isUserLoggedIn() {
+  return airService.isLoggedIn;
+}
+
+// Logout
+export async function logout() {
+  await airService.logout();
+}
+
+// Get user info
+export async function getUserInfo() {
+  const userInfo = await airService.getUserInfo();
+  // Returns: {
+  //   partnerId, partnerUserId, airId,
+  //   user: { id, abstractAccountAddress, email, isMFASetup }
+  // }
+  return userInfo;
+}
+
+// Get EIP-1193 provider for contract interactions
+export function getProvider() {
+  return airService.getProvider();
+}
+```
+
+**Create `components/auth/ConnectButton.js`:**
+```jsx
+import { useEffect, useState } from 'react';
+import { airService, loginWithAirKit, logout, getUserInfo } from '@/lib/airkit';
+import { Button } from '@/components/ui/button';
+
+export function ConnectButton() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Initialize AIR Kit on mount
+    initAirKit();
+  }, []);
+
+  async function initAirKit() {
+    try {
+      await airService.init({
+        buildEnv: 'SANDBOX',
+        enableLogging: true,
+        skipRehydration: false // Enables automatic re-login (30-day sessions)
+      });
+      
+      // Check if user is already logged in (session rehydration)
+      if (airService.isLoggedIn) {
+        setIsLoggedIn(true);
+        const info = await getUserInfo();
+        setUserInfo(info);
+      }
+    } catch (error) {
+      console.error('Failed to initialize AIR Kit:', error);
+    }
+  }
+
+  async function handleLogin() {
+    try {
+      setLoading(true);
+      const loginResult = await loginWithAirKit();
+      
+      if (loginResult.isLoggedIn) {
+        setIsLoggedIn(true);
+        const info = await getUserInfo();
+        setUserInfo(info);
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      await logout();
+      setIsLoggedIn(false);
+      setUserInfo(null);
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  }
+
+  if (isLoggedIn && userInfo) {
+    return (
+      <div className="flex items-center gap-4">
+        <div className="text-sm">
+          <div className="font-medium">{userInfo.user.email || 'Moca User'}</div>
+          <div className="text-gray-500 text-xs font-mono">
+            {userInfo.user.abstractAccountAddress?.slice(0, 6)}...
+            {userInfo.user.abstractAccountAddress?.slice(-4)}
+          </div>
+        </div>
+        <Button onClick={handleLogout} variant="outline" size="sm">
+          Disconnect
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <Button 
+      onClick={handleLogin} 
+      disabled={loading}
+      size="lg"
+    >
+      {loading ? 'Connecting...' : 'Login with Moca ID'}
+    </Button>
+  );
+}
+```
+
+**Important Notes About AIR Kit:**
+
+1. **Session Management:** AIR Kit handles sessions automatically with 30-day expiry. Users stay logged in unless they explicitly log out.
+
+2. **Partner ID:** You MUST get your Partner ID from the [Developer Dashboard](https://developers.sandbox.air3.com/):
+   - Connect your wallet
+   - Navigate to Account → General
+   - Copy your Partner ID
+
+3. **Abstract Account:** After login, users get an `abstractAccountAddress` (smart contract wallet) that can be used for transactions.
+
+4. **EIP-1193 Provider:** AIR Kit provides an Ethereum-compatible provider via `airService.getProvider()` for use with Wagmi, Ethers.js, etc.
+
+5. **Build Environment:** Use `BUILD_ENV.SANDBOX` for testnet/development.
+
+##### 3.4 Core Pages
 
 **pages/index.js - Landing Page**
 ```jsx
@@ -1302,9 +1481,9 @@ export const erc20ABI = [
 import { configureChains, createConfig } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 
-// Moca Chain testnet config
+// Moca Chain testnet config (Official from docs.moca.network)
 const mocaTestnet = {
-  id: 20241, // Replace with actual Moca testnet chain ID
+  id: 222888, // Official Moca Chain Testnet Chain ID (0x366a8)
   name: 'Moca Chain Testnet',
   network: 'moca-testnet',
   nativeCurrency: {
@@ -1313,13 +1492,13 @@ const mocaTestnet = {
     symbol: 'MOCA',
   },
   rpcUrls: {
-    default: { http: [process.env.NEXT_PUBLIC_RPC_URL] },
-    public: { http: [process.env.NEXT_PUBLIC_RPC_URL] },
+    default: { http: ['http://testnet-rpc.mocachain.org'] },
+    public: { http: ['http://testnet-rpc.mocachain.org'] },
   },
   blockExplorers: {
     default: { 
-      name: 'Moca Explorer', 
-      url: process.env.NEXT_PUBLIC_EXPLORER_URL 
+      name: 'Moca Chain Explorer', 
+      url: 'https://testnet-scan.mocachain.org'
     },
   },
   testnet: true,
@@ -1341,16 +1520,33 @@ export { chains };
 ##### 3.6 Environment Variables
 
 ```bash
-# .env.local
-NEXT_PUBLIC_RPC_URL=https://testnet-rpc.moca.network
-NEXT_PUBLIC_EXPLORER_URL=https://testnet-explorer.moca.network
-NEXT_PUBLIC_CHAIN_ID=20241
+# .env.local (Frontend)
+# Moca Chain Testnet Configuration (from docs.moca.network)
+NEXT_PUBLIC_RPC_URL=http://testnet-rpc.mocachain.org
+NEXT_PUBLIC_EXPLORER_URL=https://testnet-scan.mocachain.org
+NEXT_PUBLIC_CHAIN_ID=222888
+NEXT_PUBLIC_FAUCET_URL=https://testnet-scan.mocachain.org/faucet
 
+# Smart Contract Addresses (deployed)
 NEXT_PUBLIC_CREDIT_ORACLE_ADDRESS=0x...
 NEXT_PUBLIC_LENDING_POOL_ADDRESS=0x...
 NEXT_PUBLIC_MOCK_USDC_ADDRESS=0x...
 
+# AIR Kit Configuration
+NEXT_PUBLIC_PARTNER_ID=your_partner_id_from_dashboard
 NEXT_PUBLIC_ISSUER_API=http://localhost:3001
+
+# .env (Backend)
+PARTNER_ID=your_partner_id
+PARTNER_PRIVATE_KEY=your_private_key_for_jwt_signing
+ISSUER_DID=your_issuer_did_from_dashboard
+ISSUER_PROGRAM_ID=your_program_id_from_dashboard
+
+MOCK_EXCHANGE_PRIVATE_KEY=0x...
+MOCK_EMPLOYER_PRIVATE_KEY=0x...
+MOCK_BANK_PRIVATE_KEY=0x...
+
+RPC_URL=http://testnet-rpc.mocachain.org
 ```
 
 ---
