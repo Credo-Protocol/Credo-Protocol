@@ -14,7 +14,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, TrendingDown, Info } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Loader2, TrendingDown, Info, CheckCircle2 } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, calculateCollateralFactor } from '@/lib/contracts';
 import { handleTransactionError } from '@/lib/errorHandler';
 
@@ -26,6 +27,8 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
   const [error, setError] = useState('');
   const [liquidityLimited, setLiquidityLimited] = useState(false);
   const [creditLimit, setCreditLimit] = useState(0);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successDetails, setSuccessDetails] = useState({ amount: 0, txHash: '' });
 
   // Calculate collateral factor from credit score
   const collateralFactor = calculateCollateralFactor(creditScore);
@@ -142,14 +145,23 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
       
       console.log('Borrow transaction confirmed');
       
+      // Store success details for modal
+      setSuccessDetails({
+        amount: borrowAmount,
+        txHash: tx.hash
+      });
+      
       // Wait a moment for blockchain state to update
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Refresh max borrow amount
+      // Refresh max borrow amount immediately
       await fetchMaxBorrow();
       
       // Reset borrow amount
       setBorrowAmount(0);
+      
+      // Show success modal
+      setShowSuccessModal(true);
       
       // Call success callback to refresh parent UI
       if (onSuccess) {
@@ -183,6 +195,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
   }
 
   return (
+    <>
     <Card>
       <CardHeader>
         <CardTitle>Borrow</CardTitle>
@@ -296,6 +309,59 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
         )}
       </CardContent>
     </Card>
+
+    {/* Success Modal */}
+    <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-green-100">
+            <CheckCircle2 className="w-6 h-6 text-green-600" />
+          </div>
+          <DialogTitle className="text-center">Borrow Successful!</DialogTitle>
+          <DialogDescription className="text-center">
+            Your borrow transaction has been confirmed on the blockchain.
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4 py-4">
+          {/* Borrowed Amount */}
+          <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
+            <span className="text-sm text-muted-foreground">Amount Borrowed</span>
+            <span className="text-lg font-bold">{successDetails.amount.toFixed(2)} USDC</span>
+          </div>
+          
+          {/* Transaction Hash */}
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">Transaction Hash</p>
+            <a 
+              href={`https://devnet-scan.mocachain.org/tx/${successDetails.txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-mono text-blue-600 hover:text-blue-800 hover:underline break-all"
+            >
+              {successDetails.txHash}
+            </a>
+          </div>
+          
+          {/* Next Steps */}
+          <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+            <p className="text-sm text-blue-900">
+              <strong>Next Steps:</strong> Monitor your health factor and make sure to repay your debt on time to avoid liquidation.
+            </p>
+          </div>
+        </div>
+        
+        <DialogFooter className="sm:justify-center">
+          <Button 
+            onClick={() => setShowSuccessModal(false)}
+            className="w-full sm:w-auto"
+          >
+            Got it, thanks!
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </>
   );
 }
 

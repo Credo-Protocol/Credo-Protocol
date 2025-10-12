@@ -118,11 +118,22 @@ router.post('/request', async (req, res) => {
     // Issue the credential
     const result = await issuer.issueCredential(userAddress, mockData || {});
 
+    // Validate result structure
+    if (!result || !result.credential || !result.encodedData || !result.signature) {
+      console.error('Issuer returned incomplete data:', result);
+      return res.status(500).json({
+        success: false,
+        error: 'Issuer returned incomplete credential data'
+      });
+    }
+
     // Return the signed credential
     res.json(result);
 
   } catch (error) {
-    console.error('Error issuing credential:', error);
+    console.error('Error issuing credential:');
+    console.error('  Message:', error.message);
+    console.error('  Stack:', error.stack);
     res.status(500).json({
       success: false,
       error: error.message || 'Failed to issue credential'
