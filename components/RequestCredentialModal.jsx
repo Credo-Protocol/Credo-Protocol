@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BACKEND_URL, CONTRACTS, CREDIT_ORACLE_ABI } from '@/lib/contracts';
 
-export default function RequestCredentialModal({ credential, userAddress, isOpen, onClose, onSuccess }) {
+export default function RequestCredentialModal({ credential, userAddress, isOpen, onClose, onSuccess, provider }) {
   const [step, setStep] = useState('request'); // request, loading, review, submitting, success, error
   const [credentialData, setCredentialData] = useState(null);
   const [error, setError] = useState(null);
@@ -80,12 +80,11 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
       setStep('submitting');
       setError(null);
 
-      if (!window.ethereum) {
-        throw new Error('Please install MetaMask to submit credentials');
+      if (!provider) {
+        throw new Error('Please connect your wallet to submit credentials');
       }
 
-      // Get provider and signer
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      // Get signer
       const signer = await provider.getSigner();
 
       // Create contract instance

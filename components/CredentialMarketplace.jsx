@@ -11,7 +11,7 @@ import CredentialCard from './CredentialCard';
 import RequestCredentialModal from './RequestCredentialModal';
 import { BACKEND_URL } from '@/lib/contracts';
 
-export default function CredentialMarketplace({ userAddress, onCredentialSubmitted }) {
+export default function CredentialMarketplace({ userAddress, onCredentialSubmitted, provider }) {
   const [credentials, setCredentials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -131,6 +131,7 @@ export default function CredentialMarketplace({ userAddress, onCredentialSubmitt
           isOpen={isModalOpen}
           onClose={handleModalClose}
           onSuccess={handleCredentialSuccess}
+          provider={provider}
         />
       )}
     </div>
