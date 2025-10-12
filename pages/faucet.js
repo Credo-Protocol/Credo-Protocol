@@ -16,6 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, Droplets, CheckCircle2, Info, ArrowLeft } from 'lucide-react';
 import { CONTRACTS, ERC20_ABI, MOCA_CHAIN } from '@/lib/contracts';
 import { useAirKit } from '@/hooks/useAirKit';
+import { handleTransactionError } from '@/lib/errorHandler';
 
 export default function Faucet() {
   const router = useRouter();
@@ -75,6 +76,13 @@ export default function Faucet() {
       setSuccess(false);
       setTxHash('');
 
+      // Check if signer is available
+      if (!signer) {
+        setError('Wallet not connected. Please refresh the page and try again.');
+        setRequesting(false);
+        return;
+      }
+
       const mockUSDC = new ethers.Contract(
         CONTRACTS.MOCK_USDC,
         ERC20_ABI,
@@ -100,8 +108,9 @@ export default function Faucet() {
       // Refresh balance
       await fetchBalance();
     } catch (error) {
-      console.error('Error requesting faucet:', error);
-      setError(error.message || 'Failed to get USDC from faucet. Please try again.');
+      // Use centralized error handler for user-friendly messages
+      const errorMessage = handleTransactionError('Faucet Request', error);
+      setError(errorMessage);
     } finally {
       setRequesting(false);
     }
