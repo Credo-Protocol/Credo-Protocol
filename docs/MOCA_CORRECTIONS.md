@@ -4,59 +4,47 @@ Based on official Moca Network documentation, the following corrections need to 
 
 ## 1. Moca Chain Network Configuration
 
-### INCORRECT (Current):
-```javascript
-const mocaTestnet = {
-  id: 20241, // Replace with actual Moca testnet chain ID
-  name: 'Moca Chain Testnet',
-  network: 'moca-testnet',
-  rpcUrls: {
-    default: { http: [process.env.NEXT_PUBLIC_RPC_URL] },
-    public: { http: [process.env.NEXT_PUBLIC_RPC_URL] },
-  },
-};
-```
+### USING DEVNET (For Developers)
 
-### CORRECT (From Docs):
+From official docs: https://docs.moca.network/mocachain/using-moca-chain/network-information
+
 ```javascript
-const mocaTestnet = {
-  id: 222888, // Official Moca Chain Testnet Chain ID (0x366a8)
-  name: 'Moca Chain Testnet',
-  network: 'moca-testnet',
+const mocaDevnet = {
+  id: 5151, // Official Moca Chain Devnet Chain ID (0x141F)
+  name: 'Moca Chain Devnet',
+  network: 'moca-devnet',
   nativeCurrency: {
     decimals: 18,
     name: 'MOCA',
     symbol: 'MOCA',
   },
   rpcUrls: {
-    default: { http: ['http://testnet-rpc.mocachain.org'] },
-    public: { http: ['http://testnet-rpc.mocachain.org'] },
+    default: { http: ['http://devnet-rpc.mocachain.org'] },
+    public: { http: ['http://devnet-rpc.mocachain.org'] },
   },
   blockExplorers: {
     default: { 
       name: 'Moca Chain Explorer', 
-      url: 'https://testnet-scan.mocachain.org'
+      url: 'https://devnet-scan.mocachain.org'
     },
   },
   testnet: true,
 };
 ```
 
+**Note:** Devnet is specifically for developers. Testnet is also available:
+- **Testnet Chain ID:** 222888 (0x366a8)
+- **Testnet RPC:** http://testnet-rpc.mocachain.org
+- **Testnet Explorer:** https://testnet-scan.mocachain.org
+
 ## 2. Environment Variables
 
-### INCORRECT (Current):
+### CORRECT (Devnet - From Docs):
 ```bash
-NEXT_PUBLIC_RPC_URL=https://testnet-rpc.moca.network
-NEXT_PUBLIC_EXPLORER_URL=https://testnet-explorer.moca.network
-NEXT_PUBLIC_CHAIN_ID=20241
-```
-
-### CORRECT (From Docs):
-```bash
-NEXT_PUBLIC_RPC_URL=http://testnet-rpc.mocachain.org
-NEXT_PUBLIC_EXPLORER_URL=https://testnet-scan.mocachain.org
-NEXT_PUBLIC_CHAIN_ID=222888
-NEXT_PUBLIC_FAUCET_URL=https://testnet-scan.mocachain.org/faucet
+NEXT_PUBLIC_RPC_URL=http://devnet-rpc.mocachain.org
+NEXT_PUBLIC_EXPLORER_URL=https://devnet-scan.mocachain.org
+NEXT_PUBLIC_CHAIN_ID=5151
+NEXT_PUBLIC_FAUCET_URL=https://devnet-scan.mocachain.org/faucet
 ```
 
 ## 3. AIR Kit SDK Installation & Setup
@@ -236,7 +224,7 @@ MOCK_EXCHANGE_PRIVATE_KEY=0x...
 MOCK_EMPLOYER_PRIVATE_KEY=0x...
 MOCK_BANK_PRIVATE_KEY=0x...
 
-RPC_URL=http://testnet-rpc.mocachain.org
+RPC_URL=http://devnet-rpc.mocachain.org
 ```
 
 ## 7. Connect Button Component (Correct Implementation)
@@ -372,20 +360,22 @@ export function ConnectButton() {
    - No sensitive data exposed to Moca servers
 
 4. **Chain Information:**
-   - Testnet Chain ID: 222888 (0x366a8)
+   - **Devnet Chain ID:** 5151 (0x141F) ← Using Devnet for development
+   - **Testnet Chain ID:** 222888 (0x366a8) ← Also available
    - Block time: ~1 second
    - EVM compatible (Evmos-based)
    - Supports Solidity contracts
 
 5. **Gas Tokens:**
    - Native token: $MOCA
-   - Get testnet tokens from faucet: https://testnet-scan.mocachain.org/faucet
+   - Get devnet tokens from faucet: https://devnet-scan.mocachain.org/faucet
 
 ## 10. References
 
 - **Moca Network Docs:** https://docs.moca.network/
 - **AIR Kit Quickstart:** https://docs.moca.network/airkit/quickstart
 - **Developer Dashboard:** https://developers.sandbox.air3.com/
-- **Chain Explorer:** https://testnet-scan.mocachain.org
+- **Devnet Explorer:** https://devnet-scan.mocachain.org
+- **Testnet Explorer:** https://testnet-scan.mocachain.org (alternative)
 - **Example Repository:** https://github.com/MocaNetwork/air-credential-example
 

@@ -1481,31 +1481,31 @@ export const erc20ABI = [
 import { configureChains, createConfig } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 
-// Moca Chain testnet config (Official from docs.moca.network)
-const mocaTestnet = {
-  id: 222888, // Official Moca Chain Testnet Chain ID (0x366a8)
-  name: 'Moca Chain Testnet',
-  network: 'moca-testnet',
+// Moca Chain devnet config (Official from docs.moca.network)
+const mocaDevnet = {
+  id: 5151, // Official Moca Chain Devnet Chain ID (0x141F)
+  name: 'Moca Chain Devnet',
+  network: 'moca-devnet',
   nativeCurrency: {
     decimals: 18,
     name: 'MOCA',
     symbol: 'MOCA',
   },
   rpcUrls: {
-    default: { http: ['http://testnet-rpc.mocachain.org'] },
-    public: { http: ['http://testnet-rpc.mocachain.org'] },
+    default: { http: ['http://devnet-rpc.mocachain.org'] },
+    public: { http: ['http://devnet-rpc.mocachain.org'] },
   },
   blockExplorers: {
     default: { 
       name: 'Moca Chain Explorer', 
-      url: 'https://testnet-scan.mocachain.org'
+      url: 'https://devnet-scan.mocachain.org'
     },
   },
   testnet: true,
 };
 
 const { chains, publicClient } = configureChains(
-  [mocaTestnet],
+  [mocaDevnet],
   [publicProvider()]
 );
 
@@ -1521,11 +1521,11 @@ export { chains };
 
 ```bash
 # .env.local (Frontend)
-# Moca Chain Testnet Configuration (from docs.moca.network)
-NEXT_PUBLIC_RPC_URL=http://testnet-rpc.mocachain.org
-NEXT_PUBLIC_EXPLORER_URL=https://testnet-scan.mocachain.org
-NEXT_PUBLIC_CHAIN_ID=222888
-NEXT_PUBLIC_FAUCET_URL=https://testnet-scan.mocachain.org/faucet
+# Moca Chain Devnet Configuration (from docs.moca.network)
+NEXT_PUBLIC_RPC_URL=http://devnet-rpc.mocachain.org
+NEXT_PUBLIC_EXPLORER_URL=https://devnet-scan.mocachain.org
+NEXT_PUBLIC_CHAIN_ID=5151
+NEXT_PUBLIC_FAUCET_URL=https://devnet-scan.mocachain.org/faucet
 
 # Smart Contract Addresses (deployed)
 NEXT_PUBLIC_CREDIT_ORACLE_ADDRESS=0x...
@@ -1546,7 +1546,7 @@ MOCK_EXCHANGE_PRIVATE_KEY=0x...
 MOCK_EMPLOYER_PRIVATE_KEY=0x...
 MOCK_BANK_PRIVATE_KEY=0x...
 
-RPC_URL=http://testnet-rpc.mocachain.org
+RPC_URL=http://devnet-rpc.mocachain.org
 ```
 
 ---
@@ -1572,7 +1572,7 @@ Connect all components and ensure end-to-end functionality works seamlessly.
 - Verify loading states work correctly
 
 ##### 4.3 Frontend-Contract Integration
-- Test wallet connection on Moca testnet
+- Test wallet connection on Moca devnet (Chain ID: 5151)
 - Verify contract read operations (getCreditScore, getUserAccountData)
 - Test contract write operations (submitCredential, borrow, supply)
 - Ensure transaction states are properly tracked
@@ -1648,11 +1648,11 @@ Deploy to Moca Chain testnet and prepare comprehensive documentation.
 
 ##### 5.1 Smart Contract Deployment
 ```bash
-# Deploy to Moca testnet
-npx hardhat run scripts/deploy.js --network moca-testnet
+# Deploy to Moca devnet
+npx hardhat run scripts/deploy.js --network moca-devnet
 
 # Verify contracts on explorer
-npx hardhat verify --network moca-testnet <CONTRACT_ADDRESS>
+npx hardhat verify --network moca-devnet <CONTRACT_ADDRESS>
 ```
 
 **Post-Deployment Checklist:**
@@ -1694,7 +1694,7 @@ vercel --prod
 
 **Post-Deployment Checklist:**
 - [ ] Site accessible and loads correctly
-- [ ] Wallet connection works on Moca testnet
+- [ ] Wallet connection works on Moca devnet
 - [ ] Can read from contracts
 - [ ] Can write to contracts
 - [ ] Issuer API calls work
@@ -1723,7 +1723,7 @@ Decentralized Trust for Capital on Moca Chain
 ### For Users
 1. Visit [dApp URL]
 2. Connect your Moca ID wallet
-3. Switch to Moca Chain testnet
+3. Switch to Moca Chain Devnet (Chain ID: 5151)
 4. Get test USDC from faucet
 5. Build your credit score
 6. Borrow with better terms!
@@ -1746,7 +1746,7 @@ npm install
 cd contracts
 npm install
 npx hardhat test
-npx hardhat run scripts/deploy.js --network moca-testnet
+npx hardhat run scripts/deploy.js --network moca-devnet
 ```
 
 **Backend:**
