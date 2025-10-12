@@ -24,7 +24,8 @@ export default function Faucet() {
     userAddress,
     signer,
     provider,
-    loading: airKitLoading
+    loading: airKitLoading,
+    refreshUserInfo
   } = useAirKit();
 
   const [balance, setBalance] = useState(0);
@@ -32,6 +33,15 @@ export default function Faucet() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [txHash, setTxHash] = useState('');
+
+  // Handle connection changes from ConnectButton
+  const handleConnectionChange = (connectionData) => {
+    if (connectionData.connected && refreshUserInfo) {
+      setTimeout(() => {
+        refreshUserInfo();
+      }, 100);
+    }
+  };
 
   // Fetch balance when address changes
   useEffect(() => {
@@ -136,7 +146,7 @@ export default function Faucet() {
             </AlertDescription>
           </Alert>
 
-          <ConnectButton size="lg" />
+          <ConnectButton size="lg" onConnectionChange={handleConnectionChange} />
 
           <div className="text-center">
             <Button 
@@ -173,7 +183,7 @@ export default function Faucet() {
                 <p className="text-sm text-muted-foreground">Get test tokens</p>
               </div>
             </div>
-            <ConnectButton size="sm" />
+            <ConnectButton size="sm" onConnectionChange={handleConnectionChange} />
           </div>
         </div>
       </header>

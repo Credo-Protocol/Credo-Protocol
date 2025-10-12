@@ -67,24 +67,46 @@ export function useAirKit() {
    */
   const updateUserState = useCallback(async () => {
     try {
+      console.log('🔄 Updating user state...');
+      
       const info = await getUserInfo();
+      console.log('✅ User info:', info);
+      
       const address = info.user.abstractAccountAddress;
+      console.log('✅ Address:', address);
 
       setUserInfo(info);
       setUserAddress(address);
       setIsConnected(true);
+      
+      console.log('✅ Basic state updated, isConnected set to true');
 
       // Get AIR Kit provider for contract interactions
-      const airProvider = getProvider();
-      const ethersProvider = new ethers.BrowserProvider(airProvider);
-      const ethersSigner = await ethersProvider.getSigner();
-
-      setProvider(ethersProvider);
-      setSigner(ethersSigner);
-
-      return { info, address, provider: ethersProvider, signer: ethersSigner };
+      try {
+        const airProvider = getProvider();
+        console.log('✅ AIR Provider obtained:', airProvider ? 'Yes' : 'No');
+        
+        if (airProvider) {
+          const ethersProvider = new ethers.BrowserProvider(airProvider);
+          const ethersSigner = await ethersProvider.getSigner();
+          
+          setProvider(ethersProvider);
+          setSigner(ethersSigner);
+          
+          console.log('✅ Ethers provider and signer set');
+          
+          return { info, address, provider: ethersProvider, signer: ethersSigner };
+        } else {
+          console.warn('⚠️ AIR Provider not available, but user is connected');
+          return { info, address, provider: null, signer: null };
+        }
+      } catch (providerErr) {
+        console.error('⚠️ Provider setup failed, but user is still connected:', providerErr);
+        // Don't throw - user is connected even if provider fails
+        return { info, address, provider: null, signer: null };
+      }
     } catch (err) {
-      console.error('Failed to update user state:', err);
+      console.error('❌ Failed to update user state:', err);
       throw err;
     }
   }, []);

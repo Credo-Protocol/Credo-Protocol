@@ -29,12 +29,35 @@ export default function Dashboard() {
     userAddress,
     userInfo,
     provider,
-    loading: airKitLoading
+    loading: airKitLoading,
+    refreshUserInfo
   } = useAirKit();
 
   const [creditScore, setCreditScore] = useState(0);
   const [scoreDetails, setScoreDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Handle connection changes from ConnectButton
+  const handleConnectionChange = (connectionData) => {
+    console.log('🔄 Connection changed:', connectionData);
+    if (connectionData.connected && refreshUserInfo) {
+      // Refresh the useAirKit state
+      setTimeout(() => {
+        refreshUserInfo();
+      }, 100);
+    }
+  };
+
+  // Debug connection state
+  useEffect(() => {
+    console.log('📊 Dashboard State:', {
+      isConnected,
+      userAddress,
+      hasUserInfo: !!userInfo,
+      hasProvider: !!provider,
+      airKitLoading
+    });
+  }, [isConnected, userAddress, userInfo, provider, airKitLoading]);
 
   // Fetch credit score when user address changes
   useEffect(() => {
@@ -136,7 +159,7 @@ export default function Dashboard() {
             </ul>
           </div>
 
-          <ConnectButton size="lg" />
+          <ConnectButton size="lg" onConnectionChange={handleConnectionChange} />
 
           <p className="text-xs text-muted-foreground">
             Powered by Moca Network AIR Kit • Chain ID: {MOCA_CHAIN.id}
@@ -166,7 +189,7 @@ export default function Dashboard() {
                 <Droplets className="h-4 w-4" />
                 Get Test USDC
               </Button>
-              <ConnectButton size="sm" />
+              <ConnectButton size="sm" onConnectionChange={handleConnectionChange} />
               <Button variant="outline" size="sm" onClick={fetchCreditScore}>
                 Refresh
               </Button>
