@@ -43,6 +43,7 @@ export default function LendingInterface({ userAddress, creditScore, provider })
       {/* Position Overview */}
       <PositionCard 
         userAddress={userAddress} 
+        creditScore={creditScore}
         refresh={refreshKey}
         provider={provider}
       />

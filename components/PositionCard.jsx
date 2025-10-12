@@ -14,9 +14,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
-import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI } from '@/lib/contracts';
+import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI, calculateCollateralFactor } from '@/lib/contracts';
 
-export default function PositionCard({ userAddress, refresh, provider }) {
+export default function PositionCard({ userAddress, creditScore, refresh, provider }) {
   const [loading, setLoading] = useState(true);
   const [position, setPosition] = useState({
     totalCollateralInUSD: 0,
@@ -28,12 +28,12 @@ export default function PositionCard({ userAddress, refresh, provider }) {
     borrowedAmount: 0,
   });
 
-  // Fetch position data
+  // Fetch position data (recalculate when credit score changes)
   useEffect(() => {
-    if (userAddress && provider) {
+    if (userAddress && provider && creditScore >= 0) {
       fetchPosition();
     }
-  }, [userAddress, refresh, provider]);
+  }, [userAddress, refresh, provider, creditScore]);
 
   const fetchPosition = async () => {
     try {
@@ -66,10 +66,18 @@ export default function PositionCard({ userAddress, refresh, provider }) {
 
       // Parse account data
       // MockUSDC uses 6 decimals, not 8
+      const totalCollateralUSD = Number(ethers.formatUnits(accountData[0], 6));
+      const totalDebtUSD = Number(ethers.formatUnits(accountData[1], 6));
+      
+      // Calculate available borrow based on user's credit score collateral factor
+      const collateralFactor = calculateCollateralFactor(creditScore);
+      const maxBorrowFromCollateral = (totalCollateralUSD / collateralFactor) * 100;
+      const availableBorrowsUSD = Math.max(0, maxBorrowFromCollateral - totalDebtUSD);
+      
       const positionData = {
-        totalCollateralInUSD: Number(ethers.formatUnits(accountData[0], 6)),
-        totalDebtInUSD: Number(ethers.formatUnits(accountData[1], 6)),
-        availableBorrowsInUSD: Number(ethers.formatUnits(accountData[2], 6)),
+        totalCollateralInUSD: totalCollateralUSD,
+        totalDebtInUSD: totalDebtUSD,
+        availableBorrowsInUSD: availableBorrowsUSD,
         currentLiquidationThreshold: Number(accountData[3]),
         healthFactor: Number(ethers.formatUnits(accountData[4], 18)), // 18 decimals for health factor
         suppliedAmount: suppliedFormatted,
@@ -85,13 +93,22 @@ export default function PositionCard({ userAddress, refresh, provider }) {
     }
   };
 
+  // Check if health factor is infinite (no debt)
+  const isHealthFactorInfinite = position.healthFactor > 1e10;
+  
   // Calculate health factor percentage for progress bar
   // Health factor > 1 means safe, < 1 means at risk of liquidation
-  const healthFactorPercentage = Math.min(position.healthFactor * 50, 100);
+  const healthFactorPercentage = isHealthFactorInfinite ? 100 : Math.min(position.healthFactor * 50, 100);
+  
+  // Format health factor for display
+  const formatHealthFactor = () => {
+    if (isHealthFactorInfinite) return '∞';
+    return position.healthFactor.toFixed(2);
+  };
   
   // Determine health factor color
   const getHealthFactorColor = () => {
-    if (position.healthFactor >= 2) return 'text-green-500';
+    if (isHealthFactorInfinite || position.healthFactor >= 2) return 'text-green-500';
     if (position.healthFactor >= 1.5) return 'text-yellow-500';
     if (position.healthFactor >= 1.2) return 'text-orange-500';
     return 'text-red-500';
@@ -142,7 +159,7 @@ export default function PositionCard({ userAddress, refresh, provider }) {
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Liquidation Warning */}
-        {position.healthFactor > 0 && position.healthFactor < 1.2 && (
+        {!isHealthFactorInfinite && position.healthFactor > 0 && position.healthFactor < 1.2 && (
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Liquidation Risk!</AlertTitle>
@@ -181,12 +198,13 @@ export default function PositionCard({ userAddress, refresh, provider }) {
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium">Health Factor</p>
               <p className={`text-lg font-bold ${getHealthFactorColor()}`}>
-                {position.healthFactor.toFixed(2)}
+                {formatHealthFactor()}
               </p>
             </div>
             <Progress value={healthFactorPercentage} className="h-2" />
             <p className="text-xs text-muted-foreground">
-              {position.healthFactor >= 2 ? 'Very Safe' :
+              {isHealthFactorInfinite ? 'Very Safe' :
+               position.healthFactor >= 2 ? 'Very Safe' :
                position.healthFactor >= 1.5 ? 'Safe' :
                position.healthFactor >= 1.2 ? 'Moderate Risk' : 'High Risk'}
             </p>
