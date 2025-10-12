@@ -11,8 +11,9 @@
  */
 
 import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
 import { Button } from '@/components/ui/button';
-import { Loader2, LogOut, User, Copy, Check, Mail, Wallet } from 'lucide-react';
+import { Loader2, LogOut, User, Copy, Check, Mail, Wallet, Coins, DollarSign } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +30,7 @@ import {
   getUserInfo,
   isUserLoggedIn
 } from '@/lib/airkit';
+import { CONTRACTS, ERC20_ABI } from '@/lib/contracts';
 
 export default function ConnectButton({ onConnectionChange, size = 'default', variant = 'default' }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,6 +39,11 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
   const [loggingIn, setLoggingIn] = useState(false);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
+  
+  // Balance states
+  const [mocaBalance, setMocaBalance] = useState(null);
+  const [usdcBalance, setUsdcBalance] = useState(null);
+  const [balancesLoading, setBalancesLoading] = useState(false);
 
   // Initialize AIR Kit on mount
   useEffect(() => {
@@ -156,6 +163,51 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
     }
   }
 
+  /**
+   * Fetch user's balances (MOCA and USDC)
+   * Called when dropdown opens
+   */
+  async function fetchBalances() {
+    if (!userInfo?.user?.abstractAccountAddress) return;
+    
+    try {
+      setBalancesLoading(true);
+      
+      // Get provider from AIR Kit
+      const provider = airService.getProvider();
+      if (!provider) {
+        console.warn('Provider not available');
+        return;
+      }
+
+      const ethersProvider = new ethers.BrowserProvider(provider);
+      const address = userInfo.user.abstractAccountAddress;
+
+      // Fetch MOCA balance (native token)
+      const mocaBalanceWei = await ethersProvider.getBalance(address);
+      const mocaBalanceFormatted = ethers.formatEther(mocaBalanceWei);
+      setMocaBalance(parseFloat(mocaBalanceFormatted).toFixed(4));
+
+      // Fetch MockUSDC balance
+      const usdcContract = new ethers.Contract(
+        CONTRACTS.MOCK_USDC,
+        ERC20_ABI,
+        ethersProvider
+      );
+      
+      const usdcBalanceRaw = await usdcContract.balanceOf(address);
+      const usdcBalanceFormatted = ethers.formatUnits(usdcBalanceRaw, 6); // USDC has 6 decimals
+      setUsdcBalance(parseFloat(usdcBalanceFormatted).toFixed(2));
+
+    } catch (error) {
+      console.error('Error fetching balances:', error);
+      setMocaBalance('0');
+      setUsdcBalance('0');
+    } finally {
+      setBalancesLoading(false);
+    }
+  }
+
   // Loading state
   if (loading) {
     return (
@@ -185,7 +237,12 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
     const displayName = email || 'Moca User';
 
     return (
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={(open) => {
+        if (open) {
+          // Fetch balances when dropdown opens
+          fetchBalances();
+        }
+      }}>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size={size} className="flex items-center gap-2">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
@@ -209,6 +266,41 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
               </p>
             </div>
           </DropdownMenuLabel>
+          
+          <DropdownMenuSeparator />
+          
+          {/* Balances Section */}
+          <div className="px-2 py-3 space-y-3">
+            {/* MOCA Balance */}
+            <div className="flex items-center gap-2">
+              <Coins className="h-4 w-4 text-muted-foreground" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground">MOCA Balance</p>
+                <p className="text-sm font-bold">
+                  {balancesLoading ? (
+                    <span className="text-muted-foreground">Loading...</span>
+                  ) : (
+                    <span>{mocaBalance || '0.0000'} MOCA</span>
+                  )}
+                </p>
+              </div>
+            </div>
+            
+            {/* USDC Balance */}
+            <div className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground">MockUSDC Balance</p>
+                <p className="text-sm font-bold">
+                  {balancesLoading ? (
+                    <span className="text-muted-foreground">Loading...</span>
+                  ) : (
+                    <span>{usdcBalance || '0.00'} USDC</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
           
           <DropdownMenuSeparator />
           
