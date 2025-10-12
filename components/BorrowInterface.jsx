@@ -16,6 +16,7 @@ import { Slider } from '@/components/ui/slider';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, TrendingDown, Info } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, calculateCollateralFactor } from '@/lib/contracts';
+import { handleTransactionError } from '@/lib/errorHandler';
 
 export default function BorrowInterface({ userAddress, creditScore, onSuccess, provider }) {
   const [borrowAmount, setBorrowAmount] = useState(0);
@@ -117,16 +118,22 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
       
       console.log('Borrow transaction confirmed');
       
-      // Reset state
+      // Wait a moment for blockchain state to update
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Refresh max borrow amount
+      await fetchMaxBorrow();
+      
+      // Reset borrow amount
       setBorrowAmount(0);
       
-      // Call success callback to refresh UI
+      // Call success callback to refresh parent UI
       if (onSuccess) {
         onSuccess();
       }
     } catch (error) {
-      console.error('Error borrowing:', error);
-      setError(error.message || 'Failed to borrow. Please try again.');
+      const errorMessage = handleTransactionError('Borrow', error);
+      setError(errorMessage);
     } finally {
       setBorrowing(false);
     }

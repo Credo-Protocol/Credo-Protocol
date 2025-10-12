@@ -14,6 +14,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, CheckCircle2, TrendingUp, Coins, Info } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI } from '@/lib/contracts';
+import { handleTransactionError } from '@/lib/errorHandler';
 
 export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, provider }) {
   const [supplyAmount, setSupplyAmount] = useState('');
@@ -95,8 +96,8 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
       // Move to supply step
       setStep(3);
     } catch (error) {
-      console.error('Error approving:', error);
-      setError(error.message || 'Failed to approve. Please try again.');
+      const errorMessage = handleTransactionError('Approve USDC', error);
+      setError(errorMessage);
     } finally {
       setApproving(false);
     }
@@ -140,8 +141,8 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
         handleClose();
       }, 2000);
     } catch (error) {
-      console.error('Error supplying:', error);
-      setError(error.message || 'Failed to supply. Please try again.');
+      const errorMessage = handleTransactionError('Supply', error);
+      setError(errorMessage);
     } finally {
       setSupplying(false);
     }

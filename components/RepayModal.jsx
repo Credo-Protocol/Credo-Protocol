@@ -14,6 +14,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, CheckCircle2, TrendingUp, Info } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI } from '@/lib/contracts';
+import { handleTransactionError } from '@/lib/errorHandler';
 
 export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, provider }) {
   const [repayAmount, setRepayAmount] = useState('');
@@ -107,8 +108,8 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
       // Move to repay step
       setStep(3);
     } catch (error) {
-      console.error('Error approving:', error);
-      setError(error.message || 'Failed to approve. Please try again.');
+      const errorMessage = handleTransactionError('Approve USDC', error);
+      setError(errorMessage);
     } finally {
       setApproving(false);
     }
@@ -152,8 +153,8 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
         handleClose();
       }, 2000);
     } catch (error) {
-      console.error('Error repaying:', error);
-      setError(error.message || 'Failed to repay. Please try again.');
+      const errorMessage = handleTransactionError('Repay', error);
+      setError(errorMessage);
     } finally {
       setRepaying(false);
     }
