@@ -56,23 +56,36 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
       // Fetch user account data from LendingPool
       const accountData = await lendingPool.getUserAccountData(userAddress);
       
-      // Fetch supplied and borrowed amounts for MockUSDC
-      const supplied = await lendingPool.getUserSupplied(userAddress, CONTRACTS.MOCK_USDC);
-      const borrowed = await lendingPool.getUserBorrowed(userAddress, CONTRACTS.MOCK_USDC);
-
-      // Convert to JavaScript numbers (MockUSDC uses 6 decimals)
-      const suppliedFormatted = Number(ethers.formatUnits(supplied, 6));
-      const borrowedFormatted = Number(ethers.formatUnits(borrowed, 6));
-
-      // Parse account data
+      // Parse account data first
       // MockUSDC uses 6 decimals, not 8
       const totalCollateralUSD = Number(ethers.formatUnits(accountData[0], 6));
       const totalDebtUSD = Number(ethers.formatUnits(accountData[1], 6));
       
+      // Fetch asset data to check pool liquidity (assets is a public mapping)
+      const assetData = await lendingPool.assets(CONTRACTS.MOCK_USDC);
+      
+      // Fetch supplied amount for MockUSDC
+      const supplied = await lendingPool.getUserSupplied(userAddress, CONTRACTS.MOCK_USDC);
+
+      // Convert to JavaScript numbers (MockUSDC uses 6 decimals)
+      const suppliedFormatted = Number(ethers.formatUnits(supplied, 6));
+      
+      // Use totalDebt from getUserAccountData instead of getUserBorrowed
+      // to avoid caching issues and ensure consistency
+      const borrowedFormatted = totalDebtUSD;
+      
+      // Calculate pool's available liquidity
+      const poolTotalSupply = Number(ethers.formatUnits(assetData[0], 6));
+      const poolTotalBorrowed = Number(ethers.formatUnits(assetData[1], 6));
+      const poolAvailableLiquidity = poolTotalSupply - poolTotalBorrowed;
+      
       // Calculate available borrow based on user's credit score collateral factor
       const collateralFactor = calculateCollateralFactor(creditScore);
       const maxBorrowFromCollateral = (totalCollateralUSD / collateralFactor) * 100;
-      const availableBorrowsUSD = Math.max(0, maxBorrowFromCollateral - totalDebtUSD);
+      const availableBorrowsFromCredit = maxBorrowFromCollateral - totalDebtUSD;
+      
+      // Available to borrow is the MINIMUM of credit limit and pool liquidity
+      const availableBorrowsUSD = Math.max(0, Math.min(availableBorrowsFromCredit, poolAvailableLiquidity));
       
       const positionData = {
         totalCollateralInUSD: totalCollateralUSD,
@@ -84,7 +97,19 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
         borrowedAmount: borrowedFormatted,
       };
 
-      console.log('Position data:', positionData);
+      console.log('Position data (detailed):', {
+        ...positionData,
+        rawData: {
+          supplied: supplied.toString(),
+          accountData: {
+            totalCollateral: accountData[0].toString(),
+            totalDebt: accountData[1].toString(),
+            availableBorrows: accountData[2].toString(),
+            liquidationThreshold: accountData[3].toString(),
+            healthFactor: accountData[4].toString()
+          }
+        }
+      });
       setPosition(positionData);
     } catch (error) {
       console.error('Error fetching position:', error);
