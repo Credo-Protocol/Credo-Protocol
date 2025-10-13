@@ -8,11 +8,6 @@ import React, {
 
 import { cn } from "@/lib/utils"
 
-interface MousePosition {
-  x: number
-  y: number
-}
-
 function MousePosition() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
