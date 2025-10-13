@@ -52,6 +52,16 @@ module.exports = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      animation: {
+        gradient: "gradient 8s linear infinite",
+      },
+      keyframes: {
+        gradient: {
+          to: {
+            backgroundPosition: "var(--bg-size) 0",
+          },
+        },
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
