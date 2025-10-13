@@ -60,7 +60,7 @@ export default function Home() {
                   <span className="absolute inset-0 rounded-full bg-gradient-to-r from-black via-neutral-700 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-gradient-x" />
                   <span className="absolute inset-[2px] rounded-full bg-black" />
                   <span className="relative z-10 flex items-center gap-2">
-                    Launch App
+                    Get Started
                     <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                   </span>
                 </button>
@@ -290,15 +290,19 @@ export default function Home() {
             <p className="text-xl text-black/60 mb-10 max-w-2xl mx-auto">
               Connect your wallet and start building your on-chain credit score today.
             </p>
-            <Link href="/dashboard">
-              <Button 
-                size="lg" 
-                className="text-xl px-16 py-7 gap-3 bg-black hover:bg-black/90 text-white border-0 rounded-full shadow-lg hover:shadow-xl transition-shadow"
-              >
-                Launch App
-                <ArrowRight className="w-6 h-6" />
-              </Button>
-            </Link>
+            <div className="flex justify-center">
+              <Link href="/dashboard">
+                <button className="group relative text-xl px-16 py-7 bg-black text-white rounded-full flex items-center gap-3 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                  {/* Animated gradient border on hover */}
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-black via-neutral-700 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-gradient-x" />
+                  <span className="absolute inset-[2px] rounded-full bg-black" />
+                  <span className="relative z-10 flex items-center gap-3">
+                    Get Started
+                    <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </button>
+              </Link>
+            </div>
           </MagicCard>
         </div>
       </div>
