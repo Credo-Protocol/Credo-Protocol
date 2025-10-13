@@ -4,15 +4,15 @@
  */
 
 import Link from 'next/link';
-import { ArrowRight, Shield, TrendingUp, CheckCircle, Lock, BarChart3, Sparkles, Zap } from 'lucide-react';
+import { ArrowRight, Shield, TrendingUp, CheckCircle, Lock, BarChart3, Sparkles, Zap, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { HyperText } from '@/components/ui/hyper-text';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
-import { FlickeringGrid } from '@/components/ui/flickering-grid';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { MagicCard } from '@/components/ui/magic-card';
 import { NumberTicker } from '@/components/ui/number-ticker';
 import { Marquee } from '@/components/ui/marquee';
+import { BorderBeam } from '@/components/ui/border-beam';
 
 export default function Home() {
   return (
@@ -180,51 +180,108 @@ export default function Home() {
 
       {/* Comparison Section */}
       <div className="container mx-auto px-4 py-32">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <h2 className="text-5xl md:text-6xl font-bold text-center mb-20">
             Better Than Traditional DeFi
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <ComparisonCard
-              title="Traditional DeFi"
-              items={[
-                { text: "150% collateral required", negative: true },
-                { text: "Same terms for everyone", negative: true },
-                { text: "Capital inefficient", negative: true },
-                { text: "No credit history", negative: true },
-              ]}
-            />
-            <ComparisonCard
-              title="Credo Protocol"
-              highlight
-              items={[
-                { text: "50-150% based on score" },
-                { text: "Personalized terms" },
-                { text: "Up to 3x more efficient" },
-                { text: "Build on-chain reputation" },
-              ]}
-            />
+          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 items-stretch">
+            {/* Traditional DeFi Card - Faded */}
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative p-12 rounded-3xl border-2 border-black/10 bg-neutral-50/50 backdrop-blur-sm hover:bg-neutral-100/50 transition-all duration-300">
+                <h3 className="text-3xl font-bold mb-10 text-black/40 group-hover:text-black/50 transition-colors">
+                  Traditional DeFi
+                </h3>
+                <ul className="space-y-6">
+                  <li className="flex items-start gap-3 text-lg">
+                    <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center mt-0.5 flex-shrink-0">
+                      <X className="w-4 h-4 text-red-400" />
+                    </div>
+                    <span className="text-black/50">150% collateral required</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-lg">
+                    <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center mt-0.5 flex-shrink-0">
+                      <X className="w-4 h-4 text-red-400" />
+                    </div>
+                    <span className="text-black/50">Same terms for everyone</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-lg">
+                    <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center mt-0.5 flex-shrink-0">
+                      <X className="w-4 h-4 text-red-400" />
+                    </div>
+                    <span className="text-black/50">Capital inefficient</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-lg">
+                    <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center mt-0.5 flex-shrink-0">
+                      <X className="w-4 h-4 text-red-400" />
+                    </div>
+                    <span className="text-black/50">No credit history</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* VS Badge */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden md:block">
+              <div className="relative">
+                <div className="absolute inset-0 bg-black/20 blur-xl rounded-full" />
+                <div className="relative bg-black text-white rounded-full w-20 h-20 flex items-center justify-center text-2xl font-bold shadow-2xl border-4 border-white">
+                  VS
+                </div>
+              </div>
+            </div>
+
+            {/* Credo Protocol Card - Highlighted with Border Beam */}
+            <div className="relative z-10">
+              <div className="relative p-12 rounded-3xl border-2 border-black bg-white shadow-2xl overflow-hidden">
+                {/* Border Beam Animation */}
+                <BorderBeam size={250} duration={10} borderWidth={2} />
+                
+                <h3 className="relative text-3xl font-bold mb-10 text-black flex items-center gap-3">
+                  Credo Protocol
+                  <Sparkles className="w-6 h-6" />
+                </h3>
+                <ul className="relative space-y-6">
+                  <li className="flex items-start gap-3 text-lg">
+                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5 flex-shrink-0 shadow-lg shadow-green-200">
+                      <CheckCircle className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-black font-medium">50-150% based on score</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-lg">
+                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5 flex-shrink-0 shadow-lg shadow-green-200">
+                      <CheckCircle className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-black font-medium">Personalized terms</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-lg">
+                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5 flex-shrink-0 shadow-lg shadow-green-200">
+                      <CheckCircle className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-black font-medium">Up to 3x more efficient</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-lg">
+                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5 flex-shrink-0 shadow-lg shadow-green-200">
+                      <CheckCircle className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-black font-medium">Build on-chain reputation</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* CTA Section */}
       <div className="container mx-auto px-4 py-32 relative">
-        <div className="max-w-5xl mx-auto relative">
-          {/* Flickering Grid Background */}
-          <FlickeringGrid
-            className="absolute inset-0 z-0"
-            squareSize={4}
-            gridGap={6}
-            color="rgb(0, 0, 0)"
-            maxOpacity={0.1}
-            flickerChance={0.1}
-            height={400}
-            width={1200}
-          />
-          
-          <div className="relative z-10 rounded-3xl border border-black/10 bg-white/80 backdrop-blur-xl p-16 text-center">
+        <div className="max-w-5xl mx-auto">
+          <MagicCard 
+            className="rounded-3xl border border-black/10 p-16 text-center"
+            gradientColor="#000000" 
+            gradientOpacity={0.06}
+          >
             <h2 className="text-5xl md:text-6xl font-bold mb-6">
               Ready to Get Started?
             </h2>
@@ -234,13 +291,13 @@ export default function Home() {
             <Link href="/dashboard">
               <Button 
                 size="lg" 
-                className="text-xl px-16 py-7 gap-3 bg-black hover:bg-black/90 text-white border-0 rounded-full shadow-lg"
+                className="text-xl px-16 py-7 gap-3 bg-black hover:bg-black/90 text-white border-0 rounded-full shadow-lg hover:shadow-xl transition-shadow"
               >
                 Launch App
                 <ArrowRight className="w-6 h-6" />
               </Button>
             </Link>
-          </div>
+          </MagicCard>
         </div>
       </div>
 
@@ -311,35 +368,6 @@ function FeatureCard({ icon, title, description }) {
         <h3 className="font-semibold text-2xl">{title}</h3>
         <p className="text-black/60 leading-relaxed text-lg">{description}</p>
       </div>
-    </MagicCard>
-  );
-}
-
-// Component: Comparison Card
-function ComparisonCard({ title, items, highlight = false }) {
-  return (
-    <MagicCard 
-      className={`p-12 ${highlight ? 'border-2 border-black' : 'border border-black/10'}`}
-      gradientColor="#000000" 
-      gradientOpacity={highlight ? 0.1 : 0.05}
-    >
-      <h3 className={`text-3xl font-bold mb-10 ${highlight ? 'text-black' : 'text-black/50'}`}>
-        {title}
-      </h3>
-      <ul className="space-y-6">
-        {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-3 text-lg">
-            {item.negative ? (
-              <span className="text-black/30 mt-1 text-xl">✗</span>
-            ) : (
-              <CheckCircle className="w-6 h-6 text-black mt-0.5 flex-shrink-0" />
-            )}
-            <span className={item.negative ? 'text-black/40' : 'text-black'}>
-              {item.text}
-            </span>
-          </li>
-        ))}
-      </ul>
     </MagicCard>
   );
 }

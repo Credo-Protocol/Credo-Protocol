@@ -1,42 +1,52 @@
 /**
- * BorderBeam Component
- * Animated beam of light that travels along the border
+ * BorderBeam Component - Clean Aceternity-style implementation
+ * Simple animated border beam that travels along the border
  */
 
+"use client";
+
+import React from "react";
 import { cn } from "@/lib/utils";
 
-export function BorderBeam({
+export const BorderBeam = ({
   className,
   size = 200,
   duration = 15,
-  anchor = 90,
   borderWidth = 1.5,
-  colorFrom = "#3B82F6",
-  colorTo = "#7C3AED",
+  colorFrom = "#000000",
+  colorTo = "#000000",
   delay = 0,
-}) {
+}) => {
   return (
     <div
       style={{
         "--size": size,
         "--duration": duration,
-        "--anchor": anchor,
         "--border-width": borderWidth,
         "--color-from": colorFrom,
         "--color-to": colorTo,
         "--delay": `-${delay}s`,
       }}
       className={cn(
-        "pointer-events-none absolute inset-0 rounded-[inherit] [border:calc(var(--border-width)*1px)_solid_transparent]",
-        // Mask to show only the border
-        "[mask-clip:padding-box,border-box] [mask-composite:intersect] [mask:linear-gradient(transparent,transparent),linear-gradient(white,white)]",
-        // Animated gradient
-        "after:absolute after:aspect-square after:w-[calc(var(--size)*1px)] after:animate-border-beam after:[animation-delay:var(--delay)] after:[background:linear-gradient(to_left,var(--color-from),var(--color-to),transparent)] after:[offset-anchor:calc(var(--anchor)*1%)_50%] after:[offset-path:rect(0_auto_auto_0_round_calc(var(--size)*1px))]",
-        className,
+        "pointer-events-none absolute inset-0 rounded-[inherit]",
+        className
       )}
-    />
+    >
+      <div
+        className={cn(
+          "absolute inset-0 rounded-[inherit]",
+          "before:absolute before:inset-0 before:rounded-[inherit]",
+          "before:bg-[linear-gradient(90deg,transparent_0%,var(--color-from)_50%,var(--color-to)_100%)]",
+          "before:opacity-0",
+          "before:[mask:linear-gradient(white,white)_content-box,linear-gradient(white,white)]",
+          "before:[mask-composite:exclude]",
+          "before:p-[calc(var(--border-width)*1px)]",
+          "before:animate-[border-beam_var(--duration)s_linear_infinite]",
+          "before:[animation-delay:var(--delay)]"
+        )}
+      />
+    </div>
   );
-}
+};
 
 export default BorderBeam;
-

@@ -153,13 +153,23 @@ body {
 
 /* Border beam animation */
 @keyframes border-beam {
-  100% {
-    offset-distance: 100%;
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
   }
-}
-
-.animate-border-beam {
-  animation: border-beam linear infinite;
+  5% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(0);
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
 }
 
 /* Sparkle animation */
@@ -176,6 +186,16 @@ body {
 
 .animate-sparkle {
   animation: sparkle 1.5s ease-in-out forwards;
+}
+
+/* Spin animation for animated border */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Shimmer animation for shiny text */
@@ -231,4 +251,25 @@ body {
 
 .animate-marquee-vertical {
   animation: marquee-vertical var(--duration) linear infinite;
+}
+
+/* Shine border animation */
+@keyframes shine {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  to {
+    background-position: 0% 0%;
+  }
+}
+
+.animate-shine {
+  animation: shine var(--shine-pulse-duration) linear infinite;
+}
+
+.bg-shine-size {
+  background-size: 300% 300%;
 }
