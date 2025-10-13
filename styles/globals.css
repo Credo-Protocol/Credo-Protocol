@@ -238,7 +238,7 @@ body {
 }
 
 .animate-grid {
-  animation: grid 15s linear infinite;
+  animation: grid 8s linear infinite;
 }
 
 /* Marquee animations */

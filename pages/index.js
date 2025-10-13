@@ -53,7 +53,7 @@ export default function Home() {
             </AnimatedShinyText>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8 items-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 items-center">
               <Link href="/dashboard">
                 <button className="group relative text-lg px-10 py-3 bg-black text-white rounded-full flex items-center gap-2 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
                   {/* Animated gradient border on hover */}
@@ -149,7 +149,7 @@ export default function Home() {
       </div>
 
       {/* Features Section with Magic Cards */}
-      <div className="container mx-auto px-4 py-32 bg-neutral-50">
+      <div className="container mx-auto px-4 py-32">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-5xl md:text-6xl font-bold text-center mb-20">
             Key Features
@@ -362,14 +362,14 @@ function StepCard({ number, icon, title, description }) {
 // Component: Feature Card
 function FeatureCard({ icon, title, description }) {
   return (
-    <MagicCard className="p-10" gradientColor="#000000" gradientOpacity={0.08}>
+    <div className="group relative p-10 rounded-2xl bg-white border border-black/5 hover:border-black/10 transition-all duration-300 hover:shadow-lg">
       <div className="space-y-6">
-        <div className="w-16 h-16 rounded-xl bg-black flex items-center justify-center text-white">
+        <div className="w-16 h-16 rounded-xl bg-black flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
           {icon}
         </div>
         <h3 className="font-semibold text-2xl">{title}</h3>
         <p className="text-black/60 leading-relaxed text-lg">{description}</p>
       </div>
-    </MagicCard>
+    </div>
   );
 }
