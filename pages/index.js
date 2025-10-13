@@ -53,21 +53,23 @@ export default function Home() {
             </AnimatedShinyText>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8 items-center">
               <Link href="/dashboard">
-                <Button 
-                  size="lg" 
-                  className="text-lg px-10 gap-2 bg-black hover:bg-black/90 text-white border-0 rounded-full"
-                >
-                  Launch App
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
+                <button className="group relative text-lg px-10 py-3 bg-black text-white rounded-full flex items-center gap-2 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                  {/* Animated gradient border on hover */}
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-black via-neutral-700 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-gradient-x" />
+                  <span className="absolute inset-[2px] rounded-full bg-black" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    Launch App
+                    <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </button>
               </Link>
               <Link href="/faucet">
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="text-lg px-10 border-black/20 hover:bg-black/5 rounded-full"
+                  className="text-lg px-10 h-12 border-2 border-black/20 hover:bg-black/5 hover:border-black/30 rounded-full text-black bg-white transition-all hover:scale-105"
                 >
                   Get Test Tokens
                 </Button>
