@@ -72,7 +72,9 @@ backend/build/
 
 # Cursor/IDE
 .cursorignore
+.cursor
 
 # Documentation
  PRD.md
  docs/
+ 
