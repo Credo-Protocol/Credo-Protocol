@@ -211,9 +211,9 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
   // Loading state
   if (loading) {
     return (
-      <Button disabled size={size} variant={variant}>
+      <Button disabled className="h-[44px] px-4">
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        Initializing...
+        <span className="text-sm">Initializing...</span>
       </Button>
     );
   }
@@ -223,8 +223,8 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
     return (
       <div className="flex items-center gap-2">
         <p className="text-sm text-red-500">{error}</p>
-        <Button onClick={initAirKit} size="sm" variant="outline">
-          Retry
+        <Button onClick={initAirKit} variant="outline" className="h-[44px] px-4">
+          <span className="text-sm">Retry</span>
         </Button>
       </div>
     );
@@ -244,13 +244,13 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
         }
       }}>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size={size} className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+          <Button variant="outline" className="flex items-center gap-3 h-[44px] px-3 min-w-[200px]">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/10">
               <User className="h-4 w-4" />
             </div>
-            <div className="text-left hidden sm:block">
-              <div className="text-sm font-medium">{displayName}</div>
-              <div className="text-xs text-muted-foreground font-mono">
+            <div className="text-left hidden sm:flex flex-col gap-1 flex-1 min-w-0">
+              <div className="text-sm font-medium leading-none truncate">{displayName}</div>
+              <div className="text-xs text-black/50 font-mono leading-none">
                 {address?.slice(0, 6)}...{address?.slice(-4)}
               </div>
             </div>
@@ -379,16 +379,15 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
     <Button
       onClick={handleLogin}
       disabled={loggingIn}
-      size={size}
-      variant={variant}
+      className="h-[44px] px-4"
     >
       {loggingIn ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Connecting...
+          <span className="text-sm">Connecting...</span>
         </>
       ) : (
-        'Login with Moca ID'
+        <span className="text-sm">Login with Moca ID</span>
       )}
     </Button>
   );

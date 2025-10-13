@@ -210,30 +210,29 @@ export default function Dashboard() {
               <Link href="/">
                 <Button 
                   variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2 text-black/70 hover:text-black hover:bg-black/5"
+                  className="h-[44px] px-3 flex items-center gap-2 text-black/70 hover:text-black hover:bg-black/5"
                 >
                   <Home className="h-4 w-4" />
-                  Home
+                  <span className="text-sm">Home</span>
                 </Button>
               </Link>
               <Button 
                 variant="outline" 
-                size="sm" 
                 onClick={() => router.push('/faucet')}
-                className="flex items-center gap-2 border-black/20 hover:bg-black/5 hover:border-black/30"
+                className="h-[44px] px-4 flex items-center gap-2 border-black/20 hover:bg-black/5 hover:border-black/30 text-black bg-white"
               >
                 <Droplets className="h-4 w-4" />
-                Get Test USDC
+                <span className="text-sm">Get Test USDC</span>
               </Button>
-              <ConnectButton size="sm" onConnectionChange={handleConnectionChange} />
+              <div className="[&_button]:bg-white [&_button]:text-black [&_button]:border-black/20 [&_button:hover]:bg-black/5">
+                <ConnectButton onConnectionChange={handleConnectionChange} />
+              </div>
               <Button 
                 variant="outline" 
-                size="sm" 
                 onClick={fetchCreditScore}
-                className="border-black/20 hover:bg-black/5 hover:border-black/30"
+                className="h-[44px] px-4 border-black/20 hover:bg-black/5 hover:border-black/30 text-black bg-white"
               >
-                Refresh
+                <span className="text-sm">Refresh</span>
               </Button>
             </div>
           </div>
