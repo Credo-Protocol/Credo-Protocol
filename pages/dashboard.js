@@ -50,6 +50,15 @@ export default function Dashboard() {
       setTimeout(() => {
         refreshUserInfo();
       }, 100);
+    } else if (!connectionData.connected) {
+      // Clear dashboard state on disconnect
+      setCreditScore(0);
+      setScoreDetails(null);
+      setLoading(false);
+      // Redirect to home
+      try {
+        router.replace('/');
+      } catch {}
     }
   };
 
@@ -72,6 +81,12 @@ export default function Dashboard() {
   }, [userAddress, provider]);
 
   const fetchCreditScore = async () => {
+    // Early return if not connected or missing data
+    if (!isConnected || !userAddress || !provider) {
+      console.log('Not connected, skipping credit score fetch');
+      return;
+    }
+
     try {
       setLoading(true);
       
@@ -81,8 +96,20 @@ export default function Dashboard() {
         provider
       );
 
+      // Double check we're still connected before async call
+      if (!isConnected || !userAddress) {
+        console.log('User disconnected during fetch, aborting');
+        return;
+      }
+
       // Get score details
       const details = await oracleContract.getScoreDetails(userAddress);
+      
+      // Check again after async operation
+      if (!isConnected || !userAddress) {
+        console.log('User disconnected during credit score fetch, aborting');
+        return;
+      }
       
       const scoreData = {
         score: Number(details[0]),
@@ -97,8 +124,16 @@ export default function Dashboard() {
       setScoreDetails(scoreData);
     } catch (error) {
       console.error('Error fetching credit score:', error);
+      // Only reset scores if still connected (ignore errors if disconnected)
+      if (isConnected) {
+        setCreditScore(0);
+        setScoreDetails(null);
+      }
     } finally {
-      setLoading(false);
+      // Only clear loading if still connected
+      if (isConnected) {
+        setLoading(false);
+      }
     }
   };
 

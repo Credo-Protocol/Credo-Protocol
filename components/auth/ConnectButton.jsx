@@ -151,6 +151,11 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
       await logout();
       setIsLoggedIn(false);
       setUserInfo(null);
+      
+      // Clear balance states immediately
+      setMocaBalance(null);
+      setUsdcBalance(null);
+      setBalancesLoading(false);
 
       // Notify parent component
       if (onConnectionChange) {
@@ -162,6 +167,13 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
       }
 
       console.log('Logout successful');
+
+      // Redirect to landing page after logout
+      try {
+        if (router && router.pathname !== '/') {
+          router.replace('/');
+        }
+      } catch {}
     } catch (error) {
       console.error('Logout failed:', error);
       setError('Logout failed. Please try again.');
@@ -184,7 +196,11 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
    * Called when dropdown opens
    */
   async function fetchBalances() {
-    if (!userInfo?.user?.abstractAccountAddress) return;
+    // Early return if not logged in or no user info
+    if (!isLoggedIn || !userInfo?.user?.abstractAccountAddress) {
+      console.log('Not logged in, skipping balance fetch');
+      return;
+    }
     
     try {
       setBalancesLoading(true);
@@ -193,6 +209,14 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
       const provider = airService.getProvider();
       if (!provider) {
         console.warn('Provider not available');
+        setMocaBalance('0');
+        setUsdcBalance('0');
+        return;
+      }
+
+      // Double check we're still logged in before proceeding
+      if (!isLoggedIn || !userInfo) {
+        console.log('User logged out during fetch, aborting');
         return;
       }
 
@@ -201,6 +225,13 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
 
       // Fetch MOCA balance (native token)
       const mocaBalanceWei = await ethersProvider.getBalance(address);
+      
+      // Check again if still logged in after async operation
+      if (!isLoggedIn || !userInfo) {
+        console.log('User logged out during balance fetch, aborting');
+        return;
+      }
+      
       const mocaBalanceFormatted = ethers.formatEther(mocaBalanceWei);
       setMocaBalance(parseFloat(mocaBalanceFormatted).toFixed(4));
 
@@ -212,15 +243,28 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
       );
       
       const usdcBalanceRaw = await usdcContract.balanceOf(address);
+      
+      // Final check if still logged in
+      if (!isLoggedIn || !userInfo) {
+        console.log('User logged out during USDC fetch, aborting');
+        return;
+      }
+      
       const usdcBalanceFormatted = ethers.formatUnits(usdcBalanceRaw, 6); // USDC has 6 decimals
       setUsdcBalance(parseFloat(usdcBalanceFormatted).toFixed(2));
 
     } catch (error) {
       console.error('Error fetching balances:', error);
-      setMocaBalance('0');
-      setUsdcBalance('0');
+      // Only set to 0 if we're still logged in, otherwise ignore the error
+      if (isLoggedIn && userInfo) {
+        setMocaBalance('0');
+        setUsdcBalance('0');
+      }
     } finally {
-      setBalancesLoading(false);
+      // Only clear loading if still logged in
+      if (isLoggedIn) {
+        setBalancesLoading(false);
+      }
     }
   }
 

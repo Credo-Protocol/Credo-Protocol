@@ -51,10 +51,17 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
       );
 
       // Get user account data
-      const accountData = await lendingPool.getUserAccountData(userAddress);
+      // Guard: user might disconnect mid-request
+      const accountData = await lendingPool.getUserAccountData(userAddress).catch(() => null);
+      if (!accountData) {
+        throw new Error('Disconnected');
+      }
       
       // Get asset data to check pool liquidity (assets is a public mapping)
-      const assetData = await lendingPool.assets(CONTRACTS.MOCK_USDC);
+      const assetData = await lendingPool.assets(CONTRACTS.MOCK_USDC).catch(() => null);
+      if (!assetData) {
+        throw new Error('Disconnected');
+      }
       
       // MockUSDC uses 6 decimals
       const totalCollateralUSD = Number(ethers.formatUnits(accountData[0], 6));
@@ -100,6 +107,10 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
       setBorrowAmount(Math.max(0, actualBorrowableAmount * 0.5));
     } catch (error) {
       console.error('Error fetching max borrow:', error);
+      if (String(error?.message || '').toLowerCase().includes('disconnect')) {
+        // silent when disconnecting
+        return;
+      }
       setError('Failed to fetch borrowing capacity');
     } finally {
       setLoading(false);

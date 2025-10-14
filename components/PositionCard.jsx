@@ -54,7 +54,10 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
       );
 
       // Fetch user account data from LendingPool
-      const accountData = await lendingPool.getUserAccountData(userAddress);
+      const accountData = await lendingPool.getUserAccountData(userAddress).catch(() => null);
+      if (!accountData) {
+        throw new Error('Disconnected');
+      }
       
       // Parse account data first
       // MockUSDC uses 6 decimals, not 8
@@ -62,7 +65,10 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
       const totalDebtUSD = Number(ethers.formatUnits(accountData[1], 6));
       
       // Fetch asset data to check pool liquidity (assets is a public mapping)
-      const assetData = await lendingPool.assets(CONTRACTS.MOCK_USDC);
+      const assetData = await lendingPool.assets(CONTRACTS.MOCK_USDC).catch(() => null);
+      if (!assetData) {
+        throw new Error('Disconnected');
+      }
       
       // Fetch supplied amount for MockUSDC
       const supplied = await lendingPool.getUserSupplied(userAddress, CONTRACTS.MOCK_USDC);
@@ -116,6 +122,9 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
       setPosition(positionData);
     } catch (error) {
       console.error('Error fetching position:', error);
+      if (String(error?.message || '').toLowerCase().includes('disconnect')) {
+        return; // silent on disconnect
+      }
     } finally {
       setLoading(false);
     }
