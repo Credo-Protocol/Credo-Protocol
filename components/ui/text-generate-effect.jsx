@@ -33,7 +33,7 @@ export const TextGenerateEffect = ({
       },
       {
         duration: duration ? duration : 1,
-        delay: stagger(0.2), // Stagger each word by 0.2s
+        delay: stagger(0.4), // Stagger each word by 0.5s (slower)
       }
     );
   }, [scope.current]);

@@ -336,31 +336,56 @@ export default function Home() {
       {/* CTA Section */}
       <div className="container mx-auto px-4 py-32 relative">
         <div className="max-w-5xl mx-auto">
-          <MagicCard 
-            className="rounded-3xl border border-black/10 p-16 text-center"
-            gradientColor="#000000" 
-            gradientOpacity={0.06}
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h2 className="text-5xl md:text-6xl font-bold mb-6">
-              Ready to Get Started?
-            </h2>
-            <p className="text-xl text-black/60 mb-10 max-w-2xl mx-auto">
-              Connect your wallet and start building your on-chain credit score today.
-            </p>
-            <div className="flex justify-center">
-              <Link href="/dashboard">
-                <button className="group relative text-xl px-16 py-7 bg-black text-white rounded-full flex items-center gap-3 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                  {/* Animated gradient border on hover */}
-                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-black via-neutral-700 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-gradient-x" />
-                  <span className="absolute inset-[2px] rounded-full bg-black" />
-                  <span className="relative z-10 flex items-center gap-3">
-                    Get Started
-                    <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </button>
-              </Link>
-            </div>
-          </MagicCard>
+            <MagicCard 
+              className="rounded-3xl border border-black/10 p-16 text-center"
+              gradientColor="#000000" 
+              gradientOpacity={0.06}
+            >
+              <motion.h2 
+                className="text-5xl md:text-6xl font-bold mb-6"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                Ready to Get Started?
+              </motion.h2>
+              <motion.p 
+                className="text-xl text-black/60 mb-10 max-w-2xl mx-auto"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                Connect your wallet and start building your on-chain credit score today.
+              </motion.p>
+              <motion.div 
+                className="flex justify-center"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <Link href="/dashboard">
+                  <button className="group relative text-xl px-16 py-7 bg-black text-white rounded-full flex items-center gap-3 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                    {/* Animated gradient border on hover */}
+                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-black via-neutral-700 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-gradient-x" />
+                    <span className="absolute inset-[2px] rounded-full bg-black" />
+                    <span className="relative z-10 flex items-center gap-3">
+                      Get Started
+                      <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </button>
+                </Link>
+              </motion.div>
+            </MagicCard>
+          </motion.div>
         </div>
       </div>
 
