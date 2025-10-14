@@ -52,7 +52,7 @@ export const TextGenerateEffect = ({
               className={cn(
                 "opacity-0",
                 shouldApplyAurora 
-                  ? "bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 animate-aurora" 
+                  ? "bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 via-pink-500 to-purple-500 animate-aurora" 
                   : "dark:text-white text-black"
               )}
               style={{

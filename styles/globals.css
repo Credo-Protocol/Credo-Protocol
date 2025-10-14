@@ -301,5 +301,5 @@ body {
 
 .animate-aurora {
   background-size: 200% 200%;
-  animation: aurora 3s ease infinite;
+  animation: aurora 1s ease infinite;
 }
