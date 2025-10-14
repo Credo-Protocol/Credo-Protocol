@@ -6,7 +6,7 @@
 import Link from 'next/link';
 import { ArrowRight, Shield, TrendingUp, CheckCircle, Lock, BarChart3, Sparkles, Zap, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { HyperText } from '@/components/ui/hyper-text';
+import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { MagicCard } from '@/components/ui/magic-card';
@@ -38,10 +38,11 @@ export default function Home() {
                 Borrow Based on
               </h1>
               <div className="flex justify-center">
-                <HyperText
-                  text="Who You Are"
+                <TextGenerateEffect
+                  words="WHO YOU ARE"
                   className="text-5xl md:text-7xl lg:text-8xl font-bold"
-                  duration={1000}
+                  duration={0.5}
+                  filter={true}
                 />
               </div>
             </div>
