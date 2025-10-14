@@ -405,10 +405,6 @@ export default function Home() {
                   Identity-backed DeFi lending with undercollateralized loans. 
                   Build your on-chain credit score and unlock better terms.
                 </p>
-                <div className="flex items-center gap-2 mt-4 px-3 py-2 rounded-full bg-white/10 backdrop-blur-sm w-fit">
-                  <img src="/moca.jpg" alt="Moca Chain" className="w-4 h-4 rounded-sm object-cover" />
-                  <span className="text-sm font-medium text-white/90">Built on Moca Chain</span>
-                </div>
               </div>
 
               {/* Quick Links */}
@@ -439,7 +435,7 @@ export default function Home() {
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="text-center md:text-left">
                   <p className="text-white/60">
-                    © 2024 Credo Protocol. Built for the Moca Chain Hackathon.
+                    © 2024 Credo Protocol. Built on Moca Chain.
                   </p>
                   <p className="text-white/40 text-sm mt-1">
                     Transforming trust into capital, one credential at a time.
