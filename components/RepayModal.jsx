@@ -8,10 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, CheckCircle2, TrendingUp, Info } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI } from '@/lib/contracts';
 import { handleTransactionError } from '@/lib/errorHandler';
@@ -194,10 +191,10 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white border-black/10">
         <DialogHeader>
-          <DialogTitle>Repay Debt</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-black text-xl font-bold">Repay Debt</DialogTitle>
+          <DialogDescription className="text-black/60">
             Repay your borrowed USDC to reduce debt
           </DialogDescription>
         </DialogHeader>
@@ -207,143 +204,146 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
           {step === 1 && (
             <>
               {/* Balance and Borrowed Display */}
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Your Balance</p>
-                      <p className="text-lg font-bold">{balance.toFixed(2)} USDC</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Borrowed</p>
-                      <p className="text-lg font-bold text-red-500">{borrowed.toFixed(2)} USDC</p>
-                    </div>
+              <div className="p-6 rounded-xl border border-black/10 bg-white">
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <p className="text-sm text-black/60">Your Balance</p>
+                    <p className="text-lg font-bold text-black">{balance.toFixed(2)} USDC</p>
                   </div>
+                  <div>
+                    <p className="text-sm text-black/60">Borrowed</p>
+                    <p className="text-lg font-bold text-red-500">{borrowed.toFixed(2)} USDC</p>
+                  </div>
+                </div>
 
-                  {/* Amount Input */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Amount to Repay</label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={repayAmount}
-                        onChange={(e) => setRepayAmount(e.target.value)}
-                        placeholder="0.00"
-                        className="w-full px-4 py-3 pr-16 text-lg border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                        step="0.01"
-                        min="0"
-                        max={Math.min(balance, borrowed)}
-                      />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                        USDC
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setRepayAmount((borrowed * 0.25).toFixed(2))}
-                        disabled={balance === 0}
-                      >
-                        25%
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setRepayAmount((borrowed * 0.5).toFixed(2))}
-                        disabled={balance === 0}
-                      >
-                        50%
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setRepayAmount((borrowed * 0.75).toFixed(2))}
-                        disabled={balance === 0}
-                      >
-                        75%
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setRepayAmount(Math.min(balance, borrowed).toFixed(2))}
-                        disabled={balance === 0}
-                      >
-                        Max
-                      </Button>
+                {/* Amount Input */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-black">Amount to Repay</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      value={repayAmount}
+                      onChange={(e) => setRepayAmount(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full px-4 py-3 pr-16 text-lg border border-black/20 rounded-md focus:outline-none focus:ring-2 focus:ring-black/20 bg-white text-black"
+                      step="0.01"
+                      min="0"
+                      max={Math.min(balance, borrowed)}
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-black/60">
+                      USDC
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="flex gap-2">
+                    <button
+                      className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => setRepayAmount((borrowed * 0.25).toFixed(2))}
+                      disabled={balance === 0}
+                    >
+                      25%
+                    </button>
+                    <button
+                      className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => setRepayAmount((borrowed * 0.5).toFixed(2))}
+                      disabled={balance === 0}
+                    >
+                      50%
+                    </button>
+                    <button
+                      className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => setRepayAmount((borrowed * 0.75).toFixed(2))}
+                      disabled={balance === 0}
+                    >
+                      75%
+                    </button>
+                    <button
+                      className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => setRepayAmount(Math.min(balance, borrowed).toFixed(2))}
+                      disabled={balance === 0}
+                    >
+                      Max
+                    </button>
+                  </div>
+                </div>
+              </div>
 
               {borrowed === 0 && (
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription>
-                    You don't have any outstanding debt to repay.
-                  </AlertDescription>
-                </Alert>
+                <div className="p-4 rounded-xl border border-black/10 bg-neutral-50">
+                  <div className="flex items-start gap-3">
+                    <Info className="h-5 w-5 text-black/60 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-black/70">
+                      You don't have any outstanding debt to repay.
+                    </p>
+                  </div>
+                </div>
               )}
 
               {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+                <div className="p-4 rounded-xl border border-red-500/20 bg-red-50">
+                  <p className="text-sm text-red-900">{error}</p>
+                </div>
               )}
 
-              <Button 
-                className="w-full" 
-                size="lg" 
-                onClick={handleContinue} 
+              <button
+                className="w-full h-12 bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                onClick={handleContinue}
                 disabled={loading || borrowed === 0}
               >
                 Continue
-              </Button>
+              </button>
             </>
           )}
 
           {/* Step 2: Approve */}
           {step === 2 && (
             <>
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  You need to approve the LendingPool contract to spend your USDC tokens for repayment.
-                </AlertDescription>
-              </Alert>
+              <div className="p-4 rounded-xl border border-black/10 bg-neutral-50">
+                <div className="flex items-start gap-3">
+                  <Info className="h-5 w-5 text-black/60 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-black/70">
+                    You need to approve the LendingPool contract to spend your USDC tokens for repayment.
+                  </p>
+                </div>
+              </div>
 
-              <Card>
-                <CardContent className="pt-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Amount to Repay</span>
-                    <span className="text-lg font-bold">{repayAmount} USDC</span>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="p-6 rounded-xl border border-black/10 bg-white">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-black/60">Amount to Repay</span>
+                  <span className="text-lg font-bold text-black">{repayAmount} USDC</span>
+                </div>
+              </div>
 
               {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+                <div className="p-4 rounded-xl border border-red-500/20 bg-red-50">
+                  <p className="text-sm text-red-900">{error}</p>
+                </div>
               )}
 
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setStep(1)} disabled={approving}>
+                <button
+                  className="px-4 h-12 border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  onClick={() => setStep(1)}
+                  disabled={approving}
+                >
                   Back
-                </Button>
-                <Button className="flex-1" onClick={handleApprove} disabled={approving}>
+                </button>
+                <button
+                  className="flex-1 h-12 bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
+                  onClick={handleApprove}
+                  disabled={approving}
+                >
                   {approving ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                       Approving...
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      <CheckCircle2 className="h-4 w-4" />
                       Approve
                     </>
                   )}
-                </Button>
+                </button>
               </div>
             </>
           )}
@@ -351,47 +351,51 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
           {/* Step 3: Repay */}
           {step === 3 && (
             <>
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  Confirm the transaction to repay your debt.
-                </AlertDescription>
-              </Alert>
+              <div className="p-4 rounded-xl border border-black/10 bg-neutral-50">
+                <div className="flex items-start gap-3">
+                  <Info className="h-5 w-5 text-black/60 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-black/70">
+                    Confirm the transaction to repay your debt.
+                  </p>
+                </div>
+              </div>
 
-              <Card>
-                <CardContent className="pt-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Amount to Repay</span>
-                    <span className="text-lg font-bold">{repayAmount} USDC</span>
-                  </div>
-                  <div className="flex items-center justify-between pt-4 border-t">
-                    <span className="text-sm text-muted-foreground">New Debt</span>
-                    <span className="text-lg font-semibold">
-                      {(borrowed - parseFloat(repayAmount)).toFixed(2)} USDC
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="p-6 rounded-xl border border-black/10 bg-white space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-black/60">Amount to Repay</span>
+                  <span className="text-lg font-bold text-black">{repayAmount} USDC</span>
+                </div>
+                <div className="flex items-center justify-between pt-4 border-t border-black/10">
+                  <span className="text-sm text-black/60">New Debt</span>
+                  <span className="text-lg font-semibold text-black">
+                    {(borrowed - parseFloat(repayAmount)).toFixed(2)} USDC
+                  </span>
+                </div>
+              </div>
 
               {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+                <div className="p-4 rounded-xl border border-red-500/20 bg-red-50">
+                  <p className="text-sm text-red-900">{error}</p>
+                </div>
               )}
 
-              <Button className="w-full" size="lg" onClick={handleRepay} disabled={repaying}>
+              <button
+                className="w-full h-12 bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
+                onClick={handleRepay}
+                disabled={repaying}
+              >
                 {repaying ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     Repaying...
                   </>
                 ) : (
                   <>
-                    <TrendingUp className="mr-2 h-4 w-4" />
+                    <TrendingUp className="h-4 w-4" />
                     Repay {repayAmount} USDC
                   </>
                 )}
-              </Button>
+              </button>
             </>
           )}
 
@@ -400,8 +404,8 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
             <div className="text-center py-6 space-y-4">
               <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto animate-pulse" />
               <div>
-                <h3 className="text-lg font-semibold">Repayment Successful!</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-lg font-semibold text-black">Repayment Successful!</h3>
+                <p className="text-sm text-black/60">
                   You repaid {repayAmount} USDC
                 </p>
               </div>

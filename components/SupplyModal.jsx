@@ -8,11 +8,8 @@
 
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CheckCircle2, TrendingUp, Coins, Info } from 'lucide-react';
+import { Loader2, CheckCircle2, TrendingUp, Info } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI } from '@/lib/contracts';
 import { handleTransactionError } from '@/lib/errorHandler';
 
@@ -208,10 +205,10 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white border-black/10">
         <DialogHeader>
-          <DialogTitle>Supply Collateral</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-black text-xl font-bold">Supply Collateral</DialogTitle>
+          <DialogDescription className="text-black/60">
             Deposit USDC to use as collateral for borrowing
           </DialogDescription>
         </DialogHeader>
@@ -221,132 +218,136 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
           {step === 1 && (
             <>
               {/* Balance Display */}
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm text-muted-foreground">Your Balance</span>
-                    <div className="text-right">
-                      <p className="text-lg font-bold">{balance.toFixed(2)} USDC</p>
-                      {balance === 0 && (
-                        <Button 
-                          variant="link" 
-                          size="sm" 
-                          onClick={handleFaucet}
-                          disabled={loading}
-                          className="p-0 h-auto"
-                        >
-                          Get test USDC
-                        </Button>
-                      )}
-                    </div>
+              <div className="p-6 rounded-xl border border-black/10 bg-white">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm text-black/60">Your Balance</span>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-black">{balance.toFixed(2)} USDC</p>
+                    {balance === 0 && (
+                      <button
+                        onClick={handleFaucet}
+                        disabled={loading}
+                        className="text-sm text-black/70 hover:text-black underline mt-1 disabled:opacity-50"
+                      >
+                        Get test USDC
+                      </button>
+                    )}
                   </div>
+                </div>
 
-                  {/* Amount Input */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Amount to Supply</label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={supplyAmount}
-                        onChange={(e) => setSupplyAmount(e.target.value)}
-                        placeholder="0.00"
-                        className="w-full px-4 py-3 pr-16 text-lg border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                        step="0.01"
-                        min="0"
-                        max={balance}
-                      />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                        USDC
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setSupplyAmount((balance * 0.25).toFixed(2))}
-                      >
-                        25%
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setSupplyAmount((balance * 0.5).toFixed(2))}
-                      >
-                        50%
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setSupplyAmount((balance * 0.75).toFixed(2))}
-                      >
-                        75%
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setSupplyAmount(balance.toFixed(2))}
-                      >
-                        Max
-                      </Button>
+                {/* Amount Input */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-black">Amount to Supply</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      value={supplyAmount}
+                      onChange={(e) => setSupplyAmount(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full px-4 py-3 pr-16 text-lg border border-black/20 rounded-md focus:outline-none focus:ring-2 focus:ring-black/20 bg-white text-black"
+                      step="0.01"
+                      min="0"
+                      max={balance}
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-black/60">
+                      USDC
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="flex gap-2">
+                    <button
+                      className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black"
+                      onClick={() => setSupplyAmount((balance * 0.25).toFixed(2))}
+                    >
+                      25%
+                    </button>
+                    <button
+                      className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black"
+                      onClick={() => setSupplyAmount((balance * 0.5).toFixed(2))}
+                    >
+                      50%
+                    </button>
+                    <button
+                      className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black"
+                      onClick={() => setSupplyAmount((balance * 0.75).toFixed(2))}
+                    >
+                      75%
+                    </button>
+                    <button
+                      className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black"
+                      onClick={() => setSupplyAmount(balance.toFixed(2))}
+                    >
+                      Max
+                    </button>
+                  </div>
+                </div>
+              </div>
 
               {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+                <div className="p-4 rounded-xl border border-red-500/20 bg-red-50">
+                  <p className="text-sm text-red-900">{error}</p>
+                </div>
               )}
 
-              <Button className="w-full" size="lg" onClick={handleContinue} disabled={loading}>
+              <button
+                className="w-full h-12 bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                onClick={handleContinue}
+                disabled={loading}
+              >
                 Continue
-              </Button>
+              </button>
             </>
           )}
 
           {/* Step 2: Approve */}
           {step === 2 && (
             <>
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  You need to approve the LendingPool contract to spend your USDC tokens.
-                </AlertDescription>
-              </Alert>
+              <div className="p-4 rounded-xl border border-black/10 bg-neutral-50">
+                <div className="flex items-start gap-3">
+                  <Info className="h-5 w-5 text-black/60 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-black/70">
+                    You need to approve the LendingPool contract to spend your USDC tokens.
+                  </p>
+                </div>
+              </div>
 
-              <Card>
-                <CardContent className="pt-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Amount to Supply</span>
-                    <span className="text-lg font-bold">{supplyAmount} USDC</span>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="p-6 rounded-xl border border-black/10 bg-white">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-black/60">Amount to Supply</span>
+                  <span className="text-lg font-bold text-black">{supplyAmount} USDC</span>
+                </div>
+              </div>
 
               {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+                <div className="p-4 rounded-xl border border-red-500/20 bg-red-50">
+                  <p className="text-sm text-red-900">{error}</p>
+                </div>
               )}
 
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setStep(1)} disabled={approving}>
+                <button
+                  className="px-4 h-12 border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  onClick={() => setStep(1)}
+                  disabled={approving}
+                >
                   Back
-                </Button>
-                <Button className="flex-1" onClick={handleApprove} disabled={approving}>
+                </button>
+                <button
+                  className="flex-1 h-12 bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
+                  onClick={handleApprove}
+                  disabled={approving}
+                >
                   {approving ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                       Approving...
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      <CheckCircle2 className="h-4 w-4" />
                       Approve
                     </>
                   )}
-                </Button>
+                </button>
               </div>
             </>
           )}
@@ -354,41 +355,45 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
           {/* Step 3: Supply */}
           {step === 3 && (
             <>
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  Confirm the transaction to supply your USDC as collateral.
-                </AlertDescription>
-              </Alert>
+              <div className="p-4 rounded-xl border border-black/10 bg-neutral-50">
+                <div className="flex items-start gap-3">
+                  <Info className="h-5 w-5 text-black/60 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-black/70">
+                    Confirm the transaction to supply your USDC as collateral.
+                  </p>
+                </div>
+              </div>
 
-              <Card>
-                <CardContent className="pt-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Amount to Supply</span>
-                    <span className="text-lg font-bold">{supplyAmount} USDC</span>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="p-6 rounded-xl border border-black/10 bg-white">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-black/60">Amount to Supply</span>
+                  <span className="text-lg font-bold text-black">{supplyAmount} USDC</span>
+                </div>
+              </div>
 
               {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+                <div className="p-4 rounded-xl border border-red-500/20 bg-red-50">
+                  <p className="text-sm text-red-900">{error}</p>
+                </div>
               )}
 
-              <Button className="w-full" size="lg" onClick={handleSupply} disabled={supplying}>
+              <button
+                className="w-full h-12 bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
+                onClick={handleSupply}
+                disabled={supplying}
+              >
                 {supplying ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     Supplying...
                   </>
                 ) : (
                   <>
-                    <TrendingUp className="mr-2 h-4 w-4" />
+                    <TrendingUp className="h-4 w-4" />
                     Supply {supplyAmount} USDC
                   </>
                 )}
-              </Button>
+              </button>
             </>
           )}
 
@@ -397,8 +402,8 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
             <div className="text-center py-6 space-y-4">
               <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto animate-pulse" />
               <div>
-                <h3 className="text-lg font-semibold">Supply Successful!</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-lg font-semibold text-black">Supply Successful!</h3>
+                <p className="text-sm text-black/60">
                   You supplied {supplyAmount} USDC as collateral
                 </p>
               </div>
