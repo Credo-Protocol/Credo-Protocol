@@ -436,22 +436,35 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
 
   // Not logged in state
   return (
-    <Button
-      onClick={handleLogin}
-      disabled={loggingIn}
-      className="h-[44px] px-4 bg-black text-white hover:bg-black/90 hover:scale-105 hover:shadow-xl disabled:bg-black/70 disabled:hover:scale-100 disabled:hover:shadow-none border-0 cursor-pointer transition-all duration-300"
-      size={size}
-      variant="default"
-    >
-      {loggingIn ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin text-white" />
-          <span className="text-sm text-white">Connecting...</span>
-        </>
-      ) : (
-        <span className="text-sm text-white font-medium">Login with Moca ID</span>
-      )}
-    </Button>
+    <div className="relative inline-block">
+      {/* Rainbow border effect */}
+      <div 
+        className="absolute -inset-[2px] rounded-full opacity-75 blur-sm"
+        style={{
+          background: 'linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3)',
+          backgroundSize: '200% 100%',
+          animation: 'rainbow-slide 3s linear infinite',
+        }}
+      />
+      
+      {/* Black button on top */}
+      <button
+        onClick={handleLogin}
+        disabled={loggingIn}
+        className="relative h-[50px] px-8 rounded-full bg-black text-white font-medium transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 cursor-pointer"
+      >
+        <span className="flex items-center justify-center gap-2">
+          {loggingIn ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin text-white" />
+              <span className="text-sm text-white">Connecting...</span>
+            </>
+          ) : (
+            <span className="text-sm text-white font-medium">Login with Moca ID</span>
+          )}
+        </span>
+      </button>
+    </div>
   );
 }
 
