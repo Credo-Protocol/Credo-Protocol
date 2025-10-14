@@ -27,7 +27,7 @@ export default function Home() {
             {/* Badge */}
             <div className="flex justify-center">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 backdrop-blur-sm">
-                <Sparkles className="w-4 h-4" />
+                <img src="/moca.jpg" alt="Moca Chain" className="w-4 h-4 rounded-sm object-cover" />
                 <span className="text-sm font-medium">Built on Moca Chain</span>
               </div>
             </div>
