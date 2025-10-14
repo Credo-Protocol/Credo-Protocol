@@ -398,7 +398,7 @@ export default function Home() {
               {/* Brand Section */}
               <div className="md:col-span-2">
                 <div className="flex items-center gap-3 mb-4">
-                  <img src="/moca.jpg" alt="Moca Chain" className="w-8 h-8 rounded-lg object-cover" />
+                  <img src="/credo.jpg" alt="Credo Protocol" className="w-8 h-8 rounded-lg object-cover" />
                   <h3 className="text-2xl font-bold">Credo Protocol</h3>
                 </div>
                 <p className="text-white/70 text-lg leading-relaxed max-w-md">
