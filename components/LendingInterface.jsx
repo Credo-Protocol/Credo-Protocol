@@ -98,14 +98,13 @@ export default function LendingInterface({ userAddress, creditScore, provider })
                 </div>
               </div>
 
-              <Button 
-                className="w-full" 
-                size="lg"
+              <button 
+                className="w-full h-12 text-base bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md" 
                 onClick={() => setSupplyModalOpen(true)}
               >
-                <TrendingUp className="mr-2 h-5 w-5" />
+                <TrendingUp className="h-5 w-5" />
                 Supply USDC
-              </Button>
+              </button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -128,15 +127,13 @@ export default function LendingInterface({ userAddress, creditScore, provider })
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button 
-                className="w-full" 
-                variant="outline"
-                size="lg"
+              <button 
+                className="w-full h-12 text-base bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md" 
                 onClick={() => setRepayModalOpen(true)}
               >
-                <TrendingUp className="mr-2 h-5 w-5" />
+                <TrendingUp className="h-5 w-5" />
                 Repay USDC
-              </Button>
+              </button>
             </CardContent>
           </Card>
         </TabsContent>

@@ -16,7 +16,7 @@ import { Slider } from '@/components/ui/slider';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, TrendingDown, Info, CheckCircle2 } from 'lucide-react';
-import { CONTRACTS, LENDING_POOL_ABI, calculateCollateralFactor } from '@/lib/contracts';
+import { CONTRACTS, LENDING_POOL_ABI, calculateCollateralFactor, getScoreColor } from '@/lib/contracts';
 import { handleTransactionError } from '@/lib/errorHandler';
 
 export default function BorrowInterface({ userAddress, creditScore, onSuccess, provider }) {
@@ -32,6 +32,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
 
   // Calculate collateral factor from credit score
   const collateralFactor = calculateCollateralFactor(creditScore);
+  
+  // Get dynamic color for credit score display
+  const scoreColor = getScoreColor(creditScore);
 
   // Fetch max borrowing capacity (recalculate when credit score changes)
   useEffect(() => {
@@ -217,7 +220,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
         <div className="p-4 bg-muted rounded-lg space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Your Credit Score</span>
-            <span className="text-lg font-bold">{creditScore}</span>
+            <span className={`text-lg font-bold ${scoreColor}`}>{creditScore}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Collateral Factor</span>
@@ -312,9 +315,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
           </>
         ) : (
           <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
-              You need to supply collateral before you can borrow. Go to the Supply tab to deposit USDC.
+            <AlertDescription className="flex items-center gap-2">
+              <Info className="h-4 w-4 flex-shrink-0" />
+              <span>You need to supply collateral before you can borrow. Go to the Supply tab to deposit USDC.</span>
             </AlertDescription>
           </Alert>
         )}
