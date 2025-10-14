@@ -1,284 +1,416 @@
 # Credo Protocol
 
-**Decentralized Trust for Capital on Moca Chain**
+**Identity-Backed DeFi Lending on Moca Chain**
 
-An identity-backed DeFi lending protocol that enables undercollateralized loans based on verifiable credentials and on-chain credit scores. Built for the Moca Chain Hackathon.
+Transform your verifiable credentials into borrowing power. Build your on-chain credit score and unlock undercollateralized loans based on who you are, not just what you own.
 
 [![Moca Chain](https://img.shields.io/badge/Moca_Chain-Devnet-blue)](https://devnet-scan.mocachain.org)
-[![Status](https://img.shields.io/badge/Status-MVP_Complete-success)]()
+[![Status](https://img.shields.io/badge/Status-Live_Demo-success)]()
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 🎯 Vision
+## 🎯 Overview
 
-Transform DeFi lending from **asset-backed** to **identity-backed**, making capital accessible based on merit and reputation, not just existing wealth.
+Credo Protocol is a revolutionary DeFi lending platform that shifts from **asset-backed** to **identity-backed** lending. By leveraging Verifiable Credentials and on-chain credit scoring, we enable loans with as little as 50% collateral (vs 150% in traditional DeFi) for users with strong reputation.
 
-## ✨ Key Features
+### Key Innovation
 
-- **🔐 Identity-Based Lending** - Borrow based on verifiable credentials, not just collateral
-- **⚡ Dynamic Collateral** - 50-150% collateral requirements based on credit score (vs 150% standard DeFi)
-- **🎫 Moca ID Login** - Seamless Web3 SSO via AIR Account Services (Google/Email/Wallet)
-- **📊 On-Chain Credit Scores** - Transparent scoring algorithm (0-1000 scale)
-- **🔒 Privacy-Preserving** - Zero-Knowledge Proof framework for sensitive data
+**Traditional DeFi**: Borrow $100 → Need $150 collateral  
+**Credo Protocol**: Borrow $100 → Need $50-$150 collateral (based on your credit score)
+
+## ✨ Features
+
+- **🔐 Seamless Login** - One-click Web3 SSO via Moca AIR Kit (Google/Email/Wallet)
+- **🎫 Verifiable Credentials** - Submit proof of CEX history, employment, and stable balances
+- **📊 On-Chain Credit Scoring** - Transparent 0-1000 scale with diversity bonuses
+- **⚡ Dynamic Collateral** - 50-150% requirements based on your score
+- **💰 Complete Lending Flow** - Supply, borrow, and repay USDC seamlessly
 
 ## 🚀 Live Demo
 
-**Frontend**: [Coming Soon - Deployment in Progress]  
+**Frontend**: [Coming Soon - Deployment in Progress]
+
 **Smart Contracts** (Moca Chain Devnet):
-- 📝 CreditScoreOracle: [`0x73d361F5a7639d67657B497C89d78031713001ee`](https://devnet-scan.mocachain.org/address/0x73d361F5a7639d67657B497C89d78031713001ee)
-- 💰 LendingPool: [`0x38c0EDF8f4e79481b40D82341ca8582D7a346DB4`](https://devnet-scan.mocachain.org/address/0x38c0EDF8f4e79481b40D82341ca8582D7a346DB4)
-- 🪙 MockUSDC: [`0x3FC426Bac14Ff9C697cB2B1C65E017E99e191C03`](https://devnet-scan.mocachain.org/address/0x3FC426Bac14Ff9C697cB2B1C65E017E99e191C03)
+- 📝 CreditScoreOracle: [`0x82Adc3540672eA15C2B9fF9dFCf01BF8d81F2Cd2`](https://devnet-scan.mocachain.org/address/0x82Adc3540672eA15C2B9fF9dFCf01BF8d81F2Cd2)
+- 💰 LendingPool: [`0x72efF02BF767b79369ea749dd7d57c143A92Cf09`](https://devnet-scan.mocachain.org/address/0x72efF02BF767b79369ea749dd7d57c143A92Cf09)
+- 🪙 MockUSDC: [`0x76FdD416C70a9b51071C1751088d6715dD60d864`](https://devnet-scan.mocachain.org/address/0x76FdD416C70a9b51071C1751088d6715dD60d864)
 
 ## 📋 How It Works
 
 ```
-1️⃣ Login with Moca ID (Google/Email/Wallet) → 2️⃣ Request Verifiable Credentials 
-→ 3️⃣ Build Credit Score On-Chain → 4️⃣ Borrow with Better Terms
+1. Login with Moca ID (Google/Email/Wallet)
+   ↓
+2. Request Verifiable Credentials (CEX, Employer, Bank)
+   ↓
+3. Submit Credentials → Build Credit Score On-Chain
+   ↓
+4. Supply USDC as Collateral
+   ↓
+5. Borrow with Personalized Terms (Score-Based)
 ```
 
-**Example**: User with credit score 750 can borrow $100 with only $75 collateral (vs. $150 in traditional DeFi)
+### Example User Journey
+
+**Alice's Story**:
+1. Logs in with her Google account via Moca AIR Kit ✅
+2. Submits 3 credentials: CEX history, Employment proof, Stable balance ✅
+3. Credit score calculated: **862/1000** ✅
+4. Supplies $1,000 USDC as collateral ✅
+5. **Can borrow up to $1,667 USDC** (60% collateral requirement) vs $667 in traditional DeFi 🎉
+
+## 💎 Credit Scoring System
+
+### Collateral Requirements by Score
+
+| Credit Score | Collateral Required | Borrowing Power (per $100 collateral) |
+|--------------|---------------------|----------------------------------------|
+| 900-1000     | 50%                 | $200                                   |
+| 800-899      | 60%                 | $167                                   |
+| 700-799      | 75%                 | $133                                   |
+| 600-699      | 90%                 | $111                                   |
+| 500-599      | 100%                | $100                                   |
+| 400-499      | 110%                | $91                                    |
+| 300-399      | 125%                | $80                                    |
+| 0-299        | 150%                | $67 (Standard DeFi)                    |
+
+### Score Calculation
+
+```javascript
+Base Score: 500
+
++ Credential Type Weights:
+  • Proof of Stable Balance: +100 points
+  • Proof of CEX History: +80 points
+  • Proof of Employment: +70 points
+
+× Issuer Trust Score: 0-100%
+× Recency Decay: 70-100% (based on credential age)
+
++ Diversity Bonus: 5% per unique credential type (up to 25%)
+
+= Final Score (0-1000, capped)
+```
+
+**Example**:
+- 3 credentials (CEX + Employment + Bank Balance)
+- Full issuer trust (100%)
+- Recent submissions (100% recency)
+- Calculation: (500 + 80 + 70 + 100) × 1.15 = **862**
 
 ## 🏗️ Project Structure
 
-This is a **multi-part monorepo** with three main components:
-
 ```
-credoprotocol/
-├── contracts/          # Solidity smart contracts (Hardhat)
-│   ├── CreditScoreOracle.sol
-│   ├── LendingPool.sol
-│   └── MockUSDC.sol
-├── backend/            # Mock credential issuer service (Express)
+Credo-Protocol/
+├── pages/                      # Next.js pages
+│   ├── index.js               # Landing page
+│   ├── dashboard.js           # Main app dashboard
+│   └── faucet.js              # Get test USDC
+├── components/                 # React components
+│   ├── auth/
+│   │   └── ConnectButton.jsx  # Moca AIR Kit integration
+│   ├── CreditScoreCard.jsx    # Display user's score
+│   ├── CredentialMarketplace.jsx  # Request credentials
+│   ├── LendingInterface.jsx   # Supply/Borrow/Repay
+│   ├── SupplyModal.jsx        # Deposit collateral modal
+│   ├── RepayModal.jsx         # Repay debt modal
+│   └── ui/                    # shadcn/ui components
+├── contracts/                  # Solidity smart contracts
+│   ├── contracts/
+│   │   ├── CreditScoreOracle.sol  # Credit scoring logic
+│   │   ├── LendingPool.sol    # Lending/borrowing logic
+│   │   └── MockUSDC.sol       # Test token with faucet
+│   ├── scripts/
+│   │   ├── deploy.ts          # Deploy all contracts
+│   │   └── register-issuers.ts  # Setup credential issuers
+│   └── test/                  # Contract tests
+├── backend/                    # Express API server
 │   └── src/
-│       ├── issuers/    # CEX, Employer, Bank issuers
-│       └── routes/     # Credential API
-├── components/         # React UI components
-├── pages/              # Next.js pages (Frontend)
-├── lib/                # Utilities & contract ABIs
-├── hooks/              # React hooks (AIR Kit integration)
-└── docs/               # Detailed documentation
+│       ├── issuers/           # Mock credential issuers
+│       │   ├── MockBankIssuer.js
+│       │   ├── MockEmployerIssuer.js
+│       │   └── MockExchangeIssuer.js
+│       └── routes/
+│           └── credentials.js  # Credential API endpoints
+├── hooks/
+│   └── useAirKit.js           # AIR Kit React hook
+├── lib/
+│   ├── contracts.js           # Contract ABIs & addresses
+│   ├── airkit.js              # AIR Kit initialization
+│   └── utils.js               # Helper functions
+└── docs/                       # Comprehensive documentation
+    ├── OVERVIEW.md            # Technical architecture (670+ lines)
+    ├── IMPLEMENTATION.md      # Implementation guide (1,900+ lines)
+    ├── PHASE1-4.md            # Development progress
+    └── SCORE-CALCULATOR.md    # Scoring algorithm details
 ```
 
 ## 🛠️ Tech Stack
 
-**Frontend**
-- Next.js 15 + React 19
-- Tailwind CSS + shadcn/ui
-- Ethers.js v6
-- Moca AIR Kit SDK
+### Frontend
+- **Framework**: Next.js 15 + React 19
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Web3**: Ethers.js v6
+- **Auth**: Moca AIR Kit SDK (AIR Account Services)
+- **Credentials**: AIR Credential Services framework
 
-**Smart Contracts**
-- Solidity 0.8.x
-- Hardhat
-- OpenZeppelin v5
+### Smart Contracts
+- **Language**: Solidity 0.8.x
+- **Framework**: Hardhat
+- **Libraries**: OpenZeppelin v5
+- **Network**: Moca Chain Devnet (Chain ID: 5151)
 
-**Backend**
-- Node.js + Express
-- EIP-191 Signature Verification
-
-**Blockchain**
-- Moca Chain Devnet (Chain ID: 5151)
+### Backend
+- **Runtime**: Node.js + Express
+- **Signing**: Ethers.js for EIP-191 signatures
+- **Purpose**: Mock credential issuers for demo
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 18 or higher
 - npm or yarn
 
-### 1. Clone Repository
+### 1. Clone & Install
 
 ```bash
-git clone https://github.com/YourUsername/credoprotocol.git
-cd credoprotocol
-```
+git clone https://github.com/YourUsername/Credo-Protocol.git
+cd Credo-Protocol
 
-### 2. Install Dependencies
-
-**Frontend:**
-```bash
+# Install frontend dependencies
 npm install
-```
 
-**Backend:**
-```bash
+# Install backend dependencies
 cd backend
 npm install
-```
 
-**Contracts:**
-```bash
-cd contracts
+# Install contract dependencies
+cd ../contracts
 npm install
 ```
 
-### 3. Environment Setup
+### 2. Environment Setup
 
-**Frontend** (`.env.local`):
+Create environment files from the examples:
+
 ```bash
-# AIR Kit (Get from https://developers.sandbox.air3.com/)
-NEXT_PUBLIC_PARTNER_ID=your_partner_id
+# Frontend
+cp .env.example .env.local
+# Edit .env.local and add your NEXT_PUBLIC_PARTNER_ID from https://developers.sandbox.air3.com/
 
-# Deployed Contracts (Moca Devnet)
-NEXT_PUBLIC_CREDIT_ORACLE_ADDRESS=0x73d361F5a7639d67657B497C89d78031713001ee
-NEXT_PUBLIC_LENDING_POOL_ADDRESS=0x38c0EDF8f4e79481b40D82341ca8582D7a346DB4
-NEXT_PUBLIC_MOCK_USDC_ADDRESS=0x3FC426Bac14Ff9C697cB2B1C65E017E99e191C03
+# Backend
+cp backend/.env.example backend/.env
+# No changes needed for development
 
-# Backend API
-NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
+# Contracts (optional - if deploying your own)
+cp contracts/.env.example contracts/.env
+# Add your private key if deploying
 ```
 
-**Backend** (`backend/.env`):
+**Minimum Required**: Only the frontend `.env.local` needs configuration:
 ```bash
-# Mock Issuer Private Keys (For Development Only)
-MOCK_EXCHANGE_PRIVATE_KEY=0x...
-MOCK_EMPLOYER_PRIVATE_KEY=0x...
-MOCK_BANK_PRIVATE_KEY=0x...
-
-# Moca Chain
-RPC_URL=http://devnet-rpc.mocachain.org
+NEXT_PUBLIC_PARTNER_ID=your_partner_id_from_air_kit
 ```
 
-**Contracts** (`contracts/.env`):
-```bash
-# Moca Chain Devnet
-MOCA_DEVNET_RPC=http://devnet-rpc.mocachain.org
-PRIVATE_KEY=your_private_key
-```
+All other variables have working defaults for the deployed contracts.
 
-### 4. Run the Application
+### 3. Start the Application
 
-**Start Backend** (Terminal 1):
+**Terminal 1 - Backend**:
 ```bash
 cd backend
 npm run dev
 # → Running on http://localhost:3001
 ```
 
-**Start Frontend** (Terminal 2):
+**Terminal 2 - Frontend**:
 ```bash
 npm run dev
 # → Running on http://localhost:3000
 ```
 
-**Access**: Open http://localhost:3000
+**Access**: Open http://localhost:3000 in your browser
 
-### 5. Get Test Tokens
+### 4. Get Test Tokens
 
-1. Visit the [Moca Devnet Faucet](https://devnet-scan.mocachain.org/faucet)
-2. Get test MOCA for gas fees
-3. In the app, visit `/faucet` to get test USDC
+1. **Get MOCA for Gas**: Visit [Moca Devnet Faucet](https://devnet-scan.mocachain.org/faucet)
+2. **Get Test USDC**: Visit `/faucet` page in the app (after logging in)
+
+### 5. Try It Out!
+
+1. **Login** - Click "Login with Moca ID" and choose Google/Email/Wallet
+2. **Request Credentials** - Visit "Build Credit Score" tab, request all 3 credentials
+3. **Check Score** - Your credit score updates automatically (base 500 + credentials)
+4. **Supply USDC** - Go to "Lending Pool" tab, supply collateral
+5. **Borrow** - Borrow up to your limit based on credit score
+6. **Repay** - Pay back anytime to improve health factor
 
 ## 🧪 Testing
 
-**Smart Contracts:**
+### Smart Contract Tests
+
 ```bash
 cd contracts
 npm test
 ```
 
-**Integration Tests:**
+**Test Coverage**:
+- ✅ Credit score calculation with diversity bonuses
+- ✅ Dynamic collateral factors (8 score tiers)
+- ✅ Credential verification with EIP-191 signatures
+- ✅ Supply, borrow, repay, withdraw flows
+- ✅ Health factor calculations
+
+### Integration Tests
+
 ```bash
-node scripts/test-integration.js
+npm run test:integration
 ```
 
-**Manual Testing Guide:**
-See [`docs/TESTING-GUIDE.md`](./docs/TESTING-GUIDE.md) for comprehensive test scenarios
+Tests the full flow from frontend → backend → contracts.
 
 ## 📚 Documentation
 
-- **[PRD.md](./PRD.md)** - Product vision & hackathon plan
-- **[docs/OVERVIEW.md](./docs/OVERVIEW.md)** - Technical architecture (670+ lines)
-- **[docs/IMPLEMENTATION.md](./docs/IMPLEMENTATION.md)** - Implementation guide (1,900+ lines)
-- **[docs/PHASE1-4.md](./docs/PHASE1-4.md)** - Development progress & completion status
-- **[docs/SCORE-CALCULATOR.md](./docs/SCORE-CALCULATOR.md)** - Credit scoring algorithm reference
-- **[docs/TESTING-GUIDE.md](./docs/TESTING-GUIDE.md)** - Comprehensive testing procedures
+- **[PRD.md](./docs/PRD.md)** - Product vision & requirements
+- **[OVERVIEW.md](./docs/OVERVIEW.md)** - Technical architecture & Moca integration (670+ lines)
+- **[IMPLEMENTATION.md](./docs/IMPLEMENTATION.md)** - Complete implementation guide (1,900+ lines)
+- **[PHASE1-4.md](./docs/PHASE1-4.md)** - Development phases & completion status
+- **[SCORE-CALCULATOR.md](./docs/SCORE-CALCULATOR.md)** - Credit scoring algorithm reference
+- **[SETUP-GUIDE.md](./docs/SETUP-GUIDE.md)** - Detailed setup instructions
 
-## 🎯 Current Status
+## 📊 Current Status
 
-**✅ Completed (Phases 1-4)**
-- ✅ Smart contracts deployed & verified on Moca Devnet
-- ✅ Backend credential issuers operational (3 types)
-- ✅ Frontend with AIR Kit authentication (Google/Email/Wallet)
-- ✅ Credit score calculation with diversity bonus
-- ✅ Dynamic collateralization (50-150% based on score)
-- ✅ Supply, Borrow, Repay functionality
+### ✅ Completed Features
+
+**Phase 1: Smart Contracts**
+- ✅ CreditScoreOracle with credential verification
+- ✅ LendingPool with dynamic collateral
+- ✅ MockUSDC with faucet functionality
+- ✅ Deployed & verified on Moca Devnet
+- ✅ Comprehensive test suite
+
+**Phase 2: Backend Services**
+- ✅ Express API with 3 mock issuers
+- ✅ EIP-191 signature generation
+- ✅ Credential type endpoints
+- ✅ CORS configuration
+
+**Phase 3: Frontend Application**
+- ✅ Moca AIR Kit integration (Google/Email/Wallet login)
+- ✅ Beautiful landing page with animations
+- ✅ Dashboard with credit score display
+- ✅ Credential marketplace with 3 types
+- ✅ Lending interface (supply/borrow/repay)
+- ✅ Faucet page for test tokens
 - ✅ Real-time position monitoring
-- ✅ Comprehensive error handling
-- ✅ Mobile responsive UI
+- ✅ Responsive design (mobile-friendly)
+- ✅ Error handling & loading states
+- ✅ Transaction feedback & confirmations
 
-**🚧 In Progress (Phase 5)**
-- 🚧 Backend deployment (Railway/Render)
+**Phase 4: Polish & Testing**
+- ✅ Login state management fixes
+- ✅ Navigation improvements
+- ✅ UI/UX enhancements
+- ✅ Color-coded credit scores
+- ✅ Modal redesigns (minimalist theme)
+- ✅ RPC timeout handling
+- ✅ Graceful error fallbacks
+
+### 🚧 In Progress (Phase 5)
+
 - 🚧 Frontend deployment (Vercel)
+- 🚧 Backend deployment (Railway/Render)
 - 🚧 Demo video creation
 - 🚧 Final documentation polish
 
-**🔮 Future (Post-Hackathon)**
+### 🔮 Future Enhancements
+
+**Post-Hackathon Roadmap**:
 - Real credential issuers (Plaid, CEX APIs)
 - Full Zero-Knowledge Proof implementation
 - Liquidation mechanism
-- Interest accrual system
-- Multi-asset support
-- Cross-chain credit portability
+- Interest accrual on borrows
+- Multi-asset support (ETH, BTC, etc.)
+- Cross-chain credit score portability
+- Delegation & credit scoring for DAOs
 
 ## 🔑 Key Innovations
 
-### 1. Dynamic Collateral Based on Credit Score
+### 1. Moca AIR Kit Integration
 
-| Credit Score | Collateral Required | Example |
-|--------------|---------------------|---------|
-| 900-1000 | 50% | Borrow $100 with $50 |
-| 700-899 | 75% | Borrow $100 with $75 |
-| 500-699 | 100% | Borrow $100 with $100 |
-| 300-499 | 125% | Borrow $100 with $125 |
-| 0-299 | 150% | Standard DeFi |
+**AIR Account Services**:
+- One-click Web3 SSO (no MetaMask required!)
+- Multiple login options: Google, Email, Wallet
+- 30-day sessions (users stay logged in)
+- Smart account abstraction built-in
 
-### 2. Transparent Credit Scoring
+**AIR Credential Services**:
+- Framework for verifiable credentials
+- Zero-Knowledge Proof capabilities
+- Privacy-preserving attestations
+- EIP-191 signature verification
 
-```
-Base Score: 500
-+ Credential Weights:
-  • Proof of Stable Balance: +100 points
-  • Proof of CEX History: +80 points  
-  • Proof of Employment: +70 points
-× Issuer Trust Score (0-100%)
-× Recency Decay (70-100%)
-+ Diversity Bonus (5% per unique type)
-= Final Score (0-1000)
-```
+### 2. Privacy-Preserving Design
 
-### 3. Moca AIR Kit Integration
+Unlike traditional credit bureaus, Credo never sees your raw data:
 
-- **AIR Account Services**: One-click Web3 SSO (no MetaMask required!)
-- **AIR Credential Services**: Framework for verifiable credentials with ZK proofs
-- **30-day Sessions**: Users stay logged in automatically
-- **Smart Accounts**: Built-in account abstraction
+- **Prove income threshold** without revealing exact salary
+- **Prove trading volume** without exposing all transactions
+- **Prove employment** without sharing employer details
+- **Prove stable balance** without revealing account numbers
 
-## 🏆 Hackathon Deliverables
+### 3. Composable Financial Identity
 
-- [x] Functional MVP on Moca Chain Devnet
-- [x] Complete user flow (login → credentials → score → borrow)
-- [x] Professional UI with loading states and error handling
-- [x] Comprehensive documentation (3,000+ lines)
-- [ ] Demo video (3 minutes)
-- [ ] Deployed live demo
+Your on-chain credit score is a public good that other dApps can use:
+
+- **Identity-gated trading** (higher leverage for trusted users)
+- **Premium access** (auto-qualify for memberships)
+- **DAO governance** (reputation-weighted voting)
+- **Undercollateralized NFT purchases**
+- **Reputation-based insurance pools**
+
+## 🏆 Built for Moca Chain Hackathon
+
+**Hackathon Deliverables**:
+- ✅ Functional MVP on Moca Chain Devnet
+- ✅ Complete user flow (login → credentials → score → borrow)
+- ✅ Professional UI with error handling
+- ✅ Comprehensive documentation (3,000+ lines)
+- 🚧 Demo video (3 minutes)
+- 🚧 Live deployment
+
+**Team**: Built with ❤️ by Marcus
 
 ## 🤝 Contributing
 
 This project was built for the Moca Chain Hackathon. Contributions, issues, and feature requests are welcome!
 
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) file for details
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
 - **Moca Network** for the AIR Kit SDK and developer tools
-- **OpenZeppelin** for secure smart contract libraries
-- **Hardhat** for development framework
-- **shadcn/ui** for beautiful UI components
+- **OpenZeppelin** for secure smart contract libraries  
+- **Hardhat** for the excellent development framework
+- **shadcn/ui** for beautiful, accessible UI components
+- **Vercel** for Next.js and hosting platform
+
+## 📞 Contact & Links
+
+- **Documentation**: [docs/OVERVIEW.md](./docs/OVERVIEW.md)
+- **Smart Contracts**: [Moca Chain Devnet Explorer](https://devnet-scan.mocachain.org)
+- **Moca Developers**: [https://developers.mocaverse.xyz](https://developers.mocaverse.xyz)
 
 ---
 
-**Built with ❤️ for the Moca Chain Hackathon**
+**Built for Moca Chain Hackathon 2025**
 
-*Transforming trust into capital, one credential at a time.*
+*Transforming trust into capital, one credential at a time.* 🚀
+

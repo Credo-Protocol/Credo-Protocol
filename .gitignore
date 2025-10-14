@@ -74,7 +74,7 @@ backend/build/
 .cursorignore
 .cursor
 
-# Documentation
- PRD.md
- docs/
- 
+# Temporary files
+*.swp
+*.swo
+*~
