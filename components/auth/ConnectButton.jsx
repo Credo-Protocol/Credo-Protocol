@@ -83,12 +83,8 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
 
         console.log('User already logged in:', info.user.abstractAccountAddress);
 
-        // Ensure we're on the dashboard when a session is already active
-        try {
-          if (router && router.pathname !== '/dashboard') {
-            router.replace('/dashboard');
-          }
-        } catch {}
+        // Don't auto-redirect - allow users to stay on their current page
+        // They can navigate manually if needed
       }
     } catch (error) {
       console.error('Failed to initialize AIR Kit:', error);
@@ -127,9 +123,10 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
 
         console.log('Login successful:', info.user.abstractAccountAddress);
 
-        // Redirect to dashboard immediately after successful login
+        // Only redirect to dashboard if user is on the landing page
+        // Allow staying on other pages (like faucet) after login
         try {
-          if (router && router.pathname !== '/dashboard') {
+          if (router && router.pathname === '/') {
             router.replace('/dashboard');
           }
         } catch {}
