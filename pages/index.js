@@ -82,27 +82,28 @@ export default function Home() {
               Build your on-chain credit score and unlock better terms.
             </AnimatedShinyText>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 items-center">
+            {/* CTA Button */}
+            <div className="flex justify-center pt-4">
               <Link href="/dashboard">
-                <button className="group relative text-lg px-10 py-3 bg-black text-white rounded-full flex items-center gap-2 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                  {/* Animated gradient border on hover */}
-                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-black via-neutral-700 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-gradient-x" />
-                  <span className="absolute inset-[2px] rounded-full bg-black" />
-                  <span className="relative z-10 flex items-center gap-2">
-                    Get Started
-                    <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </button>
-              </Link>
-              <Link href="/faucet">
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="text-lg px-10 h-12 border-2 border-black/20 hover:bg-black/5 hover:border-black/30 rounded-full text-black bg-white transition-all hover:scale-105"
-                >
-                  Get Test Tokens
-                </Button>
+                <div className="relative inline-block">
+                  {/* Moca-themed gradient border effect */}
+                  <div 
+                    className="absolute -inset-[2px] rounded-full opacity-75 blur-sm"
+                    style={{
+                      background: 'linear-gradient(90deg, #d946ef, #ec4899, #a855f7, #d946ef)',
+                      backgroundSize: '200% 100%',
+                      animation: 'rainbow-slide 3s linear infinite',
+                    }}
+                  />
+                  
+                  {/* Black button on top */}
+                  <button className="relative text-lg px-10 h-12 bg-black text-white rounded-full flex items-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer">
+                    <span className="flex items-center gap-2">
+                      Get Started
+                      <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </button>
+                </div>
               </Link>
             </div>
 
@@ -400,15 +401,25 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
                 <Link href="/dashboard">
-                  <button className="group relative text-xl px-16 py-7 bg-black text-white rounded-full flex items-center gap-3 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                    {/* Animated gradient border on hover */}
-                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-black via-neutral-700 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-gradient-x" />
-                    <span className="absolute inset-[2px] rounded-full bg-black" />
-                    <span className="relative z-10 flex items-center gap-3">
-                      Get Started
-                      <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" />
-                    </span>
-                  </button>
+                  <div className="relative inline-block">
+                    {/* Moca-themed gradient border effect */}
+                    <div 
+                      className="absolute -inset-[2px] rounded-full opacity-75 blur-sm"
+                      style={{
+                        background: 'linear-gradient(90deg, #d946ef, #ec4899, #a855f7, #d946ef)',
+                        backgroundSize: '200% 100%',
+                        animation: 'rainbow-slide 3s linear infinite',
+                      }}
+                    />
+                    
+                    {/* Black button on top */}
+                    <button className="relative text-xl px-16 h-14 bg-black text-white rounded-full flex items-center gap-3 transition-all duration-300 hover:scale-105 cursor-pointer">
+                      <span className="flex items-center gap-3">
+                        Get Started
+                        <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" />
+                      </span>
+                    </button>
+                  </div>
                 </Link>
               </motion.div>
             </MagicCard>

@@ -135,8 +135,25 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
         } catch {}
       }
     } catch (error) {
-      console.error('Login failed:', error);
-      setError(error.message || 'Login failed. Please try again.');
+      // Handle user closing the modal gracefully
+      // Check if error message indicates user cancelled/closed the modal
+      const errorMessage = error.message || error.toString();
+      const isUserCancelled = 
+        errorMessage.includes('User closed') || 
+        errorMessage.includes('user closed') ||
+        errorMessage.includes('cancelled') ||
+        errorMessage.includes('canceled') ||
+        errorMessage.includes('User rejected') ||
+        errorMessage.includes('dismissed');
+      
+      if (isUserCancelled) {
+        // User intentionally closed the modal - this is not an error
+        console.log('Login cancelled by user');
+      } else {
+        // Actual error occurred
+        console.error('Login failed:', error);
+        setError(error.message || 'Login failed. Please try again.');
+      }
     } finally {
       setLoggingIn(false);
     }
@@ -437,11 +454,11 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
   // Not logged in state
   return (
     <div className="relative inline-block">
-      {/* Rainbow border effect */}
+      {/* Moca-themed gradient border effect */}
       <div 
         className="absolute -inset-[2px] rounded-full opacity-75 blur-sm"
         style={{
-          background: 'linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3)',
+          background: 'linear-gradient(90deg, #d946ef, #ec4899, #a855f7, #d946ef)',
           backgroundSize: '200% 100%',
           animation: 'rainbow-slide 3s linear infinite',
         }}
