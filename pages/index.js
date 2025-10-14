@@ -41,8 +41,9 @@ export default function Home() {
                 <TextGenerateEffect
                   words="WHO YOU ARE"
                   className="text-5xl md:text-7xl lg:text-8xl font-bold"
-                  duration={0.5}
+                  duration={1}
                   filter={true}
+                  auroraLastWord={true}
                 />
               </div>
             </div>

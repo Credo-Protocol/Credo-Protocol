@@ -224,7 +224,7 @@ body {
 }
 
 .animate-shimmer {
-  animation: shimmer 8s ease-in-out infinite;
+  animation: shimmer 3s ease-in-out infinite;
 }
 
 /* Retro grid animation */
@@ -287,4 +287,19 @@ body {
 
 .bg-shine-size {
   background-size: 300% 300%;
+}
+
+/* Aurora text animation */
+@keyframes aurora {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-aurora {
+  background-size: 200% 200%;
+  animation: aurora 3s ease infinite;
 }

@@ -11,12 +11,14 @@ import { cn } from "@/lib/utils";
  * @param {string} className - Additional CSS classes
  * @param {boolean} filter - Whether to apply blur filter (default: true)
  * @param {number} duration - Animation duration per word (default: 0.5)
+ * @param {boolean} auroraLastWord - Whether to apply aurora effect to last word (default: false)
  */
 export const TextGenerateEffect = ({
   words,
   className,
   filter = true,
   duration = 0.5,
+  auroraLastWord = false,
 }) => {
   const [scope, animate] = useAnimate();
   let wordsArray = words.split(" ");
@@ -40,10 +42,19 @@ export const TextGenerateEffect = ({
     return (
       <motion.div ref={scope}>
         {wordsArray.map((word, idx) => {
+          // Check if this is the last word and aurora effect should be applied
+          const isLastWord = idx === wordsArray.length - 1;
+          const shouldApplyAurora = auroraLastWord && isLastWord;
+          
           return (
             <motion.span
               key={word + idx}
-              className="dark:text-white text-black opacity-0"
+              className={cn(
+                "opacity-0",
+                shouldApplyAurora 
+                  ? "bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 animate-aurora" 
+                  : "dark:text-white text-black"
+              )}
               style={{
                 filter: filter ? "blur(10px)" : "none",
               }}
