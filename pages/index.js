@@ -18,6 +18,33 @@ import { motion } from 'framer-motion';
 export default function Home() {
   return (
     <div className="min-h-screen bg-white text-black">
+      {/* Header/Navbar */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-black/5">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo and Brand */}
+            <Link href="/" className="flex items-center gap-1 group">
+              <img 
+                src="/credo.jpg" 
+                alt="Credo Protocol" 
+                className="w-8 h-8 rounded-lg object-cover transition-transform group-hover:scale-105" 
+              />
+              <span className="text-xl font-bold text-black">Credo Protocol</span>
+            </Link>
+            
+            {/* Navigation Links */}
+            <nav className="hidden md:flex items-center gap-8">
+              <Link href="/dashboard" className="text-black/70 hover:text-black transition-colors font-medium">
+                Dashboard
+              </Link>
+              <Link href="/faucet" className="text-black/70 hover:text-black transition-colors font-medium">
+                Faucet
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Retro Grid Background */}

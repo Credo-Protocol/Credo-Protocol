@@ -158,7 +158,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="space-y-2">
-            <h1 className="text-5xl md:text-6xl font-bold">Credo Protocol</h1>
+            <h1 className="text-5xl md:text-6xl font-bold whitespace-nowrap">Credo Protocol</h1>
             <AnimatedShinyText className="text-xl">
               Identity-Backed DeFi Lending
             </AnimatedShinyText>
@@ -179,52 +179,23 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white text-black relative overflow-hidden">
         <RetroGrid className="opacity-50" />
-        <div className="max-w-lg w-full p-8 space-y-8 text-center relative z-10">
+        <div className="max-w-md w-full p-8 space-y-6 text-center relative z-10">
           <div className="flex justify-center mb-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 backdrop-blur-sm">
               <Image src="/moca.jpg" alt="Moca" width={16} height={16} className="rounded-full" />
               <span className="text-sm font-medium">Built on Moca Chain</span>
             </div>
           </div>
-          
-          <div className="space-y-4">
-            <h1 className="text-5xl md:text-6xl font-bold">Credo Protocol</h1>
+          <div className="space-y-2">
+            <h1 className="text-5xl md:text-6xl font-bold whitespace-nowrap">Credo Protocol</h1>
             <AnimatedShinyText className="text-xl">
               Identity-Backed DeFi Lending
             </AnimatedShinyText>
           </div>
-          
-          <div className="space-y-6 py-6">
-            <p className="text-lg text-black/70">
-              Build your on-chain credit score with verifiable credentials
-            </p>
-            <div className="space-y-3 text-left max-w-sm mx-auto">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5 flex-shrink-0 shadow-lg shadow-green-200">
-                  <CheckCircle className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-black/80">Connect with Google, Email, or Wallet</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5 flex-shrink-0 shadow-lg shadow-green-200">
-                  <CheckCircle className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-black/80">Get better collateral terms</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5 flex-shrink-0 shadow-lg shadow-green-200">
-                  <CheckCircle className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-black/80">Privacy-preserving with ZK proofs</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center">
+          <div className="flex justify-center py-8">
             <ConnectButton size="lg" onConnectionChange={handleConnectionChange} />
           </div>
-
-          <p className="text-xs text-black/50">
+          <p className="text-sm text-black/60">
             Powered by Moca Network AIR Kit • Chain ID: {MOCA_CHAIN.id}
           </p>
         </div>

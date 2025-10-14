@@ -439,7 +439,7 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
     <Button
       onClick={handleLogin}
       disabled={loggingIn}
-      className="h-[44px] px-4 bg-black text-white hover:bg-black/90 disabled:bg-black/70 border-0"
+      className="h-[44px] px-4 bg-black text-white hover:bg-black/90 hover:scale-105 hover:shadow-xl disabled:bg-black/70 disabled:hover:scale-100 disabled:hover:shadow-none border-0 cursor-pointer transition-all duration-300"
       size={size}
       variant="default"
     >
