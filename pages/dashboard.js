@@ -209,12 +209,16 @@ export default function Dashboard() {
       <header className="border-b border-black/10 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div>
-                <h1 className="text-2xl font-bold">Credo Protocol</h1>
-                <p className="text-sm text-black/60">Dashboard</p>
-              </div>
-            </div>
+            {/* Logo and Brand */}
+            <Link href="/" className="flex items-center gap-1 group">
+              <img 
+                src="/credo.jpg" 
+                alt="Credo Protocol" 
+                className="w-8 h-8 rounded-lg object-cover transition-transform group-hover:scale-105" 
+              />
+              <span className="text-xl font-bold text-black">Credo Protocol</span>
+            </Link>
+            
             <div className="flex items-center gap-3">
               <Link href="/">
                 <Button 
@@ -248,6 +252,11 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Dashboard Heading */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-black">Dashboard</h1>
+        </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Credit Score Card */}
           <div className="lg:col-span-1">
