@@ -87,20 +87,36 @@ export default function Dashboard() {
 
   // Fetch credit score when user address changes
   useEffect(() => {
+    console.log('🔍 Credit score fetch trigger:', { 
+      hasAddress: !!userAddress, 
+      hasProvider: !!provider,
+      address: userAddress 
+    });
     if (userAddress && provider) {
+      console.log('📞 Calling fetchCreditScore...');
       fetchCreditScore();
     }
   }, [userAddress, provider]);
 
   const fetchCreditScore = async () => {
+    console.log('🎯 fetchCreditScore called!');
+    
     // Early return if not connected, missing data, or component unmounted
     if (!isMounted || !isConnected || !userAddress || !provider) {
-      console.log('Skipping credit score fetch:', { isMounted, isConnected, hasAddress: !!userAddress, hasProvider: !!provider });
+      console.log('❌ Skipping credit score fetch:', { isMounted, isConnected, hasAddress: !!userAddress, hasProvider: !!provider });
       return;
     }
 
+    console.log('✅ All checks passed, proceeding with fetch');
+
     try {
       setLoading(true);
+      console.log('⏳ Loading state set to true');
+      
+      console.log('📝 Creating contract with:', {
+        address: CONTRACTS.CREDIT_ORACLE,
+        userAddress
+      });
       
       const oracleContract = new ethers.Contract(
         CONTRACTS.CREDIT_ORACLE,
@@ -108,16 +124,30 @@ export default function Dashboard() {
         provider
       );
 
+      console.log('✅ Contract created successfully');
+
       // Double check we're still connected and mounted before async call
       if (!isMounted || !isConnected || !userAddress) {
-        console.log('Component unmounted or user disconnected, aborting fetch');
+        console.log('❌ Component unmounted or user disconnected, aborting fetch');
         return;
       }
 
       // Get score details - try new method first, fallback to old
       let scoreData;
       try {
-        const details = await oracleContract.getScoreDetails(userAddress);
+        console.log('📞 Calling getScoreDetails on contract...');
+        
+        // Add timeout to prevent infinite hanging
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('RPC call timeout')), 10000)
+        );
+        
+        const details = await Promise.race([
+          oracleContract.getScoreDetails(userAddress),
+          timeoutPromise
+        ]);
+        
+        console.log('✅ getScoreDetails returned:', details);
         
         // Check again after async operation
         if (!isMounted || !isConnected || !userAddress) {
@@ -132,11 +162,23 @@ export default function Dashboard() {
           initialized: details[3]
         };
       } catch (detailsError) {
-        console.log('getScoreDetails failed, trying getCreditScore fallback:', detailsError.message);
+        console.error('❌ getScoreDetails failed:', detailsError.message);
+        console.log('🔄 Trying getCreditScore fallback...');
         
         // Fallback: try getCreditScore if getScoreDetails fails (contract version mismatch)
         try {
-          const score = await oracleContract.getCreditScore(userAddress);
+          console.log('📞 Calling getCreditScore (fallback)...');
+          
+          const timeoutPromise2 = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('RPC call timeout')), 10000)
+          );
+          
+          const score = await Promise.race([
+            oracleContract.getCreditScore(userAddress),
+            timeoutPromise2
+          ]);
+          
+          console.log('✅ getCreditScore returned:', score);
           
           // Check if still mounted
           if (!isMounted || !isConnected || !userAddress) {
@@ -151,7 +193,8 @@ export default function Dashboard() {
           };
           console.log('Using fallback getCreditScore:', scoreData);
         } catch (fallbackError) {
-          console.error('Both score methods failed:', fallbackError);
+          console.error('❌ getCreditScore fallback also failed:', fallbackError.message);
+          console.warn('⚠️ RPC may be down or unresponsive. Using default values.');
           // Use default values
           scoreData = {
             score: 500,
@@ -161,6 +204,8 @@ export default function Dashboard() {
           };
         }
       }
+      
+      console.log('💾 Final score data:', scoreData);
 
       // Final check before updating state
       if (!isMounted) {
@@ -168,10 +213,12 @@ export default function Dashboard() {
         return;
       }
 
-      console.log('Credit score fetched:', scoreData);
+      console.log('✅ Setting credit score state:', scoreData);
       
       setCreditScore(scoreData.score);
       setScoreDetails(scoreData);
+      
+      console.log('✅ Credit score successfully loaded!');
     } catch (error) {
       console.error('Error fetching credit score:', error);
       // Only update state if still mounted and connected
