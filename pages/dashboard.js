@@ -41,6 +41,7 @@ export default function Dashboard() {
   const [creditScore, setCreditScore] = useState(0);
   const [scoreDetails, setScoreDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(true);
 
   // Handle connection changes from ConnectButton
   const handleConnectionChange = (connectionData) => {
@@ -55,12 +56,23 @@ export default function Dashboard() {
       setCreditScore(0);
       setScoreDetails(null);
       setLoading(false);
-      // Redirect to home
-      try {
-        router.replace('/');
-      } catch {}
+      // Only redirect if we're still on the dashboard page
+      // Don't redirect if user is navigating away
+      if (isMounted && router.pathname === '/dashboard') {
+        try {
+          router.replace('/');
+        } catch {}
+      }
     }
   };
+
+  // Component mount/unmount tracking
+  useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      setIsMounted(false);
+    };
+  }, []);
 
   // Debug connection state
   useEffect(() => {
@@ -81,9 +93,9 @@ export default function Dashboard() {
   }, [userAddress, provider]);
 
   const fetchCreditScore = async () => {
-    // Early return if not connected or missing data
-    if (!isConnected || !userAddress || !provider) {
-      console.log('Not connected, skipping credit score fetch');
+    // Early return if not connected, missing data, or component unmounted
+    if (!isMounted || !isConnected || !userAddress || !provider) {
+      console.log('Skipping credit score fetch:', { isMounted, isConnected, hasAddress: !!userAddress, hasProvider: !!provider });
       return;
     }
 
@@ -96,27 +108,65 @@ export default function Dashboard() {
         provider
       );
 
-      // Double check we're still connected before async call
-      if (!isConnected || !userAddress) {
-        console.log('User disconnected during fetch, aborting');
+      // Double check we're still connected and mounted before async call
+      if (!isMounted || !isConnected || !userAddress) {
+        console.log('Component unmounted or user disconnected, aborting fetch');
         return;
       }
 
-      // Get score details
-      const details = await oracleContract.getScoreDetails(userAddress);
-      
-      // Check again after async operation
-      if (!isConnected || !userAddress) {
-        console.log('User disconnected during credit score fetch, aborting');
+      // Get score details - try new method first, fallback to old
+      let scoreData;
+      try {
+        const details = await oracleContract.getScoreDetails(userAddress);
+        
+        // Check again after async operation
+        if (!isMounted || !isConnected || !userAddress) {
+          console.log('Component unmounted during credit score fetch, aborting');
+          return;
+        }
+        
+        scoreData = {
+          score: Number(details[0]),
+          credentialCount: Number(details[1]),
+          lastUpdated: Number(details[2]),
+          initialized: details[3]
+        };
+      } catch (detailsError) {
+        console.log('getScoreDetails failed, trying getCreditScore fallback:', detailsError.message);
+        
+        // Fallback: try getCreditScore if getScoreDetails fails (contract version mismatch)
+        try {
+          const score = await oracleContract.getCreditScore(userAddress);
+          
+          // Check if still mounted
+          if (!isMounted || !isConnected || !userAddress) {
+            return;
+          }
+          
+          scoreData = {
+            score: Number(score),
+            credentialCount: 0,
+            lastUpdated: 0,
+            initialized: true
+          };
+          console.log('Using fallback getCreditScore:', scoreData);
+        } catch (fallbackError) {
+          console.error('Both score methods failed:', fallbackError);
+          // Use default values
+          scoreData = {
+            score: 500,
+            credentialCount: 0,
+            lastUpdated: 0,
+            initialized: false
+          };
+        }
+      }
+
+      // Final check before updating state
+      if (!isMounted) {
+        console.log('Component unmounted, skipping state update');
         return;
       }
-      
-      const scoreData = {
-        score: Number(details[0]),
-        credentialCount: Number(details[1]),
-        lastUpdated: Number(details[2]),
-        initialized: details[3]
-      };
 
       console.log('Credit score fetched:', scoreData);
       
@@ -124,14 +174,20 @@ export default function Dashboard() {
       setScoreDetails(scoreData);
     } catch (error) {
       console.error('Error fetching credit score:', error);
-      // Only reset scores if still connected (ignore errors if disconnected)
-      if (isConnected) {
-        setCreditScore(0);
-        setScoreDetails(null);
+      // Only update state if still mounted and connected
+      if (isMounted && isConnected) {
+        // Set default values instead of 0
+        setCreditScore(500);
+        setScoreDetails({
+          score: 500,
+          credentialCount: 0,
+          lastUpdated: 0,
+          initialized: false
+        });
       }
     } finally {
-      // Only clear loading if still connected
-      if (isConnected) {
+      // Only clear loading if still mounted and connected
+      if (isMounted && isConnected) {
         setLoading(false);
       }
     }
