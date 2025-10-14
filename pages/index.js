@@ -13,6 +13,7 @@ import { MagicCard } from '@/components/ui/magic-card';
 import { NumberTicker } from '@/components/ui/number-ticker';
 import { Marquee } from '@/components/ui/marquee';
 import { BorderBeam } from '@/components/ui/border-beam';
+import { motion } from 'framer-motion';
 
 export default function Home() {
   return (
@@ -117,11 +118,29 @@ export default function Home() {
       {/* How It Works Section */}
       <div className="container mx-auto px-4 py-32">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-5xl md:text-6xl font-bold text-center mb-20">
+          <motion.h2 
+            className="text-5xl md:text-6xl font-bold text-center mb-20"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             How It Works
-          </h2>
+          </motion.h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-4 gap-6 items-stretch"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.15
+                }
+              }
+            }}
+          >
             <StepCard
               number="01"
               icon={<Shield className="w-6 h-6" />}
@@ -146,18 +165,36 @@ export default function Home() {
               title="Borrow More"
               description="Higher scores unlock lower collateral requirements."
             />
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Features Section with Magic Cards */}
       <div className="container mx-auto px-4 py-32">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-5xl md:text-6xl font-bold text-center mb-20">
+          <motion.h2 
+            className="text-5xl md:text-6xl font-bold text-center mb-20"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             Key Features
-          </h2>
+          </motion.h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.15
+                }
+              }
+            }}
+          >
             <FeatureCard
               icon={<TrendingUp className="w-10 h-10" />}
               title="Dynamic Collateral"
@@ -178,20 +215,32 @@ export default function Home() {
               title="Instant Loans"
               description="Once your score is built, borrow instantly with transparent terms and no hidden fees."
             />
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Comparison Section */}
       <div className="container mx-auto px-4 py-32">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-5xl md:text-6xl font-bold text-center mb-20">
+          <motion.h2 
+            className="text-5xl md:text-6xl font-bold text-center mb-20"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             Better Than Traditional DeFi
-          </h2>
+          </motion.h2>
           
           <div className="relative grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 items-stretch">
             {/* Traditional DeFi Card - Faded */}
-            <div className="relative group">
+            <motion.div 
+              className="relative group"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative p-12 rounded-3xl border-2 border-black/10 bg-neutral-50/50 backdrop-blur-sm hover:bg-neutral-100/50 transition-all duration-300">
                 <h3 className="text-3xl font-bold mb-10 text-black/40 group-hover:text-black/50 transition-colors">
@@ -220,11 +269,11 @@ export default function Home() {
                     <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center mt-0.5 flex-shrink-0">
                       <X className="w-4 h-4 text-red-400" />
                     </div>
-                    <span className="text-black/50">No credit history</span>
-                  </li>
-                </ul>
-              </div>
+                  <span className="text-black/50">No credit history</span>
+                </li>
+              </ul>
             </div>
+          </motion.div>
 
             {/* VS Badge */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden md:block">
@@ -237,7 +286,13 @@ export default function Home() {
             </div>
 
             {/* Credo Protocol Card - Highlighted with Border Beam */}
-            <div className="relative z-10">
+            <motion.div 
+              className="relative z-10"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               <div className="relative p-12 rounded-3xl border-2 border-black bg-white shadow-2xl overflow-hidden">
                 {/* Border Beam Animation */}
                 <BorderBeam size={250} duration={10} borderWidth={2} />
@@ -269,13 +324,13 @@ export default function Home() {
                     <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5 flex-shrink-0 shadow-lg shadow-green-200">
                       <CheckCircle className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-black font-medium">Build on-chain reputation</span>
-                  </li>
-                </ul>
-              </div>
+                  <span className="text-black font-medium">Build on-chain reputation</span>
+                </li>
+              </ul>
             </div>
-          </div>
+          </motion.div>
         </div>
+      </div>
       </div>
 
       {/* CTA Section */}
@@ -347,28 +402,56 @@ function MarqueeItem({ text }) {
   );
 }
 
-// Component: Step Card
+// Component: Step Card with animation
 function StepCard({ number, icon, title, description }) {
   return (
-    <MagicCard className="p-8 relative" gradientColor="#000000" gradientOpacity={0.05}>
-      <div className="absolute top-6 right-6 text-7xl font-bold text-black/5">
-        {number}
-      </div>
-      <div className="relative space-y-4">
-        <div className="w-14 h-14 rounded-xl bg-black flex items-center justify-center text-white">
-          {icon}
+    <motion.div
+      className="h-full"
+      variants={{
+        hidden: { opacity: 0, y: 50 },
+        visible: { 
+          opacity: 1, 
+          y: 0,
+          transition: {
+            duration: 0.5,
+            ease: "easeOut"
+          }
+        }
+      }}
+    >
+      <MagicCard className="p-8 relative h-full flex flex-col" gradientColor="#000000" gradientOpacity={0.05}>
+        <div className="absolute top-6 right-6 text-7xl font-bold text-black/5">
+          {number}
         </div>
-        <h3 className="font-semibold text-xl">{title}</h3>
-        <p className="text-black/60 leading-relaxed">{description}</p>
-      </div>
-    </MagicCard>
+        <div className="relative space-y-4 flex-1 flex flex-col">
+          <div className="w-14 h-14 rounded-xl bg-black flex items-center justify-center text-white">
+            {icon}
+          </div>
+          <h3 className="font-semibold text-xl">{title}</h3>
+          <p className="text-black/60 leading-relaxed flex-1">{description}</p>
+        </div>
+      </MagicCard>
+    </motion.div>
   );
 }
 
-// Component: Feature Card
+// Component: Feature Card with animation
 function FeatureCard({ icon, title, description }) {
   return (
-    <div className="group relative p-10 rounded-2xl bg-white border border-black/5 hover:border-black/10 transition-all duration-300 hover:shadow-lg">
+    <motion.div 
+      className="group relative p-10 rounded-2xl bg-white border border-black/5 hover:border-black/10 transition-all duration-300 hover:shadow-lg"
+      variants={{
+        hidden: { opacity: 0, y: 50 },
+        visible: { 
+          opacity: 1, 
+          y: 0,
+          transition: {
+            duration: 0.5,
+            ease: "easeOut"
+          }
+        }
+      }}
+    >
       <div className="space-y-6">
         <div className="w-16 h-16 rounded-xl bg-black flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
           {icon}
@@ -376,6 +459,6 @@ function FeatureCard({ icon, title, description }) {
         <h3 className="font-semibold text-2xl">{title}</h3>
         <p className="text-black/60 leading-relaxed text-lg">{description}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
