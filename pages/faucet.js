@@ -276,26 +276,26 @@ export default function Faucet() {
             </div>
 
             {/* Info Box */}
-            <div className="p-6 rounded-xl bg-black text-white">
-              <div className="flex items-start gap-3 mb-4">
-                <Info className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold mb-3">How it works</h3>
-                  <ul className="space-y-2 text-sm text-white/90">
-                    <li className="flex items-start gap-2">
-                      <span className="text-white/60">•</span>
+            <div className="p-6 rounded-xl border border-black/10 bg-neutral-50">
+              <div className="flex items-start gap-3">
+                <Info className="h-5 w-5 text-black/60 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-black mb-3">How it works</h3>
+                  <ul className="space-y-2.5 text-sm text-black/70">
+                    <li className="flex items-start gap-2.5">
+                      <span className="text-black/40 font-bold">•</span>
                       <span>Click the button below to request tokens</span>
                     </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-white/60">•</span>
+                    <li className="flex items-start gap-2.5">
+                      <span className="text-black/40 font-bold">•</span>
                       <span>Approve the transaction in your wallet</span>
                     </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-white/60">•</span>
+                    <li className="flex items-start gap-2.5">
+                      <span className="text-black/40 font-bold">•</span>
                       <span>Receive 10,000 USDC instantly (max per transaction)</span>
                     </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-white/60">•</span>
+                    <li className="flex items-start gap-2.5">
+                      <span className="text-black/40 font-bold">•</span>
                       <span>You can request multiple times if needed</span>
                     </li>
                   </ul>
