@@ -390,13 +390,76 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-black/10 mt-16 bg-neutral-50">
-        <div className="container mx-auto px-4 py-12">
-          <div className="text-center text-black/50">
-            <p className="text-lg">Built for the Moca Chain Hackathon</p>
-            <p className="mt-2 text-black font-medium">
-              Transforming trust into capital, one credential at a time.
-            </p>
+      <footer className="bg-neutral-900 text-white">
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-6xl mx-auto">
+            {/* Main Footer Content */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+              {/* Brand Section */}
+              <div className="md:col-span-2">
+                <div className="flex items-center gap-3 mb-4">
+                  <img src="/moca.jpg" alt="Moca Chain" className="w-8 h-8 rounded-lg object-cover" />
+                  <h3 className="text-2xl font-bold">Credo Protocol</h3>
+                </div>
+                <p className="text-white/70 text-lg leading-relaxed max-w-md">
+                  Identity-backed DeFi lending with undercollateralized loans. 
+                  Build your on-chain credit score and unlock better terms.
+                </p>
+                <div className="flex items-center gap-2 mt-4 px-3 py-2 rounded-full bg-white/10 backdrop-blur-sm w-fit">
+                  <img src="/moca.jpg" alt="Moca Chain" className="w-4 h-4 rounded-sm object-cover" />
+                  <span className="text-sm font-medium text-white/90">Built on Moca Chain</span>
+                </div>
+              </div>
+
+              {/* Quick Links */}
+              <div>
+                <h4 className="font-semibold text-lg mb-4">Platform</h4>
+                <ul className="space-y-3">
+                  <li><Link href="/dashboard" className="text-white/70 hover:text-white transition-colors">Dashboard</Link></li>
+                  <li><Link href="/faucet" className="text-white/70 hover:text-white transition-colors">Get Test Tokens</Link></li>
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Documentation</a></li>
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">API</a></li>
+                </ul>
+              </div>
+
+              {/* Resources */}
+              <div>
+                <h4 className="font-semibold text-lg mb-4">Resources</h4>
+                <ul className="space-y-3">
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">How It Works</a></li>
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Security</a></li>
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Privacy Policy</a></li>
+                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Terms of Service</a></li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Bottom Section */}
+            <div className="border-t border-white/10 pt-8">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="text-center md:text-left">
+                  <p className="text-white/60">
+                    © 2024 Credo Protocol. Built for the Moca Chain Hackathon.
+                  </p>
+                  <p className="text-white/40 text-sm mt-1">
+                    Transforming trust into capital, one credential at a time.
+                  </p>
+                </div>
+                
+                {/* Social Links */}
+                <div className="flex items-center gap-4">
+                  <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                    <span className="text-sm font-medium">𝕏</span>
+                  </a>
+                  <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                    <span className="text-sm font-medium">GH</span>
+                  </a>
+                  <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                    <span className="text-sm font-medium">DC</span>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
