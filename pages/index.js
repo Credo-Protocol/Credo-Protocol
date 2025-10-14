@@ -432,28 +432,13 @@ export default function Home() {
 
             {/* Bottom Section */}
             <div className="border-t border-white/10 pt-8">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="text-center md:text-left">
-                  <p className="text-white/60">
-                    © 2024 Credo Protocol. Built on Moca Chain.
-                  </p>
-                  <p className="text-white/40 text-sm mt-1">
-                    Transforming trust into capital, one credential at a time.
-                  </p>
-                </div>
-                
-                {/* Social Links */}
-                <div className="flex items-center gap-4">
-                  <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                    <span className="text-sm font-medium">𝕏</span>
-                  </a>
-                  <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                    <span className="text-sm font-medium">GH</span>
-                  </a>
-                  <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                    <span className="text-sm font-medium">DC</span>
-                  </a>
-                </div>
+              <div className="text-center">
+                <p className="text-white/60">
+                  © 2024 Credo Protocol. Built on Moca Chain.
+                </p>
+                <p className="text-white/40 text-sm mt-1">
+                  Transforming trust into capital, one credential at a time.
+                </p>
               </div>
             </div>
           </div>
