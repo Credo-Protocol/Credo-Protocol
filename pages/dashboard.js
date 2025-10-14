@@ -13,6 +13,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
+import Image from 'next/image';
 import CreditScoreCard from '@/components/CreditScoreCard';
 import CredentialMarketplace from '@/components/CredentialMarketplace';
 import LendingInterface from '@/components/LendingInterface';
@@ -109,15 +110,15 @@ export default function Dashboard() {
     }, 2000); // Wait 2 seconds for transaction to confirm
   };
 
-  // Show loading while initializing AIR Kit
-  if (airKitLoading) {
+  // Show loading while initializing AIR Kit (only when not connected yet)
+  if (airKitLoading && !isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white text-black relative overflow-hidden">
         <RetroGrid className="opacity-50" />
         <div className="max-w-md w-full p-8 space-y-6 text-center relative z-10">
           <div className="flex justify-center mb-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 backdrop-blur-sm">
-              <Sparkles className="w-4 h-4" />
+              <Image src="/moca.jpg" alt="Moca" width={16} height={16} className="rounded-full" />
               <span className="text-sm font-medium">Built on Moca Chain</span>
             </div>
           </div>
@@ -146,7 +147,7 @@ export default function Dashboard() {
         <div className="max-w-lg w-full p-8 space-y-8 text-center relative z-10">
           <div className="flex justify-center mb-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 backdrop-blur-sm">
-              <Sparkles className="w-4 h-4" />
+              <Image src="/moca.jpg" alt="Moca" width={16} height={16} className="rounded-full" />
               <span className="text-sm font-medium">Built on Moca Chain</span>
             </div>
           </div>
@@ -184,7 +185,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <ConnectButton size="lg" onConnectionChange={handleConnectionChange} />
+          <div className="flex justify-center">
+            <ConnectButton size="lg" onConnectionChange={handleConnectionChange} />
+          </div>
 
           <p className="text-xs text-black/50">
             Powered by Moca Network AIR Kit • Chain ID: {MOCA_CHAIN.id}
@@ -224,9 +227,7 @@ export default function Dashboard() {
                 <Droplets className="h-4 w-4" />
                 <span className="text-sm">Get Test USDC</span>
               </Button>
-              <div className="[&_button]:bg-white [&_button]:text-black [&_button]:border-black/20 [&_button:hover]:bg-black/5">
-                <ConnectButton onConnectionChange={handleConnectionChange} />
-              </div>
+              <ConnectButton onConnectionChange={handleConnectionChange} />
               <Button 
                 variant="outline" 
                 onClick={fetchCreditScore}

@@ -11,6 +11,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
 import { Button } from '@/components/ui/button';
 import { Loader2, LogOut, User, Copy, Check, Mail, Wallet, Coins, DollarSign } from 'lucide-react';
@@ -33,6 +34,7 @@ import {
 import { CONTRACTS, ERC20_ABI } from '@/lib/contracts';
 
 export default function ConnectButton({ onConnectionChange, size = 'default', variant = 'default' }) {
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -80,6 +82,13 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
         }
 
         console.log('User already logged in:', info.user.abstractAccountAddress);
+
+        // Ensure we're on the dashboard when a session is already active
+        try {
+          if (router && router.pathname !== '/dashboard') {
+            router.replace('/dashboard');
+          }
+        } catch {}
       }
     } catch (error) {
       console.error('Failed to initialize AIR Kit:', error);
@@ -117,6 +126,13 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
         }
 
         console.log('Login successful:', info.user.abstractAccountAddress);
+
+        // Redirect to dashboard immediately after successful login
+        try {
+          if (router && router.pathname !== '/dashboard') {
+            router.replace('/dashboard');
+          }
+        } catch {}
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -244,7 +260,7 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
         }
       }}>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="flex items-center gap-3 h-[44px] px-3 min-w-[200px]">
+          <Button variant="outline" className="flex items-center gap-3 h-[44px] px-3 min-w-[200px] bg-white text-black border-black/20 hover:bg-black/5 hover:border-black/30">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/10">
               <User className="h-4 w-4" />
             </div>
@@ -379,15 +395,17 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
     <Button
       onClick={handleLogin}
       disabled={loggingIn}
-      className="h-[44px] px-4"
+      className="h-[44px] px-4 bg-black text-white hover:bg-black/90 disabled:bg-black/70 border-0"
+      size={size}
+      variant="default"
     >
       {loggingIn ? (
         <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          <span className="text-sm">Connecting...</span>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin text-white" />
+          <span className="text-sm text-white">Connecting...</span>
         </>
       ) : (
-        <span className="text-sm">Login with Moca ID</span>
+        <span className="text-sm text-white font-medium">Login with Moca ID</span>
       )}
     </Button>
   );
