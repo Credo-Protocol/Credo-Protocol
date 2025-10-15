@@ -13,6 +13,7 @@ import { ethers } from 'ethers';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { BACKEND_URL, CONTRACTS, CREDIT_ORACLE_ABI } from '@/lib/contracts';
+import { handleTransactionError } from '@/lib/errorHandler';
 
 export default function RequestCredentialModal({ credential, userAddress, isOpen, onClose, onSuccess, provider }) {
   const [step, setStep] = useState('request'); // request, loading, review, submitting, success, error
@@ -83,8 +84,17 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
         throw new Error('Please connect your wallet to submit credentials');
       }
 
-      // Get signer
+      console.log('🔐 Getting signer from provider...', { 
+        hasProvider: !!provider,
+        providerType: provider?.constructor?.name 
+      });
+      
+      // Get signer - this should trigger AIR Kit popup
       const signer = await provider.getSigner();
+      console.log('✅ Signer obtained successfully:', {
+        hasSigner: !!signer,
+        signerType: signer?.constructor?.name
+      });
 
       // Create contract instance
       const oracleContract = new ethers.Contract(
@@ -102,6 +112,8 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
       });
 
       // Submit credential to smart contract
+      // This should trigger AIR Kit's wallet confirmation popup
+      console.log('🔐 Calling submitCredential - AIR Kit popup should appear now...');
       const tx = await oracleContract.submitCredential(
         credentialData.encodedData,
         credentialData.signature,
@@ -110,12 +122,13 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
         credentialData.credential.expiresAt
       );
 
-      console.log('Transaction sent:', tx.hash);
+      console.log('✅ Transaction sent:', tx.hash);
       setTxHash(tx.hash);
 
       // Wait for transaction to be mined
+      console.log('⏳ Waiting for transaction confirmation...');
       const receipt = await tx.wait();
-      console.log('Transaction confirmed:', receipt);
+      console.log('✅ Transaction confirmed:', receipt);
 
       setStep('success');
       
@@ -126,7 +139,8 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
       }, 2000);
     } catch (err) {
       console.error('Error submitting credential:', err);
-      setError(err.message || 'Failed to submit credential');
+      const errorMessage = handleTransactionError('Submit Credential', err);
+      setError(errorMessage);
       setStep('error');
     }
   };
@@ -222,10 +236,12 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
               <div className="space-y-2">
                 <p className="text-sm font-medium text-black">Submitting to blockchain...</p>
                 <p className="text-xs text-black/60">
-                  Please confirm the transaction in your wallet
+                  {txHash 
+                    ? 'Waiting for transaction confirmation...' 
+                    : 'Please check your wallet for a confirmation popup'}
                 </p>
                 {txHash && (
-                  <p className="text-xs font-mono text-black/50">
+                  <p className="text-xs font-mono text-black/50 mt-2">
                     Tx: {txHash.slice(0, 10)}...{txHash.slice(-8)}
                   </p>
                 )}
