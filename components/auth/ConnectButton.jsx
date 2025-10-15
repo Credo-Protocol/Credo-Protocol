@@ -32,6 +32,7 @@ import {
   isUserLoggedIn
 } from '@/lib/airkit';
 import { CONTRACTS, ERC20_ABI } from '@/lib/contracts';
+import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 
 export default function ConnectButton({ onConnectionChange, size = 'default', variant = 'default' }) {
   const router = useRouter();
@@ -234,11 +235,16 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
         return;
       }
 
-      const ethersProvider = new ethers.BrowserProvider(provider);
       const address = userInfo.user.abstractAccountAddress;
 
-      // Fetch MOCA balance (native token)
-      const mocaBalanceWei = await ethersProvider.getBalance(address);
+      // Get reliable provider with fallback support
+      const reliableProvider = await getBestProvider(provider);
+
+      // Fetch MOCA balance (native token) with timeout and retry
+      const mocaBalanceWei = await callWithTimeout(
+        () => reliableProvider.getBalance(address),
+        { timeout: 30000, retries: 2 }
+      );
       
       // Check again if still logged in after async operation
       if (!isLoggedIn || !userInfo) {
@@ -249,14 +255,17 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
       const mocaBalanceFormatted = ethers.formatEther(mocaBalanceWei);
       setMocaBalance(parseFloat(mocaBalanceFormatted).toFixed(4));
 
-      // Fetch MockUSDC balance
+      // Fetch MockUSDC balance with timeout and retry
       const usdcContract = new ethers.Contract(
         CONTRACTS.MOCK_USDC,
         ERC20_ABI,
-        ethersProvider
+        reliableProvider
       );
       
-      const usdcBalanceRaw = await usdcContract.balanceOf(address);
+      const usdcBalanceRaw = await callWithTimeout(
+        () => usdcContract.balanceOf(address),
+        { timeout: 30000, retries: 2 }
+      );
       
       // Final check if still logged in
       if (!isLoggedIn || !userInfo) {

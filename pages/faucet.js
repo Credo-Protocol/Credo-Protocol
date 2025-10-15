@@ -18,6 +18,7 @@ import { Loader2, Droplets, CheckCircle2, Info, Home, ArrowRight } from 'lucide-
 import { CONTRACTS, ERC20_ABI, MOCA_CHAIN } from '@/lib/contracts';
 import { useAirKit } from '@/hooks/useAirKit';
 import { handleTransactionError } from '@/lib/errorHandler';
+import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
 
@@ -56,14 +57,20 @@ export default function Faucet() {
 
   const fetchBalance = async () => {
     try {
+      // Get reliable provider with fallback support
+      const reliableProvider = await getBestProvider(provider);
+      
       const mockUSDC = new ethers.Contract(
         CONTRACTS.MOCK_USDC,
         ERC20_ABI,
-        provider
+        reliableProvider
       );
 
-      // Get user's USDC balance
-      const bal = await mockUSDC.balanceOf(userAddress);
+      // Get user's USDC balance with timeout and retry
+      const bal = await callWithTimeout(
+        () => mockUSDC.balanceOf(userAddress),
+        { timeout: 30000, retries: 2 }
+      );
       const balFormatted = Number(ethers.formatUnits(bal, 6)); // MockUSDC has 6 decimals
       
       setBalance(balFormatted);
