@@ -1,16 +1,36 @@
 # Credo Protocol
 
-**Identity-Backed DeFi Lending on Moca Chain**
+> **Moca Network Proof of Build - Wave 2 Submission**  
+> **Identity-Backed DeFi Lending on Moca Chain**
 
-Transform your verifiable credentials into borrowing power. Build your on-chain credit score and unlock undercollateralized loans based on who you are, not just what you own.
+Credo Protocol is an undercollateralized lending platform on Moca Chain, built for the Moca Network Proof of Build. It leverages the AIR Kit to generate privacy-preserving, on-chain credit scores from verifiable credentials, unlocking fair access to capital in DeFi.
 
 [![Moca Chain](https://img.shields.io/badge/Moca_Chain-Devnet-blue)](https://devnet-scan.mocachain.org)
-[![Status](https://img.shields.io/badge/Status-Live_Demo-success)]()
+[![Buildathon](https://img.shields.io/badge/Buildathon-Wave_2-purple)]()
+[![Status](https://img.shields.io/badge/Status-Live_Demo-success)](https://credo-protocol.vercel.app)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 🎯 Overview
+---
 
-Credo Protocol is a revolutionary DeFi lending platform that shifts from **asset-backed** to **identity-backed** lending. By leveraging Verifiable Credentials and on-chain credit scoring, we enable loans with as little as 50% collateral (vs 150% in traditional DeFi) for users with strong reputation.
+## 📺 Demo Links
+
+- **🌐 Live Application**: [https://credo-protocol.vercel.app](https://credo-protocol.vercel.app)
+- **🔗 Backend API**: [https://credo-protocol.onrender.com](https://credo-protocol.onrender.com)
+- **📹 Demo Video**: [Coming Soon - Oct 19]
+- **📊 Smart Contracts**: [Moca Chain Devnet Explorer](https://devnet-scan.mocachain.org)
+
+---
+
+## 🎯 The Problem We're Solving
+
+### Traditional Finance (TradFi)
+Credit systems are **opaque, centralized, and exclusionary**. Billions of people are locked out of capital markets due to lack of formal credit history.
+
+### Current DeFi
+While open and permissionless, DeFi lending is **capital-inefficient**. Protocols like Aave require **150% collateral** to borrow $100, making them unsuitable for genuine credit needs.
+
+### Our Solution
+Credo Protocol bridges this gap by creating an **identity-backed lending model**. Instead of relying solely on collateral, we assess creditworthiness based on verifiable on-chain and off-chain reputation.
 
 ### Key Innovation
 
@@ -19,20 +39,40 @@ Credo Protocol is a revolutionary DeFi lending platform that shifts from **asset
 
 ## ✨ Features
 
+### Core Functionality
 - **🔐 Seamless Login** - One-click Web3 SSO via Moca AIR Kit (Google/Email/Wallet)
 - **🎫 Verifiable Credentials** - Submit proof of CEX history, employment, and stable balances
 - **📊 On-Chain Credit Scoring** - Transparent 0-1000 scale with diversity bonuses
 - **⚡ Dynamic Collateral** - 50-150% requirements based on your score
 - **💰 Complete Lending Flow** - Supply, borrow, and repay USDC seamlessly
 
-## 🚀 Live Demo
+### Why Credo Protocol?
 
-**Frontend**: [Coming Soon - Deployment in Progress]
+**For Users:**
+- 🎯 Borrow **2x-3x more** with the same collateral compared to Aave/Compound
+- 🔒 Keep your data **private** - prove creditworthiness without revealing sensitive information
+- 🌍 Access DeFi **without crypto wealth** - your real-world reputation matters
+- 📈 Build **portable credit history** that works across all dApps
 
-**Smart Contracts** (Moca Chain Devnet):
-- 📝 CreditScoreOracle: [`0x82Adc3540672eA15C2B9fF9dFCf01BF8d81F2Cd2`](https://devnet-scan.mocachain.org/address/0x82Adc3540672eA15C2B9fF9dFCf01BF8d81F2Cd2)
-- 💰 LendingPool: [`0x72efF02BF767b79369ea749dd7d57c143A92Cf09`](https://devnet-scan.mocachain.org/address/0x72efF02BF767b79369ea749dd7d57c143A92Cf09)
-- 🪙 MockUSDC: [`0x76FdD416C70a9b51071C1751088d6715dD60d864`](https://devnet-scan.mocachain.org/address/0x76FdD416C70a9b51071C1751088d6715dD60d864)
+**For the Moca Ecosystem:**
+- 🚀 **Killer App** for Moca ID adoption (requires Moca login)
+- 🛠️ **AIR Kit Showcase** - demonstrates both Account + Credential Services
+- 🧱 **Composable Primitive** - other dApps can use Credo credit scores
+- 💡 **Web3 Innovation** - shifts DeFi from "how much you have" to "who you are"
+
+**For DeFi:**
+- 💰 Unlocks **trillions in capital** currently locked due to over-collateralization
+- 🌊 Brings **real-world identity** to on-chain finance
+- 🔗 Creates **interoperability** between TradFi credentials and DeFi protocols
+- 🎪 Enables **new primitives** (credit-gated DAOs, reputation-based insurance, etc.)
+
+## 🚀 Deployed Contracts (Moca Chain Devnet)
+
+| Contract | Address | Explorer |
+|----------|---------|----------|
+| **CreditScoreOracle** | `0x82Adc3540672eA15C2B9fF9dFCf01BF8d81F2Cd2` | [View](https://devnet-scan.mocachain.org/address/0x82Adc3540672eA15C2B9fF9dFCf01BF8d81F2Cd2) |
+| **LendingPool** | `0x72efF02BF767b79369ea749dd7d57c143A92Cf09` | [View](https://devnet-scan.mocachain.org/address/0x72efF02BF767b79369ea749dd7d57c143A92Cf09) |
+| **MockUSDC** | `0x76FdD416C70a9b51071C1751088d6715dD60d864` | [View](https://devnet-scan.mocachain.org/address/0x76FdD416C70a9b51071C1751088d6715dD60d864) |
 
 ## 📋 How It Works
 
@@ -244,155 +284,99 @@ npm run dev
 5. **Borrow** - Borrow up to your limit based on credit score
 6. **Repay** - Pay back anytime to improve health factor
 
-## 🧪 Testing
+## 📊 Buildathon Progress
 
-### Smart Contract Tests
+### ✅ Wave 2 Deliverables (COMPLETED - Oct 15, 2025)
 
-```bash
-cd contracts
-npm test
-```
+**What's New This Wave:** The entire foundational infrastructure - from zero to a working, on-chain proof-of-concept demonstrating identity-based lending on Moca Chain.
 
-**Test Coverage**:
-- ✅ Credit score calculation with diversity bonuses
-- ✅ Dynamic collateral factors (8 score tiers)
-- ✅ Credential verification with EIP-191 signatures
-- ✅ Supply, borrow, repay, withdraw flows
-- ✅ Health factor calculations
+#### 1. Smart Contracts (Deployed on Moca Devnet)
+- ✅ **CreditScoreOracle.sol** - Verifies credentials & calculates credit scores (0-1000)
+- ✅ **LendingPool.sol** - Dynamic collateral lending pool with 8 credit tiers
+- ✅ **MockUSDC.sol** - Test token with faucet functionality
+- ✅ Comprehensive test suite with 100% pass rate
+- ✅ Deployed and verified on Moca Chain Devnet
 
-### Integration Tests
+#### 2. Backend Services (Live on Render)
+- ✅ Express API server for credential issuance
+- ✅ 3 Mock issuers (CEX, Employer, Bank)
+- ✅ EIP-191 signature generation for verifiable credentials
+- ✅ RESTful API endpoints for credential types and requests
+- ✅ Production deployment with CORS configuration
 
-```bash
-npm run test:integration
-```
-
-Tests the full flow from frontend → backend → contracts.
-
-## 📚 Documentation
-
-- **[PRD.md](./docs/PRD.md)** - Product vision & requirements
-- **[OVERVIEW.md](./docs/OVERVIEW.md)** - Technical architecture & Moca integration (670+ lines)
-- **[IMPLEMENTATION.md](./docs/IMPLEMENTATION.md)** - Complete implementation guide (1,900+ lines)
-- **[PHASE1-4.md](./docs/PHASE1-4.md)** - Development phases & completion status
-- **[SCORE-CALCULATOR.md](./docs/SCORE-CALCULATOR.md)** - Credit scoring algorithm reference
-- **[SETUP-GUIDE.md](./docs/SETUP-GUIDE.md)** - Detailed setup instructions
-
-## 📊 Current Status
-
-### ✅ Completed Features
-
-**Phase 1: Smart Contracts**
-- ✅ CreditScoreOracle with credential verification
-- ✅ LendingPool with dynamic collateral
-- ✅ MockUSDC with faucet functionality
-- ✅ Deployed & verified on Moca Devnet
-- ✅ Comprehensive test suite
-
-**Phase 2: Backend Services**
-- ✅ Express API with 3 mock issuers
-- ✅ EIP-191 signature generation
-- ✅ Credential type endpoints
-- ✅ CORS configuration
-
-**Phase 3: Frontend Application**
-- ✅ Moca AIR Kit integration (Google/Email/Wallet login)
-- ✅ Beautiful landing page with animations
-- ✅ Dashboard with credit score display
-- ✅ Credential marketplace with 3 types
-- ✅ Lending interface (supply/borrow/repay)
-- ✅ Faucet page for test tokens
-- ✅ Real-time position monitoring
-- ✅ Responsive design (mobile-friendly)
-- ✅ Error handling & loading states
+#### 3. Frontend Application (Live on Vercel)
+- ✅ **AIR Account Services Integration** - Seamless login with Google/Email/Wallet
+- ✅ **AIR Credential Services Framework** - Request and submit verifiable credentials
+- ✅ Beautiful landing page with animations (shadcn/ui + Framer Motion)
+- ✅ Dashboard with real-time credit score display
+- ✅ Credential marketplace (3 credential types)
+- ✅ Lending interface (Supply/Borrow/Repay flows)
+- ✅ Faucet page for test USDC tokens
+- ✅ Real-time position monitoring & health factor tracking
+- ✅ Fully responsive design (mobile-optimized)
+- ✅ Comprehensive error handling & loading states
 - ✅ Transaction feedback & confirmations
 
-**Phase 4: Polish & Testing**
-- ✅ Login state management fixes
-- ✅ Navigation improvements
-- ✅ UI/UX enhancements
-- ✅ Color-coded credit scores
-- ✅ Modal redesigns (minimalist theme)
-- ✅ RPC timeout handling
-- ✅ Graceful error fallbacks
+#### 4. Deployment & Infrastructure
+- ✅ Frontend deployed to Vercel (Production)
+- ✅ Backend deployed to Render (Production)
+- ✅ Environment configuration for production
+- ✅ CORS and security headers configured
+- ✅ Public GitHub repository with documentation
 
-### 🚧 In Progress (Phase 5)
+---
 
-- 🚧 Frontend deployment (Vercel)
-- 🚧 Backend deployment (Railway/Render)
-- 🚧 Demo video creation
-- 🚧 Final documentation polish
+### 🚀 Wave 3 Plans (Oct 19-23, 2025)
 
-### 🔮 Future Enhancements
+**Goal:** Evolve the MVP into a robust, privacy-preserving prototype with real-world integrations and production-grade UX.
 
-**Post-Hackathon Roadmap**:
-- Real credential issuers (Plaid, CEX APIs)
-- Full Zero-Knowledge Proof implementation
-- Liquidation mechanism
-- Interest accrual on borrows
-- Multi-asset support (ETH, BTC, etc.)
+#### Planned Deliverables:
+- 🔜 **Real-World Data Integration** - Plaid API sandbox for "Proof of Bank Balance"
+- 🔜 **Zero-Knowledge Proofs** - Implement ZK capabilities from AIR Credential Services
+  - Prove "income > $X" without revealing exact salary
+  - Prove "balance stable for Y months" without exposing amounts
+- 🔜 **Liquidation Mechanism** - Automated liquidations for unhealthy positions
+- 🔜 **Interest Accrual** - Time-based interest calculation on borrows
+- 🔜 **Enhanced Dashboard** - Credential management with interactive score breakdowns
+- 🔜 **UI/UX Refinement** - Polished design with micro-interactions, onboarding flows, and accessibility
+- 🔜 **Issuer SDK v0.1** - Documentation for third-party credential issuers
+- 🔜 **Advanced Analytics** - Historical credit score tracking & trends
+
+**Note:** Wave 2 focused on proving core functionality. Wave 3 will add privacy features, protocol completeness, and transform the interface into a production-ready experience.
+
+---
+
+### 🎯 Post-Buildathon Vision
+
+**Phase 1: Beachhead (Q1 2026)**
+- Target crypto-native users in Moca & Animoca ecosystems
+- Partner with GameFi projects for on-chain activity credentials
+- Build initial liquidity pools
+
+**Phase 2: Crossover (Q2-Q3 2026)**
+- Integrate with regional FinTechs (Southeast Asia focus)
+- Real credential issuers (exchanges, neobanks, payroll systems)
+- Expand to multi-asset support (ETH, BTC, stablecoins)
+
+**Phase 3: Platform (2027+)**
+- Open Issuer SDK for any developer
+- Composable credit score as infrastructure primitive
 - Cross-chain credit score portability
-- Delegation & credit scoring for DAOs
+- DAO governance and $CREDO token launch
 
-## 🔑 Key Innovations
+## 👥 Team
 
-### 1. Moca AIR Kit Integration
+**Built with ❤️ by Marcus**
 
-**AIR Account Services**:
-- One-click Web3 SSO (no MetaMask required!)
-- Multiple login options: Google, Email, Wallet
-- 30-day sessions (users stay logged in)
-- Smart account abstraction built-in
+- **Role**: Full-Stack Developer (Smart Contracts, Frontend, Backend, Integration & Deployment)
+- **Location**: Southeast Asia (Malaysia, UTC+8)
+- **Twitter/X**: [@marcustan1337](https://x.com/marcustan1337)
 
-**AIR Credential Services**:
-- Framework for verifiable credentials
-- Zero-Knowledge Proof capabilities
-- Privacy-preserving attestations
-- EIP-191 signature verification
+---
 
-### 2. Privacy-Preserving Design
+**🏆 Moca Network Proof of Build - Wave 2 Submission**
 
-Unlike traditional credit bureaus, Credo never sees your raw data:
-
-- **Prove income threshold** without revealing exact salary
-- **Prove trading volume** without exposing all transactions
-- **Prove employment** without sharing employer details
-- **Prove stable balance** without revealing account numbers
-
-### 3. Composable Financial Identity
-
-Your on-chain credit score is a public good that other dApps can use:
-
-- **Identity-gated trading** (higher leverage for trusted users)
-- **Premium access** (auto-qualify for memberships)
-- **DAO governance** (reputation-weighted voting)
-- **Undercollateralized NFT purchases**
-- **Reputation-based insurance pools**
-
-## 🏆 Built for Moca Chain Hackathon
-
-**Hackathon Deliverables**:
-- ✅ Functional MVP on Moca Chain Devnet
-- ✅ Complete user flow (login → credentials → score → borrow)
-- ✅ Professional UI with error handling
-- ✅ Comprehensive documentation (3,000+ lines)
-- 🚧 Demo video (3 minutes)
-- 🚧 Live deployment
-
-**Team**: Built with ❤️ by Marcus
-
-## 🤝 Contributing
-
-This project was built for the Moca Chain Hackathon. Contributions, issues, and feature requests are welcome!
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
+*Transforming trust into capital, one credential at a time.* 🚀
 
 ## 🙏 Acknowledgments
 
@@ -402,15 +386,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - **shadcn/ui** for beautiful, accessible UI components
 - **Vercel** for Next.js and hosting platform
 
-## 📞 Contact & Links
-
-- **Documentation**: [docs/OVERVIEW.md](./docs/OVERVIEW.md)
-- **Smart Contracts**: [Moca Chain Devnet Explorer](https://devnet-scan.mocachain.org)
-- **Moca Developers**: [https://developers.mocaverse.xyz](https://developers.mocaverse.xyz)
-
----
-
-**Built for Moca Chain Hackathon 2025**
-
-*Transforming trust into capital, one credential at a time.* 🚀
 
