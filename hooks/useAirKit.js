@@ -70,10 +70,7 @@ export function useAirKit() {
       console.log('🔄 Updating user state...');
       
       const info = await getUserInfo();
-      console.log('✅ User info:', info);
-      
       const address = info.user.abstractAccountAddress;
-      console.log('✅ Address:', address);
 
       setUserInfo(info);
       setUserAddress(address);
@@ -143,6 +140,7 @@ export function useAirKit() {
     try {
       await logout();
       
+      // Clear all state
       setIsConnected(false);
       setUserAddress(null);
       setUserInfo(null);

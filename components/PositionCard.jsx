@@ -40,8 +40,9 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
     try {
       setLoading(true);
       
-      // Get reliable provider with fallback support
-      const reliableProvider = await getBestProvider(provider);
+      // IMPORTANT: Always use public provider to avoid AIR Kit caching issues
+      // AIR Kit provider can cache getUserSupplied() results even after withdrawals
+      const reliableProvider = await getBestProvider(null); // Force public provider
       
       // Get LendingPool contract
       const lendingPool = new ethers.Contract(
@@ -121,19 +122,6 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
         borrowedAmount: borrowedFormatted,
       };
 
-      console.log('Position data (detailed):', {
-        ...positionData,
-        rawData: {
-          supplied: supplied.toString(),
-          accountData: {
-            totalCollateral: accountData[0].toString(),
-            totalDebt: accountData[1].toString(),
-            availableBorrows: accountData[2].toString(),
-            liquidationThreshold: accountData[3].toString(),
-            healthFactor: accountData[4].toString()
-          }
-        }
-      });
       setPosition(positionData);
     } catch (error) {
       console.error('Error fetching position:', error);
