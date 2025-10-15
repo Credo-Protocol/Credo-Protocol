@@ -112,6 +112,7 @@ export default function LendingInterface({ userAddress, creditScore, provider })
         {/* Borrow Tab */}
         <TabsContent value="borrow" className="space-y-4">
           <BorrowInterface
+            key={refreshKey}
             userAddress={userAddress}
             creditScore={creditScore}
             onSuccess={handleTransactionSuccess}

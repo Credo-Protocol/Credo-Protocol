@@ -239,9 +239,11 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
         {/* Liquidity Warning */}
         {liquidityLimited && maxBorrow > 0 && (
           <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription className="text-sm">
-              <strong>Note:</strong> Pool liquidity is currently limiting you to <strong>{maxBorrow.toFixed(2)} USDC</strong>. More will become available as others supply collateral.
+            <AlertDescription className="flex items-center gap-2 text-sm">
+              <Info className="h-4 w-4 flex-shrink-0" />
+              <span>
+                <strong>Note:</strong> Pool liquidity is currently limiting you to <strong>{maxBorrow.toFixed(2)} USDC</strong>. More will become available as others supply collateral.
+              </span>
             </AlertDescription>
           </Alert>
         )}
@@ -326,52 +328,52 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
 
     {/* Success Modal */}
     <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white border-black/10">
         <DialogHeader>
-          <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-green-100">
-            <CheckCircle2 className="w-6 h-6 text-green-600" />
+          <div className="flex justify-center mb-4">
+            <CheckCircle2 className="h-16 w-16 text-green-500" />
           </div>
-          <DialogTitle className="text-center">Borrow Successful!</DialogTitle>
-          <DialogDescription className="text-center">
+          <DialogTitle className="text-center text-black text-2xl font-bold">Borrow Successful!</DialogTitle>
+          <DialogDescription className="text-center text-black/60">
             Your borrow transaction has been confirmed on the blockchain.
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
           {/* Borrowed Amount */}
-          <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
-            <span className="text-sm text-muted-foreground">Amount Borrowed</span>
-            <span className="text-lg font-bold">{successDetails.amount.toFixed(2)} USDC</span>
+          <div className="flex items-center justify-between p-6 rounded-xl border border-black/10 bg-white">
+            <span className="text-sm text-black/60">Amount Borrowed</span>
+            <span className="text-lg font-bold text-black">{successDetails.amount.toFixed(2)} USDC</span>
           </div>
           
           {/* Transaction Hash */}
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Transaction Hash</p>
+            <p className="text-sm text-black/60">Transaction Hash</p>
             <a 
               href={`https://devnet-scan.mocachain.org/tx/${successDetails.txHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-mono text-blue-600 hover:text-blue-800 hover:underline break-all"
+              className="text-sm font-mono text-black hover:text-black/70 hover:underline break-all block"
             >
               {successDetails.txHash}
             </a>
           </div>
           
           {/* Next Steps */}
-          <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
-            <p className="text-sm text-blue-900">
-              <strong>Next Steps:</strong> Monitor your health factor and make sure to repay your debt on time to avoid liquidation.
+          <div className="p-4 rounded-xl bg-neutral-50 border border-black/10">
+            <p className="text-sm text-black/70">
+              <strong className="text-black">Next Steps:</strong> Monitor your health factor and make sure to repay your debt on time to avoid liquidation.
             </p>
           </div>
         </div>
         
         <DialogFooter className="sm:justify-center">
-          <Button 
+          <button
+            className="w-full h-12 bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] font-medium"
             onClick={() => setShowSuccessModal(false)}
-            className="w-full sm:w-auto"
           >
             Got it, thanks!
-          </Button>
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

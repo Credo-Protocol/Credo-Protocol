@@ -11,8 +11,7 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { CheckCircle2, Loader2 } from 'lucide-react';
 import { BACKEND_URL, CONTRACTS, CREDIT_ORACLE_ABI } from '@/lib/contracts';
 
 export default function RequestCredentialModal({ credential, userAddress, isOpen, onClose, onSuccess, provider }) {
@@ -134,29 +133,30 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md bg-white border-black/10">
         <DialogHeader>
-          <DialogTitle>{credential?.name}</DialogTitle>
-          <DialogDescription>{credential?.description}</DialogDescription>
+          <DialogTitle className="text-black text-xl font-bold">{credential?.name}</DialogTitle>
+          <DialogDescription className="text-black/60">{credential?.description}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Step 1: Initial Request */}
           {step === 'request' && (
             <div className="py-6 space-y-4">
-              <div className="text-center space-y-2">
-                <p className="text-sm text-muted-foreground">
+              <div className="text-center space-y-4">
+                <p className="text-sm text-black/70">
                   This will connect you to {credential?.name} to verify your information.
                 </p>
-                <div className="flex justify-center">
-                  <Badge variant="secondary">
-                    +{credential?.scoreWeight} points
-                  </Badge>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-black/10">
+                  <span className="text-sm font-medium text-black">+{credential?.scoreWeight} points</span>
                 </div>
               </div>
-              <Button onClick={handleRequestCredential} className="w-full">
+              <button
+                className="w-full h-12 bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 font-medium"
+                onClick={handleRequestCredential}
+              >
                 Connect & Verify
-              </Button>
+              </button>
             </div>
           )}
 
@@ -164,44 +164,52 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
           {step === 'loading' && (
             <div className="py-12 text-center space-y-4">
               <div className="flex justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <Loader2 className="h-12 w-12 animate-spin text-black" />
               </div>
-              <p className="text-sm text-muted-foreground">Requesting credential...</p>
+              <p className="text-sm text-black/60">Requesting credential...</p>
             </div>
           )}
 
           {/* Step 3: Review Credential */}
           {step === 'review' && credentialData && (
             <div className="py-4 space-y-4">
-              <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg border border-green-200 dark:border-green-800">
-                <p className="text-sm text-green-800 dark:text-green-200 font-medium">
-                  ✓ Credential verified!
-                </p>
-                <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                  Ready to submit to blockchain
-                </p>
+              <div className="p-4 rounded-xl border border-green-500/20 bg-green-50">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm text-green-900 font-medium">
+                      Credential verified!
+                    </p>
+                    <p className="text-xs text-green-700 mt-1">
+                      Ready to submit to blockchain
+                    </p>
+                  </div>
+                </div>
               </div>
               
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Type:</span>
-                  <span className="font-medium">{credentialData.credential.type}</span>
+              <div className="p-6 rounded-xl border border-black/10 bg-white space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-black/60">Type:</span>
+                  <span className="text-sm font-medium text-black">{credentialData.credential.type}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Score Boost:</span>
-                  <span className="font-medium text-green-600">+{credential.scoreWeight} points</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-black/60">Score Boost:</span>
+                  <span className="text-sm font-medium text-green-600">+{credential.scoreWeight} points</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Valid Until:</span>
-                  <span className="font-medium">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-black/60">Valid Until:</span>
+                  <span className="text-sm font-medium text-black">
                     {new Date(credentialData.credential.expiresAt * 1000).toLocaleDateString()}
                   </span>
                 </div>
               </div>
 
-              <Button onClick={handleSubmitToOracle} className="w-full">
+              <button
+                className="w-full h-12 bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 font-medium"
+                onClick={handleSubmitToOracle}
+              >
                 Submit to Update Score
-              </Button>
+              </button>
             </div>
           )}
 
@@ -209,15 +217,15 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
           {step === 'submitting' && (
             <div className="py-12 text-center space-y-4">
               <div className="flex justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <Loader2 className="h-12 w-12 animate-spin text-black" />
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium">Submitting to blockchain...</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm font-medium text-black">Submitting to blockchain...</p>
+                <p className="text-xs text-black/60">
                   Please confirm the transaction in your wallet
                 </p>
                 {txHash && (
-                  <p className="text-xs font-mono text-muted-foreground">
+                  <p className="text-xs font-mono text-black/50">
                     Tx: {txHash.slice(0, 10)}...{txHash.slice(-8)}
                   </p>
                 )}
@@ -228,12 +236,10 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
           {/* Step 5: Success */}
           {step === 'success' && (
             <div className="py-12 text-center space-y-4">
-              <div className="flex justify-center">
-                <div className="text-6xl animate-bounce">🎉</div>
-              </div>
+              <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto animate-pulse" />
               <div className="space-y-2">
-                <h3 className="text-2xl font-bold text-green-600">Score Updated!</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-2xl font-bold text-black">Score Updated!</h3>
+                <p className="text-sm text-black/60">
                   Your credit score has been updated on-chain.
                 </p>
               </div>
@@ -243,17 +249,20 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
           {/* Step 6: Error */}
           {step === 'error' && (
             <div className="py-6 space-y-4">
-              <div className="bg-red-50 dark:bg-red-950 p-4 rounded-lg border border-red-200 dark:border-red-800">
-                <p className="text-sm text-red-800 dark:text-red-200 font-medium">
+              <div className="p-4 rounded-xl border border-red-500/20 bg-red-50">
+                <p className="text-sm text-red-900 font-medium">
                   ✗ Error
                 </p>
-                <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                <p className="text-xs text-red-700 mt-1">
                   {error}
                 </p>
               </div>
-              <Button onClick={() => setStep('request')} variant="outline" className="w-full">
+              <button
+                className="w-full h-12 border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black font-medium"
+                onClick={() => setStep('request')}
+              >
                 Try Again
-              </Button>
+              </button>
             </div>
           )}
         </div>
