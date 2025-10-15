@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Droplets, Sparkles, CheckCircle, Home, ArrowRight } from 'lucide-react';
 import { CONTRACTS, CREDIT_ORACLE_ABI, MOCA_CHAIN } from '@/lib/contracts';
 import { useAirKit } from '@/hooks/useAirKit';
+import { getBestProvider, callWithTimeout, getPublicProvider } from '@/lib/rpcProvider';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
 import { AuroraText } from '@/components/ui/aurora-text';
@@ -102,9 +103,9 @@ export default function Dashboard() {
   const fetchCreditScore = async () => {
     console.log('🎯 fetchCreditScore called!');
     
-    // Early return if not connected, missing data, or component unmounted
-    if (!isMounted || !isConnected || !userAddress || !provider) {
-      console.log('❌ Skipping credit score fetch:', { isMounted, isConnected, hasAddress: !!userAddress, hasProvider: !!provider });
+    // Early return if not connected or missing user address
+    if (!isMounted || !isConnected || !userAddress) {
+      console.log('❌ Skipping credit score fetch:', { isMounted, isConnected, hasAddress: !!userAddress });
       return;
     }
 
@@ -114,6 +115,16 @@ export default function Dashboard() {
       setLoading(true);
       console.log('⏳ Loading state set to true');
       
+      // Get the best available provider (with fallback support)
+      let reliableProvider;
+      try {
+        reliableProvider = await getBestProvider(provider);
+        console.log('✅ Reliable provider obtained');
+      } catch (providerError) {
+        console.warn('⚠️ Failed to get reliable provider, using fallback:', providerError.message);
+        reliableProvider = getPublicProvider();
+      }
+      
       console.log('📝 Creating contract with:', {
         address: CONTRACTS.CREDIT_ORACLE,
         userAddress
@@ -122,7 +133,7 @@ export default function Dashboard() {
       const oracleContract = new ethers.Contract(
         CONTRACTS.CREDIT_ORACLE,
         CREDIT_ORACLE_ABI,
-        provider
+        reliableProvider
       );
 
       console.log('✅ Contract created successfully');
@@ -138,15 +149,14 @@ export default function Dashboard() {
       try {
         console.log('📞 Calling getScoreDetails on contract...');
         
-        // Add timeout to prevent infinite hanging
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('RPC call timeout')), 10000)
+        // Use the robust timeout wrapper (30 seconds with retries)
+        const details = await callWithTimeout(
+          () => oracleContract.getScoreDetails(userAddress),
+          { 
+            timeout: 30000, // 30 seconds for Vercel cold starts
+            retries: 2,
+          }
         );
-        
-        const details = await Promise.race([
-          oracleContract.getScoreDetails(userAddress),
-          timeoutPromise
-        ]);
         
         console.log('✅ getScoreDetails returned:', details);
         
@@ -170,14 +180,13 @@ export default function Dashboard() {
         try {
           console.log('📞 Calling getCreditScore (fallback)...');
           
-          const timeoutPromise2 = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('RPC call timeout')), 10000)
+          const score = await callWithTimeout(
+            () => oracleContract.getCreditScore(userAddress),
+            { 
+              timeout: 30000,
+              retries: 2,
+            }
           );
-          
-          const score = await Promise.race([
-            oracleContract.getCreditScore(userAddress),
-            timeoutPromise2
-          ]);
           
           console.log('✅ getCreditScore returned:', score);
           

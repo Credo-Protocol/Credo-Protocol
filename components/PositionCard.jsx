@@ -15,6 +15,7 @@ import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI, calculateCollateralFactor } from '@/lib/contracts';
+import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 
 export default function PositionCard({ userAddress, creditScore, refresh, provider }) {
   const [loading, setLoading] = useState(true);
@@ -39,22 +40,29 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
     try {
       setLoading(true);
       
+      // Get reliable provider with fallback support
+      const reliableProvider = await getBestProvider(provider);
+      
       // Get LendingPool contract
       const lendingPool = new ethers.Contract(
         CONTRACTS.LENDING_POOL,
         LENDING_POOL_ABI,
-        provider
+        reliableProvider
       );
 
       // Get MockUSDC contract
       const mockUSDC = new ethers.Contract(
         CONTRACTS.MOCK_USDC,
         ERC20_ABI,
-        provider
+        reliableProvider
       );
 
-      // Fetch user account data from LendingPool
-      const accountData = await lendingPool.getUserAccountData(userAddress).catch(() => null);
+      // Fetch user account data from LendingPool with timeout
+      const accountData = await callWithTimeout(
+        () => lendingPool.getUserAccountData(userAddress),
+        { timeout: 30000, retries: 2 }
+      ).catch(() => null);
+      
       if (!accountData) {
         throw new Error('Disconnected');
       }
@@ -65,13 +73,20 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
       const totalDebtUSD = Number(ethers.formatUnits(accountData[1], 6));
       
       // Fetch asset data to check pool liquidity (assets is a public mapping)
-      const assetData = await lendingPool.assets(CONTRACTS.MOCK_USDC).catch(() => null);
+      const assetData = await callWithTimeout(
+        () => lendingPool.assets(CONTRACTS.MOCK_USDC),
+        { timeout: 30000, retries: 2 }
+      ).catch(() => null);
+      
       if (!assetData) {
         throw new Error('Disconnected');
       }
       
       // Fetch supplied amount for MockUSDC
-      const supplied = await lendingPool.getUserSupplied(userAddress, CONTRACTS.MOCK_USDC);
+      const supplied = await callWithTimeout(
+        () => lendingPool.getUserSupplied(userAddress, CONTRACTS.MOCK_USDC),
+        { timeout: 30000, retries: 2 }
+      );
 
       // Convert to JavaScript numbers (MockUSDC uses 6 decimals)
       const suppliedFormatted = Number(ethers.formatUnits(supplied, 6));
