@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Loader2, CheckCircle2, TrendingUp, Info } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI } from '@/lib/contracts';
 import { handleTransactionError } from '@/lib/errorHandler';
+import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 
 export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, provider }) {
   const [repayAmount, setRepayAmount] = useState('');
@@ -35,28 +36,40 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
     try {
       setLoading(true);
       
+      // Get reliable provider with fallback support
+      const reliableProvider = await getBestProvider(provider);
+      
       const mockUSDC = new ethers.Contract(
         CONTRACTS.MOCK_USDC,
         ERC20_ABI,
-        provider
+        reliableProvider
       );
 
       const lendingPool = new ethers.Contract(
         CONTRACTS.LENDING_POOL,
         LENDING_POOL_ABI,
-        provider
+        reliableProvider
       );
 
-      // Get user's USDC balance
-      const bal = await mockUSDC.balanceOf(userAddress);
+      // Get user's USDC balance with timeout and retry
+      const bal = await callWithTimeout(
+        () => mockUSDC.balanceOf(userAddress),
+        { timeout: 30000, retries: 2 }
+      );
       const balFormatted = Number(ethers.formatUnits(bal, 6));
       
-      // Get borrowed amount
-      const borr = await lendingPool.getUserBorrowed(userAddress, CONTRACTS.MOCK_USDC);
+      // Get borrowed amount with timeout and retry
+      const borr = await callWithTimeout(
+        () => lendingPool.getUserBorrowed(userAddress, CONTRACTS.MOCK_USDC),
+        { timeout: 30000, retries: 2 }
+      );
       const borrFormatted = Number(ethers.formatUnits(borr, 6));
       
-      // Get current allowance for LendingPool
-      const allow = await mockUSDC.allowance(userAddress, CONTRACTS.LENDING_POOL);
+      // Get current allowance for LendingPool with timeout and retry
+      const allow = await callWithTimeout(
+        () => mockUSDC.allowance(userAddress, CONTRACTS.LENDING_POOL),
+        { timeout: 30000, retries: 2 }
+      );
       const allowFormatted = Number(ethers.formatUnits(allow, 6));
 
       setBalance(balFormatted);

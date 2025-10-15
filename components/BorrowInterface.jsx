@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Loader2, TrendingDown, Info, CheckCircle2 } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, calculateCollateralFactor, getScoreColor } from '@/lib/contracts';
 import { handleTransactionError } from '@/lib/errorHandler';
+import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 
 export default function BorrowInterface({ userAddress, creditScore, onSuccess, provider }) {
   const [borrowAmount, setBorrowAmount] = useState(0);
@@ -47,21 +48,31 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
     try {
       setLoading(true);
       
+      // Get reliable provider with fallback support
+      const reliableProvider = await getBestProvider(provider);
+      
       const lendingPool = new ethers.Contract(
         CONTRACTS.LENDING_POOL,
         LENDING_POOL_ABI,
-        provider
+        reliableProvider
       );
 
-      // Get user account data
-      // Guard: user might disconnect mid-request
-      const accountData = await lendingPool.getUserAccountData(userAddress).catch(() => null);
+      // Get user account data with timeout and retry
+      const accountData = await callWithTimeout(
+        () => lendingPool.getUserAccountData(userAddress),
+        { timeout: 30000, retries: 2 }
+      ).catch(() => null);
+      
       if (!accountData) {
         throw new Error('Disconnected');
       }
       
-      // Get asset data to check pool liquidity (assets is a public mapping)
-      const assetData = await lendingPool.assets(CONTRACTS.MOCK_USDC).catch(() => null);
+      // Get asset data to check pool liquidity with timeout
+      const assetData = await callWithTimeout(
+        () => lendingPool.assets(CONTRACTS.MOCK_USDC),
+        { timeout: 30000, retries: 2 }
+      ).catch(() => null);
+      
       if (!assetData) {
         throw new Error('Disconnected');
       }
