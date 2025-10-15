@@ -326,7 +326,7 @@ npm run dev
 
 ---
 
-### 🚀 Wave 3 Plans (Oct 19-23, 2025)
+### 🚀 Wave 3 Plans (Oct 24-27, 2025)
 
 **Goal:** Evolve the MVP into a robust, privacy-preserving prototype with real-world integrations and production-grade UX.
 
