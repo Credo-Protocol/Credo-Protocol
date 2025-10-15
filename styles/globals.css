@@ -319,6 +319,11 @@ body {
   animation: aurora 1s ease infinite;
 }
 
+.animate-aurora-slow {
+  background-size: 200% 200%;
+  animation: aurora 3s ease infinite;
+}
+
 /* Rainbow button animation */
 @keyframes rainbow-slide {
   0% {

@@ -25,6 +25,7 @@ import { CONTRACTS, CREDIT_ORACLE_ABI, MOCA_CHAIN } from '@/lib/contracts';
 import { useAirKit } from '@/hooks/useAirKit';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
+import { AuroraText } from '@/components/ui/aurora-text';
 import Link from 'next/link';
 
 export default function Dashboard() {
@@ -373,9 +374,21 @@ export default function Dashboard() {
 
           {/* Quick Stats */}
           <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-6 border border-black/10 rounded-2xl bg-white hover:shadow-lg transition-all duration-300">
-              <p className="text-sm text-black/60 mb-2">Collateral Factor</p>
-              <p className="text-3xl font-bold text-black">
+            {/* Collateral Factor Card */}
+            <div className="p-8 border border-black/10 rounded-2xl bg-white hover:shadow-lg transition-all duration-300 flex flex-col justify-center items-center text-center h-full">
+              <p className="text-sm text-black/60 mb-4">Collateral Factor</p>
+              <AuroraText 
+                className={`text-7xl leading-none mb-6 ${
+                  creditScore >= 900 ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500' : 
+                  creditScore >= 800 ? 'bg-gradient-to-r from-green-500 via-lime-500 to-emerald-500' :
+                  creditScore >= 700 ? 'bg-gradient-to-r from-lime-500 via-yellow-500 to-green-500' :
+                  creditScore >= 600 ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500' :
+                  creditScore >= 500 ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
+                  creditScore >= 400 ? 'bg-gradient-to-r from-orange-500 via-red-500 to-pink-500' :
+                  creditScore >= 300 ? 'bg-gradient-to-r from-red-500 via-rose-500 to-pink-500' : 
+                  'bg-gradient-to-r from-red-600 via-red-700 to-red-800'
+                } animate-aurora-slow`}
+              >
                 {creditScore >= 900 ? '50%' : 
                  creditScore >= 800 ? '60%' :
                  creditScore >= 700 ? '75%' :
@@ -383,19 +396,20 @@ export default function Dashboard() {
                  creditScore >= 500 ? '100%' :
                  creditScore >= 400 ? '110%' :
                  creditScore >= 300 ? '125%' : '150%'}
-              </p>
-              <p className="text-xs text-black/50 mt-2">
+              </AuroraText>
+              <p className="text-sm text-black/70 font-medium mb-1">
                 Required collateral for borrowing
               </p>
             </div>
 
-            <div className="p-6 border border-black/10 rounded-2xl bg-white hover:shadow-lg transition-all duration-300">
-              <p className="text-sm text-black/60 mb-2">Login Method</p>
-              <p className="text-xl font-bold text-black">
-                {userInfo?.user?.email ? 'Email/Google' : 'Moca ID'}
+            {/* Login Method Card */}
+            <div className="p-8 border border-black/10 rounded-2xl bg-white hover:shadow-lg transition-all duration-300 flex flex-col justify-center items-center text-center h-full">
+              <p className="text-sm text-black/60 mb-4">Login Method</p>
+              <p className="text-5xl font-bold text-black leading-none mb-6">
+                {userInfo?.user?.email ? 'Email / Google' : 'Moca ID'}
               </p>
-              <p className="text-xs text-black/50 mt-2">
-                AIR Kit SSO • {MOCA_CHAIN.name}
+              <p className="text-sm text-black/70 font-medium mb-1">
+                AIR Kit SSO • Moca Chain Devnet
               </p>
             </div>
           </div>
