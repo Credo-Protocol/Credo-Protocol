@@ -472,7 +472,7 @@ export default function Home() {
             <div className="border-t border-white/10 pt-8">
               <div className="text-center">
                 <p className="text-white/60">
-                  © 2024 Credo Protocol. Built on Moca Chain.
+                  © 2025 Credo Protocol. Built on Moca Chain.
                 </p>
                 <p className="text-white/40 text-sm mt-1">
                   Transforming trust into capital, one credential at a time.
