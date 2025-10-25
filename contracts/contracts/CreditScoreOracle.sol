@@ -46,10 +46,10 @@ contract CreditScoreOracle is Ownable, ReentrancyGuard {
     }
 
     /**
-     * @dev Individual credential submitted by a user
+     * @dev Individual credential submitted by a user (Updated for Phase 2)
      */
     struct Credential {
-        uint256 credentialType;     // Type of credential (0-4)
+        bytes32 credentialType;     // Type hash (keccak256 of type name)
         address issuer;             // Address of the issuer
         uint256 issuedAt;           // Timestamp when issued
         uint256 expiresAt;          // Expiration timestamp
@@ -317,29 +317,44 @@ contract CreditScoreOracle is Ownable, ReentrancyGuard {
      * @param expirationTimestamp When the credential expires
      * @return newScore The updated credit score
      */
+    /**
+     * @notice Submit credential to update credit score (Phase 2)
+     * @param credentialData Encoded credential data
+     * @param signature EIP-191 signature from issuer  
+     * @param issuer Address of credential issuer
+     * @param credentialTypeHash keccak256 hash of credential type name
+     * @param expirationTimestamp When credential expires
+     * @return newScore Updated credit score
+     */
     function submitCredential(
         bytes memory credentialData,
         bytes memory signature,
         address issuer,
-        uint256 credentialType,
+        bytes32 credentialTypeHash,
         uint256 expirationTimestamp
     ) external returns (uint256 newScore) {
         // Validate issuer (v2: also check isActive)
         require(issuers[issuer].registered, "Issuer not registered");
         require(issuers[issuer].isActive, "Issuer not active");
         
-        // Validate credential type
-        require(credentialType <= 4, "Invalid credential type");
+        // Validate credential type is registered (Phase 2)
+        require(credentialTypes[credentialTypeHash].isActive, "Invalid or inactive credential type");
         
         // Validate expiration
         require(expirationTimestamp > block.timestamp, "Credential already expired");
+        
+        // Check max credentials limit
+        require(
+            userCredentials[msg.sender].length < MAX_CREDENTIALS_PER_USER,
+            "Max credentials limit reached"
+        );
         
         // Generate credential hash for replay protection
         bytes32 credentialHash = keccak256(abi.encodePacked(
             credentialData,
             msg.sender,
             issuer,
-            credentialType
+            credentialTypeHash
         ));
         
         // Check replay protection
@@ -356,7 +371,7 @@ contract CreditScoreOracle is Ownable, ReentrancyGuard {
         
         // Store credential
         userCredentials[msg.sender].push(Credential({
-            credentialType: credentialType,
+            credentialType: credentialTypeHash,
             issuer: issuer,
             issuedAt: block.timestamp,
             expiresAt: expirationTimestamp,
@@ -366,19 +381,11 @@ contract CreditScoreOracle is Ownable, ReentrancyGuard {
         // Update issuer stats
         issuers[issuer].credentialCount++;
         
-        // Calculate new score
+        // Calculate new score using computeCreditScore (Phase 2)
         uint256 oldScore = creditProfiles[msg.sender].score;
-        newScore = calculateScore(msg.sender);
+        newScore = this.computeCreditScore(msg.sender);
         
-        // Update credit profile
-        creditProfiles[msg.sender] = CreditProfile({
-            score: newScore,
-            lastUpdated: block.timestamp,
-            credentialCount: userCredentials[msg.sender].length,
-            initialized: true
-        });
-        
-        emit CredentialSubmitted(msg.sender, issuer, credentialType, newScore);
+        emit CredentialSubmitted(msg.sender, issuer, uint256(credentialTypeHash), newScore);
         emit ScoreUpdated(msg.sender, oldScore, newScore);
         
         return newScore;
@@ -483,10 +490,12 @@ contract CreditScoreOracle is Ownable, ReentrancyGuard {
         
         uint16 finalScore = uint16(totalPoints);
         
-        // Update stored score
+        // Update stored score and profile
         uint256 oldScore = creditProfiles[user].score;
         creditProfiles[user].score = finalScore;
         creditProfiles[user].lastUpdated = block.timestamp;
+        creditProfiles[user].credentialCount = credentials.length;
+        creditProfiles[user].initialized = true;
         
         // Create audit hash for off-chain verification
         bytes32 scoreRoot = keccak256(abi.encode(user, finalScore, block.timestamp));
@@ -513,88 +522,30 @@ contract CreditScoreOracle is Ownable, ReentrancyGuard {
      * @dev Implements weighted scoring with issuer trust, recency decay, and diversity bonus
      */
     function calculateScore(address user) internal view returns (uint256) {
-        Credential[] memory creds = userCredentials[user];
+        // DEPRECATED: This function is no longer used in Phase 2
+        // Use computeCreditScore() instead, which supports bytes32 credential types
+        // and the new credential type registry
         
-        // Base score for no credentials
-        if (creds.length == 0) return 500;
-        
-        uint256 totalPoints = 500; // Starting base
-        uint256 uniqueCredentialTypes = 0;
-        bool[5] memory seenTypes; // Track unique credential types
-        
-        // Calculate points from each valid credential
-        for (uint i = 0; i < creds.length; i++) {
-            Credential memory cred = creds[i];
-            
-            // Skip expired credentials
-            if (block.timestamp > cred.expiresAt) continue;
-            
-            // Track unique types for diversity bonus
-            if (!seenTypes[cred.credentialType]) {
-                seenTypes[cred.credentialType] = true;
-                uniqueCredentialTypes++;
-            }
-            
-            // Get base points for credential type
-            uint256 basePoints = getCredentialTypeWeight(cred.credentialType);
-            
-            // Apply issuer trust multiplier (0-100%)
-            uint256 issuerMultiplier = issuers[cred.issuer].trustScore;
-            uint256 adjustedPoints = (basePoints * issuerMultiplier) / 100;
-            
-            // Apply recency decay
-            uint256 age = block.timestamp - cred.issuedAt;
-            uint256 decayFactor = calculateDecayFactor(age);
-            adjustedPoints = (adjustedPoints * decayFactor) / 100;
-            
-            totalPoints += adjustedPoints;
-        }
-        
-        // Apply diversity bonus: 5% per unique credential type (capped at 25%)
-        uint256 diversityBonus = uniqueCredentialTypes * 5;
-        if (diversityBonus > 25) diversityBonus = 25;
-        totalPoints = (totalPoints * (100 + diversityBonus)) / 100;
-        
-        // Cap at maximum score of 1000
-        if (totalPoints > 1000) totalPoints = 1000;
-        
-        return totalPoints;
+        // Return a stub value to avoid compilation errors
+        user; // Silence unused parameter warning
+        return 500;
     }
 
     /**
-     * @notice Get point weight for a credential type
-     * @param credType Credential type (0-4)
-     * @return Points awarded for this credential type
+     * @notice Get point weight for a credential type (DEPRECATED - Phase 2 uses credentialTypes mapping)
      */
-    function getCredentialTypeWeight(uint256 credType) internal pure returns (uint256) {
-        // 0: Proof of Income -> 150 points
-        // 1: Proof of Stable Balance -> 100 points
-        // 2: Proof of CEX History -> 80 points
-        // 3: Proof of Employment -> 70 points
-        // 4: Proof of On-Chain Activity -> 50 points
-        if (credType == 0) return 150;
-        if (credType == 1) return 100;
-        if (credType == 2) return 80;
-        if (credType == 3) return 70;
-        if (credType == 4) return 50;
-        return 30; // Default for unknown types
-    }
+    // function getCredentialTypeWeight(uint256 credType) internal pure returns (uint256) {
+    //     // DEPRECATED: Phase 2 uses credentialTypes[bytes32] registry
+    //     return 50;
+    // }
 
     /**
-     * @notice Calculate decay factor based on credential age
-     * @param age Age of credential in seconds
-     * @return Decay factor as percentage (70-100)
+     * @notice Calculate decay factor based on credential age (DEPRECATED - Phase 2 uses per-type decay)
      */
-    function calculateDecayFactor(uint256 age) internal pure returns (uint256) {
-        // Fresh (< 30 days): 100%
-        // 30-90 days: 95%
-        // 90-180 days: 85%
-        // 180+ days: 70%
-        if (age < 30 days) return 100;
-        if (age < 90 days) return 95;
-        if (age < 180 days) return 85;
-        return 70;
-    }
+    // function calculateDecayFactor(uint256 age) internal pure returns (uint256) {
+    //     // DEPRECATED: Phase 2 uses credentialTypes[].decayDays
+    //     return 100;
+    // }
 
     // ============ Signature Verification ============
 
