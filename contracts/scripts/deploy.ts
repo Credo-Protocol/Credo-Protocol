@@ -78,14 +78,25 @@ async function main() {
   await oracle.registerIssuer(MOCK_BANK_ADDRESS, 100, "Mock Bank Issuer");
   console.log("✅ Mock Bank registered:", MOCK_BANK_ADDRESS);
   
-  // ============ Setup: Register Credential Types ============
+  // ============ Setup: Register Credential Types (Phase 2 - Bucketed) ============
   console.log("\n⚙️  Registering credential types...");
   
   const credentialTypes = [
-    { name: "CEX_HISTORY", weight: 80, decay: 180, display: "CEX History Verification" },
-    { name: "EMPLOYMENT", weight: 70, decay: 180, display: "Employment Status" },
-    { name: "BANK_BALANCE", weight: 100, decay: 90, display: "Bank Balance Verification" },
-    { name: "INCOME", weight: 150, decay: 90, display: "Proof of Income" },
+    // Bank Balance Buckets (Phase 2)
+    { name: "BANK_BALANCE_HIGH", weight: 150, decay: 90, display: "Bank Balance (High)" },
+    { name: "BANK_BALANCE_MEDIUM", weight: 120, decay: 90, display: "Bank Balance (Medium)" },
+    { name: "BANK_BALANCE_LOW", weight: 80, decay: 90, display: "Bank Balance (Low)" },
+    { name: "BANK_BALANCE_MINIMAL", weight: 40, decay: 90, display: "Bank Balance (Minimal)" },
+    
+    // Income Range Buckets (Phase 2)
+    { name: "INCOME_VERY_HIGH", weight: 180, decay: 180, display: "Income (Very High)" },
+    { name: "INCOME_HIGH", weight: 140, decay: 180, display: "Income (High)" },
+    { name: "INCOME_MEDIUM", weight: 100, decay: 180, display: "Income (Medium)" },
+    { name: "INCOME_LOW", weight: 50, decay: 180, display: "Income (Low)" },
+    
+    // Basic Existing Types
+    { name: "CEX_HISTORY", weight: 80, decay: 180, display: "CEX Trading History" },
+    { name: "EMPLOYMENT", weight: 70, decay: 180, display: "Employment Verified" },
     { name: "ON_CHAIN_ACTIVITY", weight: 50, decay: 180, display: "On-Chain Activity" },
   ];
   
@@ -126,7 +137,7 @@ async function main() {
       liquidationThreshold: "80%",
       liquidationBonus: "5%",
       tiersInitialized: true,
-      credentialTypesCount: 5,
+      credentialTypesCount: 11, // Phase 2: 4 bank + 4 income + 3 basic
     },
   };
 
@@ -153,7 +164,9 @@ async function main() {
   console.log("\n📝 Oracle v2 Features:");
   console.log("   ✅ 8 tiers initialized");
   console.log("   ✅ 3 issuers registered");
-  console.log("   ✅ 5 credential types configured");
+  console.log("   ✅ 11 credential types configured (Phase 2)");
+  console.log("   ✅ 4 bank balance buckets (40-150 pts)");
+  console.log("   ✅ 4 income range buckets (50-180 pts)");
   console.log("   ✅ ReentrancyGuard enabled");
   console.log("\n📝 Next steps:");
   console.log("   1. Update frontend .env with contract addresses");
