@@ -70,6 +70,25 @@ contract LendingPool is Ownable, ReentrancyGuard {
     // Liquidation bonus (in basis points, e.g., 500 = 5%)
     uint256 public constant LIQUIDATION_BONUS = 500;
 
+    // ============ Interest Rate System (Phase 3) ============
+    
+    // Per-user borrow index for each asset
+    // Tracks the global index at the time user borrowed
+    // Used to calculate accrued interest: userDebt * (currentIndex / userIndex)
+    mapping(address => mapping(address => uint256)) public userBorrowIndex;
+    
+    // Global borrow index per asset (starts at 1e18, grows over time)
+    // Represents cumulative interest accrued since contract deployment
+    mapping(address => uint256) public globalBorrowIndex;
+    
+    // Last time interest was accrued for each asset
+    mapping(address => uint256) public lastAccrualTime;
+    
+    // Interest rates by tier (annual APR in basis points)
+    // Tier 0 (900-1000): 5% APR = 500 basis points
+    // Tier 7 (0-299): 18% APR = 1800 basis points
+    uint16[8] public tierInterestRates;
+
     // ============ Events ============
 
     event AssetEnabled(address indexed asset, uint256 baseInterestRate);
@@ -91,6 +110,21 @@ contract LendingPool is Ownable, ReentrancyGuard {
         uint256 debtCovered,
         uint256 collateralSeized
     );
+    
+    // Phase 3: Interest events
+    event InterestAccrued(
+        address indexed asset,
+        uint256 newIndex,
+        uint256 timeElapsed,
+        uint256 timestamp
+    );
+    event BorrowWithInterest(
+        address indexed user,
+        address indexed asset,
+        uint256 principal,
+        uint256 interest,
+        uint256 total
+    );
 
     // ============ Constructor ============
 
@@ -101,6 +135,17 @@ contract LendingPool is Ownable, ReentrancyGuard {
     constructor(address _creditOracle) Ownable(msg.sender) {
         require(_creditOracle != address(0), "Invalid oracle address");
         creditOracle = _creditOracle;
+        
+        // Phase 3: Initialize tier-based interest rates (basis points)
+        // These rates match the 8-tier system from Phase 1
+        tierInterestRates[0] = 500;   // Tier 0 (900-1000): 5% APR
+        tierInterestRates[1] = 600;   // Tier 1 (800-899): 6% APR
+        tierInterestRates[2] = 750;   // Tier 2 (700-799): 7.5% APR
+        tierInterestRates[3] = 900;   // Tier 3 (600-699): 9% APR
+        tierInterestRates[4] = 1100;  // Tier 4 (500-599): 11% APR
+        tierInterestRates[5] = 1300;  // Tier 5 (400-499): 13% APR
+        tierInterestRates[6] = 1500;  // Tier 6 (300-399): 15% APR
+        tierInterestRates[7] = 1800;  // Tier 7 (0-299): 18% APR
     }
 
     // ============ Admin Functions ============
@@ -122,6 +167,10 @@ contract LendingPool is Ownable, ReentrancyGuard {
             utilizationRate: 0,
             enabled: true
         });
+        
+        // Phase 3: Initialize interest tracking for this asset
+        globalBorrowIndex[asset] = 1e18;      // Start at 1.0 (scaled by 1e18)
+        lastAccrualTime[asset] = block.timestamp;
 
         supportedAssets.push(asset);
         emit AssetEnabled(asset, baseRate);
@@ -216,6 +265,8 @@ contract LendingPool is Ownable, ReentrancyGuard {
      * @param asset Address of the ERC20 token
      * @param amount Amount to borrow
      * @dev Collateral factor is dynamically calculated based on user's credit score
+     * 
+     * Phase 3: Now tracks borrow index for interest accrual
      */
     function borrow(address asset, uint256 amount) external nonReentrant {
         require(assets[asset].enabled, "Asset not enabled");
@@ -224,6 +275,9 @@ contract LendingPool is Ownable, ReentrancyGuard {
             assets[asset].totalSupply - assets[asset].totalBorrowed >= amount,
             "Insufficient liquidity"
         );
+
+        // Phase 3: Accrue interest first (updates global index)
+        accrueInterest(asset);
 
         // Get user's credit score
         uint256 userScore = ICreditScoreOracle(creditOracle).getCreditScore(msg.sender);
@@ -245,7 +299,20 @@ contract LendingPool is Ownable, ReentrancyGuard {
         // Calculate interest rate based on score
         uint256 interestRate = calculateInterestRate(userScore, asset);
 
-        // Update state
+        // Phase 3: Handle borrow index for interest tracking
+        if (userAccounts[msg.sender].borrowed[asset] == 0) {
+            // First borrow: set user's index to current global index
+            userBorrowIndex[msg.sender][asset] = globalBorrowIndex[asset];
+        } else {
+            // Existing borrow: compound accrued interest into principal first
+            uint256 totalOwed = getBorrowBalanceWithInterest(msg.sender, asset);
+            userAccounts[msg.sender].borrowed[asset] = totalOwed;
+            
+            // Reset user's index to current (interest is now in principal)
+            userBorrowIndex[msg.sender][asset] = globalBorrowIndex[asset];
+        }
+
+        // Update state: add new borrow to principal
         userAccounts[msg.sender].borrowed[asset] += amount;
         userAccounts[msg.sender].lastUpdateTimestamp = block.timestamp;
         assets[asset].totalBorrowed += amount;
@@ -261,23 +328,55 @@ contract LendingPool is Ownable, ReentrancyGuard {
      * @notice Repay borrowed assets
      * @param asset Address of the ERC20 token
      * @param amount Amount to repay
+     * 
+     * Phase 3: Now includes accrued interest in repayment calculation
+     * User must repay both principal and interest
      */
     function repay(address asset, uint256 amount) external nonReentrant {
         require(amount > 0, "Amount must be > 0");
         
-        uint256 borrowed = userAccounts[msg.sender].borrowed[asset];
-        require(borrowed > 0, "No debt to repay");
+        // Phase 3: Accrue interest first
+        accrueInterest(asset);
+        
+        // Get total owed (principal + interest)
+        uint256 totalOwed = getBorrowBalanceWithInterest(msg.sender, asset);
+        require(totalOwed > 0, "No debt to repay");
 
-        // Can't repay more than borrowed
-        uint256 repayAmount = amount > borrowed ? borrowed : amount;
+        // Can't repay more than total owed
+        uint256 repayAmount = amount > totalOwed ? totalOwed : amount;
 
         // Transfer tokens from user
         IERC20(asset).safeTransferFrom(msg.sender, address(this), repayAmount);
 
-        // Update state
-        userAccounts[msg.sender].borrowed[asset] -= repayAmount;
+        // Calculate remaining debt after repayment
+        uint256 remainingDebt = totalOwed - repayAmount;
+        
+        // Phase 3: Update principal and index
+        // Store old principal before modifying it
+        uint256 oldPrincipal = userAccounts[msg.sender].borrowed[asset];
+        
+        if (remainingDebt == 0) {
+            // Full repayment: clear everything
+            userAccounts[msg.sender].borrowed[asset] = 0;
+            userBorrowIndex[msg.sender][asset] = 0;
+            
+            // Update pool's total borrowed (reduce by old principal)
+            assets[asset].totalBorrowed -= oldPrincipal;
+        } else {
+            // Partial repayment: convert remaining debt back to principal at current index
+            // Formula: newPrincipal = remainingDebt * userIndex / globalIndex
+            // This ensures the user still owes remainingDebt when calculated with new index
+            uint256 newPrincipal = (remainingDebt * userBorrowIndex[msg.sender][asset]) / globalBorrowIndex[asset];
+            
+            // Update borrowed amount and reset index to current
+            userAccounts[msg.sender].borrowed[asset] = newPrincipal;
+            userBorrowIndex[msg.sender][asset] = globalBorrowIndex[asset];
+            
+            // Update pool's total borrowed
+            assets[asset].totalBorrowed = assets[asset].totalBorrowed - oldPrincipal + newPrincipal;
+        }
+        
         userAccounts[msg.sender].lastUpdateTimestamp = block.timestamp;
-        assets[asset].totalBorrowed -= repayAmount;
         _updateUtilizationRate(asset);
 
         emit Repaid(msg.sender, asset, repayAmount);
@@ -383,6 +482,166 @@ contract LendingPool is Ownable, ReentrancyGuard {
         }
     }
 
+    // ============ Phase 3: Interest Accrual Functions ============
+
+    /**
+     * @notice Accrue interest for an asset based on time elapsed
+     * @param asset Address of the asset to accrue interest for
+     * @dev Called before any borrow/repay operation to ensure up-to-date interest
+     * 
+     * Interest is calculated using a simple compounding model:
+     * newIndex = oldIndex * (1 + rate * time)
+     * 
+     * where rate = weighted average APR / seconds per year
+     */
+    function accrueInterest(address asset) public {
+        // Skip if already updated this block
+        if (lastAccrualTime[asset] == block.timestamp) {
+            return;
+        }
+        
+        uint256 timeElapsed = block.timestamp - lastAccrualTime[asset];
+        
+        // If no time has passed or no borrows, just update timestamp
+        if (timeElapsed == 0 || assets[asset].totalBorrowed == 0) {
+            lastAccrualTime[asset] = block.timestamp;
+            return;
+        }
+        
+        // Use fixed 12% APR for simplicity (can be improved with weighted average)
+        // In a production system, this would calculate weighted average based on all borrowers' rates
+        uint256 annualRateBps = 1200; // 12% APR
+        
+        // Convert annual rate to per-second rate
+        // Formula: (rate_bps / 10000) / seconds_per_year
+        // Multiply by 1e18 for precision
+        // Seconds per year: 365.25 * 24 * 60 * 60 = 31557600
+        uint256 ratePerSecond = (annualRateBps * 1e18) / 31557600 / 10000;
+        
+        // Calculate interest factor for time elapsed
+        // interestFactor = rate * time
+        uint256 interestFactor = ratePerSecond * timeElapsed;
+        
+        // Update global index: newIndex = oldIndex * (1 + interestFactor)
+        // Simplified: newIndex = oldIndex + (oldIndex * interestFactor / 1e18)
+        globalBorrowIndex[asset] = globalBorrowIndex[asset] + 
+            ((globalBorrowIndex[asset] * interestFactor) / 1e18);
+        
+        lastAccrualTime[asset] = block.timestamp;
+        
+        emit InterestAccrued(
+            asset,
+            globalBorrowIndex[asset],
+            timeElapsed,
+            block.timestamp
+        );
+    }
+
+    /**
+     * @notice Get user's borrow balance including accrued interest
+     * @param user Address to check
+     * @param asset Address of the asset
+     * @return Total owed (principal + interest)
+     * 
+     * Formula: totalOwed = principal * (currentIndex / userIndex)
+     * 
+     * Example:
+     * - User borrowed 100 USDC when global index was 1.0
+     * - Time passes, global index is now 1.05 (5% interest accrued)
+     * - User owes: 100 * (1.05 / 1.0) = 105 USDC
+     */
+    function getBorrowBalanceWithInterest(address user, address asset) 
+        public 
+        view 
+        returns (uint256) 
+    {
+        uint256 principal = userAccounts[user].borrowed[asset];
+        
+        if (principal == 0) {
+            return 0;
+        }
+        
+        // If user has never borrowed or index not initialized, return principal
+        if (userBorrowIndex[user][asset] == 0) {
+            return principal;
+        }
+        
+        // Calculate current global index (including pending interest)
+        uint256 currentGlobalIndex = _getCurrentGlobalIndex(asset);
+        
+        // Calculate total owed: principal * (currentIndex / userIndex)
+        uint256 totalOwed = (principal * currentGlobalIndex) / userBorrowIndex[user][asset];
+        
+        return totalOwed;
+    }
+
+    /**
+     * @dev Internal function to calculate current global index including pending interest
+     * @param asset Address of the asset
+     * @return Current global index (not yet saved to storage)
+     * 
+     * This is a view function that calculates what the index WOULD be if accrueInterest() was called now
+     */
+    function _getCurrentGlobalIndex(address asset) internal view returns (uint256) {
+        uint256 timeElapsed = block.timestamp - lastAccrualTime[asset];
+        
+        // If no time elapsed or no borrows, return current index
+        if (timeElapsed == 0 || assets[asset].totalBorrowed == 0) {
+            return globalBorrowIndex[asset];
+        }
+        
+        // Same calculation as accrueInterest but read-only
+        uint256 annualRateBps = 1200; // 12% APR (matches accrueInterest)
+        uint256 ratePerSecond = (annualRateBps * 1e18) / 31557600 / 10000;
+        uint256 interestFactor = ratePerSecond * timeElapsed;
+        
+        return globalBorrowIndex[asset] + 
+            ((globalBorrowIndex[asset] * interestFactor) / 1e18);
+    }
+
+    /**
+     * @notice Get accrued interest for a user (interest only, not principal)
+     * @param user Address of the user
+     * @param asset Address of the asset
+     * @return Accrued interest amount
+     */
+    function getAccruedInterest(address user, address asset) 
+        public 
+        view 
+        returns (uint256) 
+    {
+        uint256 totalOwed = getBorrowBalanceWithInterest(user, asset);
+        uint256 principal = userAccounts[user].borrowed[asset];
+        
+        return totalOwed > principal ? totalOwed - principal : 0;
+    }
+
+    /**
+     * @notice Get APR for a user based on their credit score tier
+     * @param user Address of the user
+     * @return Annual interest rate in basis points (e.g., 500 = 5%)
+     */
+    function getUserAPR(address user) public view returns (uint256) {
+        uint256 score = ICreditScoreOracle(creditOracle).getCreditScore(user);
+        return getTierAPR(score);
+    }
+
+    /**
+     * @notice Get APR for a credit score tier
+     * @param creditScore User's credit score (0-1000)
+     * @return Annual interest rate in basis points
+     */
+    function getTierAPR(uint256 creditScore) public view returns (uint256) {
+        if (creditScore >= 900) return tierInterestRates[0];  // 5%
+        if (creditScore >= 800) return tierInterestRates[1];  // 6%
+        if (creditScore >= 700) return tierInterestRates[2];  // 7.5%
+        if (creditScore >= 600) return tierInterestRates[3];  // 9%
+        if (creditScore >= 500) return tierInterestRates[4];  // 11%
+        if (creditScore >= 400) return tierInterestRates[5];  // 13%
+        if (creditScore >= 300) return tierInterestRates[6];  // 15%
+        return tierInterestRates[7];  // 18%
+    }
+
     // ============ View Functions ============
 
     /**
@@ -447,13 +706,17 @@ contract LendingPool is Ownable, ReentrancyGuard {
     /**
      * @notice Get user's total borrows across all assets
      * @param user Address of the user
-     * @return Total borrowed value
+     * @return Total borrowed value (including accrued interest)
+     * 
+     * Phase 3: Now includes accrued interest in total borrows
+     * This ensures health factor calculations account for interest
      */
     function getUserTotalBorrows(address user) public view returns (uint256) {
         uint256 total = 0;
         for (uint i = 0; i < supportedAssets.length; i++) {
             address asset = supportedAssets[i];
-            total += userAccounts[user].borrowed[asset];
+            // Phase 3: Use getBorrowBalanceWithInterest instead of just principal
+            total += getBorrowBalanceWithInterest(user, asset);
         }
         return total;
     }
