@@ -18,6 +18,7 @@ import CreditScoreCard from '@/components/CreditScoreCard';
 import CredentialMarketplace from '@/components/CredentialMarketplace';
 import LendingInterface from '@/components/LendingInterface';
 import ScoreBuilderWizard from '@/components/ScoreBuilderWizard';
+import Leaderboard from '@/components/Leaderboard';
 import ConnectButton from '@/components/auth/ConnectButton';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -488,6 +489,11 @@ export default function Dashboard() {
             />
           </TabsContent>
         </Tabs>
+
+        {/* Phase 4: Leaderboard Section (NEW!) */}
+        <div className="mt-12">
+          <Leaderboard />
+        </div>
       </main>
     </div>
   );
