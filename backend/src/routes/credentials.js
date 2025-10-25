@@ -168,9 +168,10 @@ router.post('/request/income-range', async (req, res) => {
 
 /**
  * POST /api/credentials/request/cex
+ * POST /api/credentials/request/cex-history (alias)
  * Issues CEX trading history credential
  */
-router.post('/request/cex', async (req, res) => {
+const handleCexCredential = async (req, res) => {
     try {
         const { userAddress } = req.body;
         
@@ -191,13 +192,22 @@ router.post('/request/cex', async (req, res) => {
         }
         
         const result = await mockExchangeIssuer.issueCredential(userAddress, 'cex-history');
-        res.json({ success: true, ...result });
+        res.json({ 
+            success: true, 
+            credential: result.credential,
+            credentialData: result.credentialData,
+            signature: result.signature,
+            issuer: result.issuer
+        });
         
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
-});
+};
+
+router.post('/request/cex', handleCexCredential);
+router.post('/request/cex-history', handleCexCredential);
 
 /**
  * POST /api/credentials/request/employment
@@ -224,7 +234,13 @@ router.post('/request/employment', async (req, res) => {
         }
         
         const result = await mockEmployerIssuer.issueEmploymentCredential(userAddress);
-        res.json({ success: true, ...result });
+        res.json({ 
+            success: true,
+            credential: result.credential,
+            credentialData: result.credentialData,
+            signature: result.signature,
+            issuer: result.issuer
+        });
         
     } catch (error) {
         console.error('Error:', error);
