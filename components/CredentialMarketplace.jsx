@@ -34,7 +34,8 @@ export default function CredentialMarketplace({ userAddress, onCredentialSubmitt
       }
 
       const data = await response.json();
-      setCredentials(data.credentials || []);
+      // Phase 2: Backend returns credentialTypes, not credentials
+      setCredentials(data.credentialTypes || data.credentials || []);
       setError(null);
     } catch (err) {
       console.error('Error fetching credentials:', err);
