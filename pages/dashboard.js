@@ -17,6 +17,7 @@ import Image from 'next/image';
 import CreditScoreCard from '@/components/CreditScoreCard';
 import CredentialMarketplace from '@/components/CredentialMarketplace';
 import LendingInterface from '@/components/LendingInterface';
+import ScoreBuilderWizard from '@/components/ScoreBuilderWizard';
 import ConnectButton from '@/components/auth/ConnectButton';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -44,6 +45,7 @@ export default function Dashboard() {
   const [scoreDetails, setScoreDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(true);
+  const [credentials, setCredentials] = useState([]); // Track submitted credentials for Score Builder
 
   // Handle connection changes from ConnectButton
   const handleConnectionChange = (connectionData) => {
@@ -258,6 +260,13 @@ export default function Dashboard() {
     }, 2000); // Wait 2 seconds for transaction to confirm
   };
 
+  // Handler for Score Builder credential requests
+  const handleRequestCredential = async (credential) => {
+    // This will trigger the credential request modal
+    // The actual implementation is handled by CredentialMarketplace
+    console.log('Requesting credential from Score Builder:', credential);
+  };
+
   // Show loading while initializing AIR Kit (only when not connected yet)
   if (airKitLoading && !isConnected) {
     return (
@@ -424,14 +433,21 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Main Tabs: Credentials and Lending */}
-        <Tabs defaultValue="credentials" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2 mb-6 bg-neutral-100 p-1 rounded-full border border-black/5">
+        {/* Main Tabs: Score Builder, Credentials, and Lending */}
+        <Tabs defaultValue="builder" className="w-full">
+          <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-6 bg-neutral-100 p-1 rounded-full border border-black/5">
+            <TabsTrigger 
+              value="builder"
+              className="rounded-full data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-lg transition-all flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              Score Builder
+            </TabsTrigger>
             <TabsTrigger 
               value="credentials"
               className="rounded-full data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-lg transition-all"
             >
-              Build Credit Score
+              Build Credit
             </TabsTrigger>
             <TabsTrigger 
               value="lending"
@@ -440,6 +456,15 @@ export default function Dashboard() {
               Lending Pool
             </TabsTrigger>
           </TabsList>
+
+          {/* Score Builder Tab (NEW - Phase 3) */}
+          <TabsContent value="builder">
+            <ScoreBuilderWizard
+              currentScore={creditScore}
+              submittedCredentials={credentials}
+              onRequestCredential={handleRequestCredential}
+            />
+          </TabsContent>
 
           {/* Credentials Tab */}
           <TabsContent value="credentials">
