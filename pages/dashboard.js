@@ -46,6 +46,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(true);
   const [credentials, setCredentials] = useState([]); // Track submitted credentials for Score Builder
+  const [activeTab, setActiveTab] = useState('builder'); // Track active tab
 
   // Handle connection changes from ConnectButton
   const handleConnectionChange = (connectionData) => {
@@ -262,9 +263,12 @@ export default function Dashboard() {
 
   // Handler for Score Builder credential requests
   const handleRequestCredential = async (credential) => {
-    // This will trigger the credential request modal
-    // The actual implementation is handled by CredentialMarketplace
-    console.log('Requesting credential from Score Builder:', credential);
+    // Navigate to Build Credit tab so user can request credentials
+    console.log('Navigating to Build Credit tab for credential:', credential);
+    setActiveTab('credentials');
+    
+    // Scroll to top smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Show loading while initializing AIR Kit (only when not connected yet)
@@ -434,7 +438,7 @@ export default function Dashboard() {
         </div>
 
         {/* Main Tabs: Score Builder, Credentials, and Lending */}
-        <Tabs defaultValue="builder" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-6 bg-neutral-100 p-1 rounded-full border border-black/5">
             <TabsTrigger 
               value="builder"

@@ -134,12 +134,12 @@ export default function ScoreBuilderWizard({
     };
     
     const handleRequestSelected = async () => {
-        for (const cred of selectedCredentials) {
-            if (onRequestCredential) {
-                await onRequestCredential({ id: cred.id });
-            }
+        // Just navigate to Build Credit tab
+        // User can request credentials there using existing flow
+        if (onRequestCredential) {
+            await onRequestCredential({ credentials: selectedCredentials });
         }
-        setSelectedCredentials([]);
+        // Don't clear selection - user can see what they wanted
     };
     
     return (
@@ -302,20 +302,32 @@ export default function ScoreBuilderWizard({
             
             {/* Action Buttons */}
             {selectedCredentials.length > 0 && (
-                <div className="flex justify-end gap-3">
-                    <Button 
-                        variant="outline" 
-                        onClick={() => setSelectedCredentials([])}
-                    >
-                        Clear Selection
-                    </Button>
-                    <Button 
-                        onClick={handleRequestSelected}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                        Request {selectedCredentials.length} Credential{selectedCredentials.length > 1 ? 's' : ''}
-                    </Button>
-                </div>
+                <Card className="p-4 bg-blue-50 border-blue-300">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="font-semibold text-blue-900">
+                                {selectedCredentials.length} Credential{selectedCredentials.length > 1 ? 's' : ''} Selected
+                            </p>
+                            <p className="text-sm text-blue-700">
+                                Ready to request and improve your score
+                            </p>
+                        </div>
+                        <div className="flex gap-3">
+                            <Button 
+                                variant="outline" 
+                                onClick={() => setSelectedCredentials([])}
+                            >
+                                Clear
+                            </Button>
+                            <Button 
+                                onClick={handleRequestSelected}
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                                Go to Build Credit →
+                            </Button>
+                        </div>
+                    </div>
+                </Card>
             )}
         </div>
     );
