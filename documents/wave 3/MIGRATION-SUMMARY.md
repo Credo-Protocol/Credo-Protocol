@@ -19,33 +19,43 @@ Your Credo Protocol currently uses **custom credential infrastructure** instead 
 
 ## ✅ What You Need to Do
 
-### **Phase 5: MOCA Migration** (NEW - 6-8 hours)
+### **Phase 5: MOCA Migration** (NEW - 6-8 hours, Split into 3 Sub-Phases)
 
-**Document**: `PHASE5-MOCA-MIGRATION.md`
+**Overview Document**: `PHASE5-MOCA-MIGRATION.md`
 
-This is now the **most critical** phase before finalizing Wave 3.
+This is now the **most critical** phase before finalizing Wave 3. It's been split into 3 focused sub-phases for easier execution.
 
-#### High-Level Steps:
+#### Sub-Phase 5.1: Dashboard Setup (2 hours)
 
-1. **AIR Kit Dashboard Setup** (2 hours)
-   - Register 3 Issuer DIDs (Bank, Employment, CEX)
-   - Register 1 Verifier DID
-   - Create 10 credential schemas
-   - Create 10 verifier programs
-   - Enable gas sponsorship (paymaster)
-   - Generate Partner secret for JWT
+**Document**: `PHASE5.1-DASHBOARD-SETUP.md`
 
-2. **Backend Refactor** (2-3 hours)
-   - Add Partner JWT generation
-   - Replace mock issuers with credential metadata endpoints
-   - Delete `backend/src/issuers/*.js` files
-   - Update environment variables (20+ new vars)
+- Register 3 Issuer DIDs (Bank, Employment, CEX)
+- Register 1 Verifier DID
+- Create 10 credential schemas
+- Create 10 verifier programs
+- Enable gas sponsorship (paymaster)
+- Generate Partner secret for JWT
 
-3. **Frontend Integration** (2-3 hours)
-   - Update credential issuance to use `airService.credential.issue()`
-   - Add gas sponsorship configuration
-   - Create credential wallet component
-   - Update environment variables
+#### Sub-Phase 5.2: Backend Refactor (2-3 hours)
+
+**Document**: `PHASE5.2-BACKEND-REFACTOR.md`
+
+- Add Partner JWT generation module
+- Replace mock issuers with credential metadata endpoints
+- Delete `backend/src/issuers/*.js` files
+- Update environment variables (20+ new vars)
+- Test all API endpoints
+
+#### Sub-Phase 5.3: Frontend Integration (2-3 hours)
+
+**Document**: `PHASE5.3-FRONTEND-INTEGRATION.md`
+
+- Update AIR Kit initialization with paymaster
+- Refactor credential issuance to use `airService.credential.issue()`
+- Add gas sponsorship configuration
+- Create credential wallet component
+- Update environment variables
+- Test end-to-end with gas sponsorship
 
 ---
 
@@ -91,36 +101,42 @@ User → Frontend → Your Backend (JWT generation)
 
 ## 📋 Action Plan
 
-### Step 1: Read Phase 5 Document
-- Open `PHASE5-MOCA-MIGRATION.md`
-- Understand the 3-part structure
-- Review all code examples
+### Step 1: Read Overview Document
+- Open `PHASE5-MOCA-MIGRATION.md` (overview)
+- Understand the migration architecture
+- Review the 3 sub-phase structure
 
-### Step 2: Access AIR Kit Dashboard
+### Step 2: Execute Phase 5.1 (Dashboard Setup)
+- Open `PHASE5.1-DASHBOARD-SETUP.md`
 - Login: https://developers.sandbox.air3.com/
-- Complete Part A (Dashboard Setup)
-- Save all DIDs, schemas, program IDs
+- Register all DIDs and create schemas
+- Enable gas sponsorship
+- Save all credentials (20+ env vars)
 
-### Step 3: Refactor Backend
+### Step 3: Execute Phase 5.2 (Backend Refactor)
+- Open `PHASE5.2-BACKEND-REFACTOR.md`
 - Add `backend/src/auth/jwt.js`
 - Update `backend/src/routes/credentials.js`
 - Delete old issuer files
-- Update `.env` with 20+ new variables
+- Update `.env` with saved values
+- Test all API endpoints
 
-### Step 4: Update Frontend
-- Modify credential issuance flow
-- Add gas sponsorship config
+### Step 4: Execute Phase 5.3 (Frontend Integration)
+- Open `PHASE5.3-FRONTEND-INTEGRATION.md`
+- Update AIR Kit initialization
+- Refactor credential issuance flow
 - Create credential wallet component
 - Update `.env.local`
+- Test end-to-end with gas sponsorship
 
-### Step 5: Test Everything
-- Run smoke tests
-- Verify gas sponsorship
+### Step 5: Verify Complete Migration
+- Run all tests from each sub-phase
+- Verify gas sponsorship working
 - Check AIR Kit Dashboard
 - Confirm MCSP storage
 
 ### Step 6: Proceed to Phase 6
-- Only after Phase 5 is 100% complete
+- Only after ALL 3 sub-phases complete
 - Update documentation
 - Prepare demo
 - Submit
@@ -129,8 +145,13 @@ User → Frontend → Your Backend (JWT generation)
 
 ## ⏱️ Timeline
 
-**Phase 5**: 6-8 hours (split over 1-2 days recommended)  
-**Phase 6**: 4-6 hours (after Phase 5 complete)  
+**Phase 5.1** (Dashboard): 2 hours  
+**Phase 5.2** (Backend): 2-3 hours  
+**Phase 5.3** (Frontend): 2-3 hours  
+**Phase 5 Total**: 6-8 hours (split over 1-2 days recommended)  
+
+**Phase 6** (Docs & Demo): 4-6 hours  
+
 **Total**: 10-14 hours to properly integrate with MOCA
 
 ---
@@ -199,11 +220,18 @@ Judges will recognize the difference immediately.
 
 ## ✅ Next Steps
 
-1. **Read** `PHASE5-MOCA-MIGRATION.md` cover to cover
-2. **Block** 6-8 hours for focused work
-3. **Start** with Part A (Dashboard Setup)
-4. **Test** after each major change
+1. **Read** `PHASE5-MOCA-MIGRATION.md` (overview)
+2. **Block** 6-8 hours for focused work (can split across days)
+3. **Execute** Phase 5.1 → 5.2 → 5.3 in order
+4. **Test** after each sub-phase
 5. **Verify** all acceptance criteria before Phase 6
+
+### Recommended Schedule
+
+**Day 1 Morning** (2 hours): Phase 5.1 - Dashboard Setup  
+**Day 1 Afternoon** (2-3 hours): Phase 5.2 - Backend Refactor  
+**Day 2 Morning** (2-3 hours): Phase 5.3 - Frontend Integration  
+**Day 2 Afternoon** (4-6 hours): Phase 6 - Documentation & Demo
 
 ---
 

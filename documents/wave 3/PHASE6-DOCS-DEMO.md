@@ -498,13 +498,17 @@ Clean Up:
 ## 📊 Progress Tracking
 
 **Prerequisites Check** (Before starting Phase 6):
-- [ ] ✅ Phase 5 (MOCA Migration) complete
-- [ ] ✅ All 3 Issuer DIDs registered and active
-- [ ] ✅ All 10 credential schemas created
-- [ ] ✅ Gas sponsorship enabled and tested
-- [ ] ✅ Credentials issuing via AIR Kit (not mock backend)
-- [ ] ✅ Credentials stored on MCSP
-- [ ] ✅ Backend using Partner JWT authentication
+- [ ] ✅ Phase 5.1 (Dashboard Setup) complete
+  - [ ] All 3 Issuer DIDs registered and active
+  - [ ] All 10 credential schemas created
+  - [ ] Gas sponsorship enabled
+- [ ] ✅ Phase 5.2 (Backend Refactor) complete
+  - [ ] Backend using Partner JWT authentication
+  - [ ] All API endpoints tested
+- [ ] ✅ Phase 5.3 (Frontend Integration) complete
+  - [ ] Credentials issuing via AIR Kit (not mock backend)
+  - [ ] Credentials stored on MCSP
+  - [ ] Gas sponsorship tested and working
 
 **Part A: Documentation**
 - [ ] Step 1: Update README (1 hour)
@@ -668,24 +672,30 @@ If you advance to Wave 4 or continue post-buildathon:
 
 ### Before Starting Phase 6
 
-**YOU MUST COMPLETE PHASE 5 FIRST!**
+**YOU MUST COMPLETE ALL 3 SUB-PHASES OF PHASE 5 FIRST!**
 
-Phase 5 (MOCA Migration) is the most critical upgrade. Without it:
+Phase 5 has been split into 3 parts for easier execution:
+- **Phase 5.1**: Dashboard Setup (2 hours)
+- **Phase 5.2**: Backend Refactor (2-3 hours)  
+- **Phase 5.3**: Frontend Integration (2-3 hours)
+
+Phase 5 (MOCA Migration) is the most critical upgrade. Without completing ALL 3 sub-phases:
 - ❌ Your credentials won't be interoperable
 - ❌ You're not truly integrated with MOCA ecosystem
 - ❌ You won't have gas sponsorship
 - ❌ Judges will see you only use MOCA for login (not credentials)
 
-### After Phase 5, Before Phase 6
+### After Phase 5 (All 3 Sub-Phases), Before Phase 6
 
 Test these **in order**:
-1. Can issue credential without MOCA tokens? (gas sponsored)
-2. Does credential appear in AIR Kit Dashboard?
-3. Is credential stored on MCSP? (check dashboard storage section)
-4. Can you see issuer DIDs in dashboard?
-5. Does credential appear in AIR wallet component?
+1. ✅ Phase 5.1: Can you see your 3 Issuer DIDs and 10 schemas in AIR Kit Dashboard?
+2. ✅ Phase 5.2: Does `curl localhost:3001/api/credentials/types` return 10 credentials?
+3. ✅ Phase 5.3: Can issue credential without MOCA tokens? (gas sponsored)
+4. ✅ Phase 5.3: Does credential appear in AIR Kit Dashboard?
+5. ✅ Phase 5.3: Is credential stored on MCSP? (check dashboard storage section)
+6. ✅ Phase 5.3: Does credential appear in AIR wallet component?
 
-If any of these fail, **don't proceed** to Phase 6. Fix Phase 5 first.
+If any of these fail, **go back** to the relevant sub-phase and fix it before proceeding.
 
 ### Demo Day Talking Points
 
