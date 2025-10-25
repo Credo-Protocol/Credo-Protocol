@@ -14,6 +14,7 @@ module.exports = {
         enabled: true,
         runs: 200,
       },
+      viaIR: true, // Enable IR-based code generator to fix "stack too deep" errors
     },
   },
   networks: {
