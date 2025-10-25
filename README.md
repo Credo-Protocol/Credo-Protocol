@@ -373,19 +373,6 @@ npm run dev
 - **Role**: Full-Stack Developer (Smart Contracts, Frontend, Backend, Integration & Deployment)
 - **Location**: Southeast Asia (Malaysia, UTC+8)
 - **Twitter/X**: [@marcustan1337](https://x.com/marcustan1337)
-
+- **Telegram**: [@szaaa2311](https://t.me/szaaa2311)
 ---
-
-**🏆 Moca Network Proof of Build - Wave 2 Submission**
-
-*Transforming trust into capital, one credential at a time.* 🚀
-
-## 🙏 Acknowledgments
-
-- **Moca Network** for the AIR Kit SDK and developer tools
-- **OpenZeppelin** for secure smart contract libraries  
-- **Hardhat** for the excellent development framework
-- **shadcn/ui** for beautiful, accessible UI components
-- **Vercel** for Next.js and hosting platform
-
 
