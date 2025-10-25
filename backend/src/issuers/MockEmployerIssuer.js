@@ -1,125 +1,176 @@
 /**
- * Mock Employer Issuer
+ * Mock Employer Issuer - Phase 2 Upgrade
  * 
- * Simulates an employer or payroll system that issues credentials
- * proving a user's employment status and history.
+ * Implements privacy-preserving bucketed income range credentials.
+ * Uses 4 income brackets to protect user privacy while proving earning capacity.
  * 
- * In production, this would integrate with HR systems and use
- * zero-knowledge proofs to prove employment without revealing
- * employer identity or salary details.
+ * In production, this would integrate with payroll APIs (e.g., Gusto, ADP)
+ * to get real income data and issue bucketed credentials.
  */
 
-const { signCredential, validateCredentialData } = require('../utils/credentialSigner');
+const { ethers } = require('ethers');
 
 class MockEmployerIssuer {
-  /**
-   * Initialize the employer issuer
-   * 
-   * @param {ethers.Wallet} signerWallet - Wallet with issuer's private key
-   */
-  constructor(signerWallet) {
-    this.name = 'Mock Employer';
-    this.description = 'Employment Verification Service';
-    this.signerWallet = signerWallet;
-    this.issuerAddress = signerWallet.address;
+    constructor(privateKey) {
+        this.privateKey = privateKey;
+        this.wallet = new ethers.Wallet(privateKey);
+        this.issuerAddress = this.wallet.address;
+    }
     
-    // Credential Type 3: Proof of Employment
-    this.credentialType = 3;
+    /**
+     * Issue bucketed income range credential
+     * In production: Pull from payroll API (e.g., Gusto, ADP)
+     * For demo: Simulate realistic income distribution
+     */
+    async issueIncomeRangeCredential(userAddress) {
+        console.log(`[Mock Employer] Issuing income range credential for ${userAddress}`);
+        
+        // Simulate payroll API data
+        const simulatedMonthlyIncome = this._simulatePayrollData();
+        
+        // Determine income bucket
+        const bucket = this._determineBucket(simulatedMonthlyIncome, [
+            { min: 10000, type: 'INCOME_VERY_HIGH', weight: 180, display: 'Very High Income ($10k+/mo)' },
+            { min: 5000, type: 'INCOME_HIGH', weight: 140, display: 'High Income ($5k-$10k/mo)' },
+            { min: 2000, type: 'INCOME_MEDIUM', weight: 100, display: 'Medium Income ($2k-$5k/mo)' },
+            { min: 0, type: 'INCOME_LOW', weight: 50, display: 'Low Income (<$2k/mo)' }
+        ]);
+        
+        console.log(`  Simulated income: $${simulatedMonthlyIncome.toFixed(2)}/mo`);
+        console.log(`  Bucket: ${bucket.display}`);
+        
+        const timestamp = Math.floor(Date.now() / 1000);
+        const expirationDate = timestamp + (180 * 24 * 60 * 60); // 6 months
+        
+        // Compute credential type hash (keccak256 of type name)
+        const credentialTypeHash = ethers.id(bucket.type);
+        
+        // Encode credential data for signature (matching contract's verification)
+        const credentialData = ethers.AbiCoder.defaultAbiCoder().encode(
+            ['string', 'address', 'address', 'uint256', 'uint256'],
+            [bucket.type, this.issuerAddress, userAddress, timestamp, expirationDate]
+        );
+        
+        // Sign the credential data
+        const messageHash = ethers.keccak256(credentialData);
+        const signature = await this.wallet.signMessage(ethers.getBytes(messageHash));
+        
+        // Prepare response with all data needed for contract submission
+        const credential = {
+            credentialType: bucket.type,
+            credentialTypeHash: credentialTypeHash,
+            issuer: this.issuerAddress,
+            subject: userAddress,
+            issuanceDate: timestamp,
+            expirationDate: expirationDate,
+            metadata: {
+                bucket: bucket.type,
+                weight: bucket.weight,
+                display: bucket.display,
+                description: `Monthly income in ${bucket.type.replace('INCOME_', '').toLowerCase()} range`,
+                privacyNote: 'Exact salary not disclosed',
+                dataSource: 'Payroll API (simulated)',
+                verification: 'Employment status verified'
+            }
+        };
+        
+        return {
+            credential,
+            credentialData,  // Encoded data for contract
+            signature,
+            issuer: this.issuerAddress
+        };
+    }
     
-    // Weight in scoring algorithm: 70 points
-    this.scoreWeight = 70;
+    /**
+     * Legacy employment credential (non-bucketed)
+     */
+    async issueEmploymentCredential(userAddress) {
+        console.log(`[Mock Employer] Issuing basic employment credential for ${userAddress}`);
+        
+        const timestamp = Math.floor(Date.now() / 1000);
+        const expirationDate = timestamp + (180 * 24 * 60 * 60);
+        const credentialType = 'EMPLOYMENT';
+        const credentialTypeHash = ethers.id(credentialType);
+        
+        // Encode credential data for signature
+        const credentialData = ethers.AbiCoder.defaultAbiCoder().encode(
+            ['string', 'address', 'address', 'uint256', 'uint256'],
+            [credentialType, this.issuerAddress, userAddress, timestamp, expirationDate]
+        );
+        
+        // Sign the credential data
+        const messageHash = ethers.keccak256(credentialData);
+        const signature = await this.wallet.signMessage(ethers.getBytes(messageHash));
+        
+        const credential = {
+            credentialType: credentialType,
+            credentialTypeHash: credentialTypeHash,
+            issuer: this.issuerAddress,
+            subject: userAddress,
+            issuanceDate: timestamp,
+            expirationDate: expirationDate,
+            metadata: {
+                weight: 70,
+                display: 'Employment Verified',
+                description: 'Current employment status confirmed',
+                employmentStatus: 'Full-time',
+                tenure: 'Simulated'
+            }
+        };
+        
+        return { credential, credentialData, signature, issuer: this.issuerAddress };
+    }
     
-    // Default expiration: 365 days (1 year)
-    this.defaultExpirationDays = 365;
-  }
-
-  /**
-   * Issue a credential to a user
-   * 
-   * @param {string} userAddress - User's wallet address
-   * @param {Object} mockData - Mock employment data for simulation
-   * @param {boolean} mockData.employed - Employment status
-   * @param {string} mockData.employmentDuration - "6_months" | "1_year" | "3_years"
-   * @param {string} mockData.employmentType - "full_time" | "part_time" | "contract"
-   * @returns {Object} - Signed credential ready for blockchain submission
-   */
-  async issueCredential(userAddress, mockData = {}) {
-    console.log(`[${this.name}] Issuing credential for ${userAddress}`);
-
-    // Set default values if not provided
-    const employmentData = {
-      employed: mockData.employed !== undefined ? mockData.employed : true,
-      employmentDuration: mockData.employmentDuration || '3_years',
-      employmentType: mockData.employmentType || 'full_time'
-    };
-
-    // Calculate timestamps
-    const issuedAt = Math.floor(Date.now() / 1000);
-    const expiresAt = issuedAt + (this.defaultExpirationDays * 24 * 60 * 60);
-
-    // Build credential data structure
-    const credentialData = {
-      type: 'ProofOfEmployment',
-      issuer: this.issuerAddress,
-      subject: userAddress,
-      credentialType: this.credentialType,
-      issuedAt,
-      expiresAt,
-      claims: {
-        employed: employmentData.employed,
-        employmentDuration: employmentData.employmentDuration,
-        employmentType: employmentData.employmentType,
-        // In production, this would be a real ZK proof
-        // proving employment without revealing employer or salary
-        zkProof: '0x' + Buffer.from('mock_zk_proof_employment').toString('hex')
-      },
-      metadata: {
-        issuerName: this.name,
-        scoreWeight: this.scoreWeight,
-        expirationDays: this.defaultExpirationDays
-      }
-    };
-
-    // Validate the credential data
-    validateCredentialData(credentialData);
-
-    // Sign the credential
-    const signedData = await signCredential(credentialData, this.signerWallet);
-
-    console.log(`[${this.name}] Credential issued successfully`);
-    console.log(`[${this.name}] Credential Hash: ${signedData.credentialHash}`);
-
-    return {
-      success: true,
-      credential: credentialData,
-      encodedData: signedData.encodedData,
-      signature: signedData.signature,
-      credentialHash: signedData.credentialHash
-    };
-  }
-
-  /**
-   * Get issuer information for display
-   * 
-   * @returns {Object} - Public issuer information
-   */
-  getInfo() {
-    return {
-      name: this.name,
-      description: this.description,
-      address: this.issuerAddress,
-      credentialType: this.credentialType,
-      credentialTypeName: 'ProofOfEmployment',
-      scoreWeight: this.scoreWeight,
-      expirationDays: this.defaultExpirationDays,
-      benefits: [
-        '+70 points to credit score',
-        'Proves stable income source',
-        'Valid for 12 months'
-      ]
-    };
-  }
+    /**
+     * Route to appropriate credential type
+     */
+    async issueCredential(userAddress, credentialType) {
+        if (credentialType === 'income-range') {
+            return this.issueIncomeRangeCredential(userAddress);
+        } else if (credentialType === 'employment') {
+            return this.issueEmploymentCredential(userAddress);
+        }
+        
+        throw new Error(`Unknown credential type: ${credentialType}`);
+    }
+    
+    /**
+     * Simulate payroll data with realistic income distribution
+     */
+    _simulatePayrollData() {
+        const incomes = [
+            { amount: 1500, weight: 0.25 },   // 25% low income
+            { amount: 3500, weight: 0.40 },   // 40% middle income
+            { amount: 7000, weight: 0.25 },   // 25% upper-middle
+            { amount: 12000, weight: 0.10 }   // 10% high income
+        ];
+        
+        const rand = Math.random();
+        let cumulative = 0;
+        
+        for (const income of incomes) {
+            cumulative += income.weight;
+            if (rand < cumulative) {
+                // Add noise ±$500
+                return income.amount + (Math.random() - 0.5) * 1000;
+            }
+        }
+        
+        return incomes[0].amount;
+    }
+    
+    /**
+     * Determine which bucket an amount falls into
+     */
+    _determineBucket(amount, bucketDefinitions) {
+        for (const bucket of bucketDefinitions) {
+            if (amount >= bucket.min) {
+                return bucket;
+            }
+        }
+        return bucketDefinitions[bucketDefinitions.length - 1];
+    }
 }
 
 module.exports = MockEmployerIssuer;
-
