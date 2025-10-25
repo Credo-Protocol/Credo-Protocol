@@ -55,7 +55,7 @@ describe("Basic Contract Tests", function () {
     });
 
     it("Should allow owner to register issuer", async function () {
-      await oracle.registerIssuer(issuer.address, 100);
+      await oracle.registerIssuer(issuer.address, 100, "Test Issuer");
       expect(await oracle.isIssuerRegistered(issuer.address)).to.be.true;
     });
 

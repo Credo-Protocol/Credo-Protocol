@@ -26,45 +26,46 @@ describe("CreditScoreOracle", function () {
 
   describe("Issuer Management", function () {
     it("Should allow owner to register issuer", async function () {
-      await oracle.registerIssuer(issuer1.address, 100);
+      await oracle.registerIssuer(issuer1.address, 100, "Test Issuer");
       
       expect(await oracle.isIssuerRegistered(issuer1.address)).to.be.true;
       
       const issuerInfo = await oracle.issuers(issuer1.address);
       expect(issuerInfo.registered).to.be.true;
+      expect(issuerInfo.isActive).to.be.true;
       expect(issuerInfo.trustScore).to.equal(100);
       expect(issuerInfo.credentialCount).to.equal(0);
     });
 
     it("Should reject issuer registration from non-owner", async function () {
       await expect(
-        oracle.connect(user1).registerIssuer(issuer1.address, 100)
+        oracle.connect(user1).registerIssuer(issuer1.address, 100, "Test")
       ).to.be.revertedWithCustomError(oracle, "OwnableUnauthorizedAccount");
     });
 
     it("Should reject invalid issuer address", async function () {
       await expect(
-        oracle.registerIssuer(ethers.ZeroAddress, 100)
+        oracle.registerIssuer(ethers.ZeroAddress, 100, "Test")
       ).to.be.revertedWith("Invalid issuer address");
     });
 
     it("Should reject trust score over 100", async function () {
       await expect(
-        oracle.registerIssuer(issuer1.address, 101)
-      ).to.be.revertedWith("Trust score must be <= 100");
+        oracle.registerIssuer(issuer1.address, 101, "Test")
+      ).to.be.revertedWith("Trust score must be 0-100");
     });
 
     it("Should reject duplicate issuer registration", async function () {
-      await oracle.registerIssuer(issuer1.address, 100);
+      await oracle.registerIssuer(issuer1.address, 100, "Test");
       
       await expect(
-        oracle.registerIssuer(issuer1.address, 100)
+        oracle.registerIssuer(issuer1.address, 100, "Test")
       ).to.be.revertedWith("Issuer already registered");
     });
 
     it("Should allow updating issuer trust score", async function () {
-      await oracle.registerIssuer(issuer1.address, 100);
-      await oracle.updateIssuerTrustScore(issuer1.address, 80);
+      await oracle.registerIssuer(issuer1.address, 100, "Test");
+      await oracle.updateIssuerTrust(issuer1.address, 80);
       
       const issuerInfo = await oracle.issuers(issuer1.address);
       expect(issuerInfo.trustScore).to.equal(80);
@@ -72,7 +73,7 @@ describe("CreditScoreOracle", function () {
 
     it("Should reject trust score update for unregistered issuer", async function () {
       await expect(
-        oracle.updateIssuerTrustScore(issuer1.address, 80)
+        oracle.updateIssuerTrust(issuer1.address, 80)
       ).to.be.revertedWith("Issuer not registered");
     });
   });
@@ -83,7 +84,7 @@ describe("CreditScoreOracle", function () {
 
     beforeEach(async function () {
       // Register issuer with 100% trust score
-      await oracle.registerIssuer(issuer1.address, 100);
+      await oracle.registerIssuer(issuer1.address, 100, "Test Issuer");
       
       // Create credential data
       const credentialType = 0; // Proof of Income (150 points)
@@ -212,8 +213,8 @@ describe("CreditScoreOracle", function () {
   describe("Score Calculation", function () {
     beforeEach(async function () {
       // Register issuers with different trust scores
-      await oracle.registerIssuer(issuer1.address, 100); // 100% trust
-      await oracle.registerIssuer(issuer2.address, 50);  // 50% trust
+      await oracle.registerIssuer(issuer1.address, 100, "Issuer 1"); // 100% trust
+      await oracle.registerIssuer(issuer2.address, 50, "Issuer 2");  // 50% trust
     });
 
     it("Should return base score (500) for new users", async function () {
@@ -240,8 +241,8 @@ describe("CreditScoreOracle", function () {
       );
       
       const score = await oracle.getCreditScore(user1.address);
-      // Base 500 + 150 (income) + 5% diversity bonus = ~657
-      expect(score).to.be.gte(650).and.lte(660);
+      // Base 500 + 150 (income) + 5% diversity bonus = ~682 (with full recency)
+      expect(score).to.be.gte(675).and.lte(690);
     });
 
     it("Should apply issuer trust score multiplier", async function () {
@@ -266,8 +267,8 @@ describe("CreditScoreOracle", function () {
       const score2 = await oracle.getCreditScore(user2.address);
       
       // Score should be lower due to 50% trust multiplier
-      // Base 500 + (150 * 0.5) + 5% diversity = ~578
-      expect(score2).to.be.gte(575).and.lte(585);
+      // Base 500 + (150 * 0.5) + 5% diversity = ~603 (with full recency)
+      expect(score2).to.be.gte(595).and.lte(610);
     });
 
     it("Should apply diversity bonus for multiple credential types", async function () {
@@ -302,7 +303,7 @@ describe("CreditScoreOracle", function () {
       // Submit all 5 credential types multiple times
       for (let credType = 0; credType <= 4; credType++) {
         for (let i = 0; i < 2; i++) {
-          const nonce = Math.random(); // Make each credential unique
+          const nonce = Math.floor(Math.random() * 1000000000); // Integer nonce
           const credentialData = ethers.AbiCoder.defaultAbiCoder().encode(
             ["address", "address", "uint256", "uint256", "uint256", "uint256"],
             [issuer1.address, user1.address, credType, Math.floor(Date.now() / 1000), expiresAt, nonce]
@@ -346,7 +347,7 @@ describe("CreditScoreOracle", function () {
       expect(await oracle.getUserCredentialCount(user1.address)).to.equal(0);
       
       // Add a credential
-      await oracle.registerIssuer(issuer1.address, 100);
+      await oracle.registerIssuer(issuer1.address, 100, "Test Issuer");
       const expiresAt = Math.floor(Date.now() / 1000) + (180 * 24 * 60 * 60);
       const credentialData = ethers.AbiCoder.defaultAbiCoder().encode(
         ["address", "address", "uint256", "uint256", "uint256"],

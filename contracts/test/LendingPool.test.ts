@@ -37,7 +37,7 @@ describe("LendingPool", function () {
     await lendingPool.enableAsset(await usdc.getAddress(), 500);
     
     // Register issuer in oracle
-    await oracle.registerIssuer(issuer.address, 100);
+    await oracle.registerIssuer(issuer.address, 100, "Test Issuer");
   });
 
   describe("Asset Management", function () {
