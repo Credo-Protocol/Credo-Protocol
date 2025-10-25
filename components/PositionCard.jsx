@@ -13,7 +13,8 @@ import { ethers } from 'ethers';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { AlertTriangle, TrendingUp, TrendingDown, Clock } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI, calculateCollateralFactor } from '@/lib/contracts';
 import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 
@@ -28,6 +29,11 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
     suppliedAmount: 0,
     borrowedAmount: 0,
   });
+  
+  // Phase 3: Real-time interest tracking
+  const [accruedInterest, setAccruedInterest] = useState(0);
+  const [totalOwed, setTotalOwed] = useState(0);
+  const [userAPR, setUserAPR] = useState(0);
 
   // Fetch position data (recalculate when credit score changes)
   useEffect(() => {
@@ -35,6 +41,59 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
       fetchPosition();
     }
   }, [userAddress, refresh, provider, creditScore]);
+  
+  // Phase 3: Auto-refresh interest every 5 seconds
+  useEffect(() => {
+    if (!userAddress || !provider || position.borrowedAmount === 0) {
+      return;
+    }
+    
+    const fetchInterest = async () => {
+      try {
+        const reliableProvider = await getBestProvider(null);
+        const lendingPool = new ethers.Contract(
+          CONTRACTS.LENDING_POOL,
+          LENDING_POOL_ABI,
+          reliableProvider
+        );
+        
+        // Get total owed (principal + interest)
+        const currentDebt = await callWithTimeout(
+          () => lendingPool.getBorrowBalanceWithInterest(userAddress, CONTRACTS.MOCK_USDC),
+          { timeout: 10000, retries: 1 }
+        );
+        const currentDebtFormatted = parseFloat(ethers.formatUnits(currentDebt, 6));
+        
+        // Get accrued interest
+        const interest = await callWithTimeout(
+          () => lendingPool.getAccruedInterest(userAddress, CONTRACTS.MOCK_USDC),
+          { timeout: 10000, retries: 1 }
+        );
+        const interestFormatted = parseFloat(ethers.formatUnits(interest, 6));
+        
+        // Get user's APR
+        const apr = await callWithTimeout(
+          () => lendingPool.getUserAPR(userAddress),
+          { timeout: 10000, retries: 1 }
+        );
+        
+        setTotalOwed(currentDebtFormatted);
+        setAccruedInterest(interestFormatted);
+        setUserAPR(Number(apr));
+        
+      } catch (error) {
+        console.error('Error fetching interest:', error);
+      }
+    };
+    
+    // Fetch immediately
+    fetchInterest();
+    
+    // Then update every 5 seconds
+    const interval = setInterval(fetchInterest, 5000);
+    
+    return () => clearInterval(interval);
+  }, [userAddress, provider, position.borrowedAmount]);
 
   const fetchPosition = async () => {
     try {
@@ -231,6 +290,41 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
             <p className="text-xs text-muted-foreground">USDC</p>
           </div>
         </div>
+
+        {/* Phase 3: Real-Time Interest Display (NEW!) */}
+        {position.borrowedAmount > 0 && (
+          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-700">Interest Accruing</span>
+              <Badge variant="outline" className="text-yellow-700 border-yellow-400">
+                {(userAPR / 100).toFixed(2)}% APR
+              </Badge>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Principal:</span>
+                <span className="font-semibold">${position.borrowedAmount.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Accrued Interest:</span>
+                <span className="font-semibold text-yellow-700">
+                  +${accruedInterest.toFixed(6)}
+                </span>
+              </div>
+              <div className="h-px bg-gray-300 my-2" />
+              <div className="flex justify-between">
+                <span className="font-medium text-gray-900">Total Owed:</span>
+                <span className="font-bold text-lg">${totalOwed.toFixed(2)}</span>
+              </div>
+            </div>
+            
+            <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+              <Clock className="w-3 h-3" />
+              <span>Updates every 5 seconds</span>
+            </div>
+          </div>
+        )}
 
         {/* Health Factor */}
         {position.healthFactor > 0 && (
