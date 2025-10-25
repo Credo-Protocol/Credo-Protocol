@@ -355,7 +355,9 @@ contract LendingPool is Ownable, ReentrancyGuard {
         // Store old principal before modifying it
         uint256 oldPrincipal = userAccounts[msg.sender].borrowed[asset];
         
-        if (remainingDebt == 0) {
+        // Handle dust amounts (< 10 units due to rounding)
+        // This prevents tiny amounts from being left over due to integer division
+        if (remainingDebt < 10 || remainingDebt == 0) {
             // Full repayment: clear everything
             userAccounts[msg.sender].borrowed[asset] = 0;
             userBorrowIndex[msg.sender][asset] = 0;
