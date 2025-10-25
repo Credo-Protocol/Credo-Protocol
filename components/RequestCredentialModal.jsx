@@ -37,21 +37,36 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
       setStep('loading');
       setError(null);
 
+      // Determine endpoint based on credential format
+      // Phase 2 credentials have 'id' field, legacy credentials have 'credentialType' field
+      let endpoint;
+      if (credential.id) {
+        // Phase 2 format: use specific endpoints
+        endpoint = `${BACKEND_URL}/api/credentials/request/${credential.id}`;
+      } else if (credential.credentialType !== undefined) {
+        // Legacy format: use old endpoint
+        endpoint = `${BACKEND_URL}/api/credentials/request`;
+      } else {
+        throw new Error('Invalid credential format');
+      }
+
       console.log('Requesting credential from backend...', {
         userAddress,
+        endpoint,
+        credentialId: credential.id,
         credentialType: credential.credentialType
       });
 
-      const response = await fetch(`${BACKEND_URL}/api/credentials/request`, {
+      const requestBody = credential.id 
+        ? { userAddress }  // Phase 2 format
+        : { userAddress, credentialType: credential.credentialType, mockData: {} }; // Legacy format
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          userAddress,
-          credentialType: credential.credentialType,
-          mockData: {} // In production, this would come from OAuth flow
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -103,23 +118,35 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
         signer
       );
 
-      console.log('Submitting credential to oracle...', {
-        encodedData: credentialData.encodedData,
+      // Phase 2: Determine which parameters to use based on credential format
+      const isPhase2 = credentialData.credentialData !== undefined; // Phase 2 has credentialData field
+      
+      const submitParams = isPhase2 ? {
+        credentialData: credentialData.credentialData,
         signature: credentialData.signature,
         issuer: credentialData.credential.issuer,
-        credentialType: credentialData.credential.credentialType,
+        credentialTypeHash: credentialData.credential.credentialTypeHash,
+        expiresAt: credentialData.credential.expirationDate
+      } : {
+        // Legacy format
+        credentialData: credentialData.encodedData,
+        signature: credentialData.signature,
+        issuer: credentialData.credential.issuer,
+        credentialTypeHash: ethers.id('LEGACY_TYPE'), // Convert legacy to hash
         expiresAt: credentialData.credential.expiresAt
-      });
+      };
+
+      console.log('Submitting credential to oracle...', submitParams);
 
       // Submit credential to smart contract
       // This should trigger AIR Kit's wallet confirmation popup
       console.log('🔐 Calling submitCredential - AIR Kit popup should appear now...');
       const tx = await oracleContract.submitCredential(
-        credentialData.encodedData,
-        credentialData.signature,
-        credentialData.credential.issuer,
-        credentialData.credential.credentialType,
-        credentialData.credential.expiresAt
+        submitParams.credentialData,
+        submitParams.signature,
+        submitParams.issuer,
+        submitParams.credentialTypeHash,
+        submitParams.expiresAt
       );
 
       console.log('✅ Transaction sent:', tx.hash);
@@ -161,8 +188,15 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
                 <p className="text-sm text-black/70">
                   This will connect you to {credential?.name} to verify your information.
                 </p>
+                {credential?.privacyPreserving && (
+                  <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-green-50 border border-green-200">
+                    <span className="text-xs font-medium text-green-700">🔒 Privacy-Preserving</span>
+                  </div>
+                )}
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-black/10">
-                  <span className="text-sm font-medium text-black">+{credential?.scoreWeight} points</span>
+                  <span className="text-sm font-medium text-black">
+                    {credential?.weight || `+${credential?.scoreWeight} points`}
+                  </span>
                 </div>
               </div>
               <button
@@ -204,18 +238,39 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
               <div className="p-6 rounded-xl border border-black/10 bg-white space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-black/60">Type:</span>
-                  <span className="text-sm font-medium text-black">{credentialData.credential.type}</span>
+                  <span className="text-sm font-medium text-black">
+                    {credentialData.credential.credentialType || credentialData.credential.type}
+                  </span>
                 </div>
+                {/* Phase 2: Show bucket info if available */}
+                {credentialData.credential.metadata?.display && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-black/60">Bucket:</span>
+                    <span className="text-sm font-medium text-black">
+                      {credentialData.credential.metadata.display}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-black/60">Score Boost:</span>
-                  <span className="text-sm font-medium text-green-600">+{credential.scoreWeight} points</span>
+                  <span className="text-sm font-medium text-green-600">
+                    +{credentialData.credential.metadata?.weight || credential.scoreWeight} points
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-black/60">Valid Until:</span>
                   <span className="text-sm font-medium text-black">
-                    {new Date(credentialData.credential.expiresAt * 1000).toLocaleDateString()}
+                    {new Date((credentialData.credential.expirationDate || credentialData.credential.expiresAt) * 1000).toLocaleDateString()}
                   </span>
                 </div>
+                {/* Phase 2: Show privacy note */}
+                {credentialData.credential.metadata?.privacyNote && (
+                  <div className="pt-2 border-t border-black/5">
+                    <p className="text-xs text-green-600">
+                      🔒 {credentialData.credential.metadata.privacyNote}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <button
