@@ -39,30 +39,31 @@ app.use((req, res, next) => {
   next();
 });
 
-// Initialize issuer wallets from environment variables
-let mockExchangeWallet, mockEmployerWallet, mockBankWallet;
+// Initialize issuers from environment variables (Phase 2)
 let mockExchangeIssuer, mockEmployerIssuer, mockBankIssuer;
 
 try {
-  // Create wallet instances from private keys
-  mockExchangeWallet = new ethers.Wallet(process.env.MOCK_EXCHANGE_PRIVATE_KEY);
-  mockEmployerWallet = new ethers.Wallet(process.env.MOCK_EMPLOYER_PRIVATE_KEY);
-  mockBankWallet = new ethers.Wallet(process.env.MOCK_BANK_PRIVATE_KEY);
+  // Validate private keys exist
+  if (!process.env.MOCK_EXCHANGE_PRIVATE_KEY || 
+      !process.env.MOCK_EMPLOYER_PRIVATE_KEY || 
+      !process.env.MOCK_BANK_PRIVATE_KEY) {
+    throw new Error('Missing private keys in .env file');
+  }
 
-  // Create issuer instances
-  mockExchangeIssuer = new MockExchangeIssuer(mockExchangeWallet);
-  mockEmployerIssuer = new MockEmployerIssuer(mockEmployerWallet);
-  mockBankIssuer = new MockBankIssuer(mockBankWallet);
+  // Create issuer instances (Phase 2: pass private keys directly)
+  mockExchangeIssuer = new MockExchangeIssuer(process.env.MOCK_EXCHANGE_PRIVATE_KEY);
+  mockEmployerIssuer = new MockEmployerIssuer(process.env.MOCK_EMPLOYER_PRIVATE_KEY);
+  mockBankIssuer = new MockBankIssuer(process.env.MOCK_BANK_PRIVATE_KEY);
 
   // Store issuers in app.locals for access in routes
   app.locals.mockExchangeIssuer = mockExchangeIssuer;
   app.locals.mockEmployerIssuer = mockEmployerIssuer;
   app.locals.mockBankIssuer = mockBankIssuer;
 
-  console.log('✅ Issuers initialized successfully:');
-  console.log(`   - ${mockExchangeIssuer.name} (${mockExchangeWallet.address})`);
-  console.log(`   - ${mockEmployerIssuer.name} (${mockEmployerWallet.address})`);
-  console.log(`   - ${mockBankIssuer.name} (${mockBankWallet.address})`);
+  console.log('✅ Issuers initialized successfully (Phase 2):');
+  console.log(`   - Mock Exchange (${mockExchangeIssuer.issuerAddress})`);
+  console.log(`   - Mock Employer (${mockEmployerIssuer.issuerAddress})`);
+  console.log(`   - Mock Bank (${mockBankIssuer.issuerAddress})`);
 } catch (error) {
   console.error('❌ Failed to initialize issuers:', error.message);
   console.error('Please check your .env file has valid private keys.');
@@ -82,23 +83,23 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    service: 'Credo Protocol Mock Issuer Service',
-    version: '1.0.0',
+    service: 'Credo Protocol Mock Issuer Service (Phase 2)',
+    version: '2.0.0',
     issuers: [
       {
-        name: mockExchangeIssuer.name,
-        address: mockExchangeWallet.address,
-        credentialType: mockExchangeIssuer.credentialType
+        name: 'Mock Exchange',
+        address: mockExchangeIssuer.issuerAddress,
+        features: ['CEX History']
       },
       {
-        name: mockEmployerIssuer.name,
-        address: mockEmployerWallet.address,
-        credentialType: mockEmployerIssuer.credentialType
+        name: 'Mock Employer',
+        address: mockEmployerIssuer.issuerAddress,
+        features: ['Employment', 'Income Range (4 buckets)']
       },
       {
-        name: mockBankIssuer.name,
-        address: mockBankWallet.address,
-        credentialType: mockBankIssuer.credentialType
+        name: 'Mock Bank',
+        address: mockBankIssuer.issuerAddress,
+        features: ['Bank Balance (4 buckets)']
       }
     ]
   });
