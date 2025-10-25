@@ -29,13 +29,18 @@ async function main() {
     process.exit(1);
   }
 
-  // ============ Deploy CreditScoreOracle ============
-  console.log("📦 Deploying CreditScoreOracle...");
+  // ============ Deploy CreditScoreOracle v2 ============
+  console.log("📦 Deploying CreditScoreOracle v2...");
   const CreditScoreOracleFactory = await ethers.getContractFactory("CreditScoreOracle");
   const oracle = await CreditScoreOracleFactory.deploy();
   await oracle.waitForDeployment();
   const oracleAddress = await oracle.getAddress();
-  console.log("✅ CreditScoreOracle deployed to:", oracleAddress);
+  console.log("✅ CreditScoreOracle v2 deployed to:", oracleAddress);
+  
+  // Initialize tier configurations
+  console.log("⚙️  Initializing tier configurations...");
+  await oracle.initializeTiers();
+  console.log("✅ Tiers initialized (8 tiers: Exceptional → Very Poor)");
 
   // ============ Deploy LendingPool ============
   console.log("\n📦 Deploying LendingPool...");
@@ -53,29 +58,46 @@ async function main() {
   const usdcAddress = await usdc.getAddress();
   console.log("✅ MockUSDC deployed to:", usdcAddress);
 
-  // ============ Setup: Register Issuers ============
+  // ============ Setup: Register Issuers (v2) ============
   console.log("\n⚙️  Setting up issuers...");
   
-  // Get issuer addresses from environment
-  const MOCK_EXCHANGE_ADDRESS = process.env.MOCK_EXCHANGE_ADDRESS;
-  const MOCK_EMPLOYER_ADDRESS = process.env.MOCK_EMPLOYER_ADDRESS;
-  const MOCK_BANK_ADDRESS = process.env.MOCK_BANK_ADDRESS;
+  // Get issuer addresses from environment or use deployer as fallback
+  const MOCK_EXCHANGE_ADDRESS = process.env.MOCK_EXCHANGE_ADDRESS || deployer.address;
+  const MOCK_EMPLOYER_ADDRESS = process.env.MOCK_EMPLOYER_ADDRESS || deployer.address;
+  const MOCK_BANK_ADDRESS = process.env.MOCK_BANK_ADDRESS || deployer.address;
 
-  if (!MOCK_EXCHANGE_ADDRESS || !MOCK_EMPLOYER_ADDRESS || !MOCK_BANK_ADDRESS) {
-    console.log("⚠️  Warning: Mock issuer addresses not found in .env");
-    console.log("   You'll need to register issuers manually later");
-  } else {
-    console.log("Registering Mock Exchange issuer...");
-    await oracle.registerIssuer(MOCK_EXCHANGE_ADDRESS, 100);
-    console.log("✅ Mock Exchange registered:", MOCK_EXCHANGE_ADDRESS);
+  console.log("Registering Mock Exchange issuer...");
+  await oracle.registerIssuer(MOCK_EXCHANGE_ADDRESS, 100, "Mock Exchange Issuer");
+  console.log("✅ Mock Exchange registered:", MOCK_EXCHANGE_ADDRESS);
 
-    console.log("Registering Mock Employer issuer...");
-    await oracle.registerIssuer(MOCK_EMPLOYER_ADDRESS, 100);
-    console.log("✅ Mock Employer registered:", MOCK_EMPLOYER_ADDRESS);
+  console.log("Registering Mock Employer issuer...");
+  await oracle.registerIssuer(MOCK_EMPLOYER_ADDRESS, 100, "Mock Employer Issuer");
+  console.log("✅ Mock Employer registered:", MOCK_EMPLOYER_ADDRESS);
 
-    console.log("Registering Mock Bank issuer...");
-    await oracle.registerIssuer(MOCK_BANK_ADDRESS, 100);
-    console.log("✅ Mock Bank registered:", MOCK_BANK_ADDRESS);
+  console.log("Registering Mock Bank issuer...");
+  await oracle.registerIssuer(MOCK_BANK_ADDRESS, 100, "Mock Bank Issuer");
+  console.log("✅ Mock Bank registered:", MOCK_BANK_ADDRESS);
+  
+  // ============ Setup: Register Credential Types ============
+  console.log("\n⚙️  Registering credential types...");
+  
+  const credentialTypes = [
+    { name: "CEX_HISTORY", weight: 80, decay: 180, display: "CEX History Verification" },
+    { name: "EMPLOYMENT", weight: 70, decay: 180, display: "Employment Status" },
+    { name: "BANK_BALANCE", weight: 100, decay: 90, display: "Bank Balance Verification" },
+    { name: "INCOME", weight: 150, decay: 90, display: "Proof of Income" },
+    { name: "ON_CHAIN_ACTIVITY", weight: 50, decay: 180, display: "On-Chain Activity" },
+  ];
+  
+  for (const type of credentialTypes) {
+    const typeHash = ethers.id(type.name);
+    await oracle.registerCredentialType(
+      typeHash,
+      type.weight,
+      type.decay,
+      type.display
+    );
+    console.log(`✅ Registered ${type.name} (weight: ${type.weight}, decay: ${type.decay} days)`);
   }
 
   // ============ Setup: Enable USDC in Lending Pool ============
@@ -103,6 +125,8 @@ async function main() {
       baseInterestRate: "5%",
       liquidationThreshold: "80%",
       liquidationBonus: "5%",
+      tiersInitialized: true,
+      credentialTypesCount: 5,
     },
   };
 
@@ -126,6 +150,11 @@ async function main() {
   console.log(`   npx hardhat verify --network moca-devnet ${oracleAddress}`);
   console.log(`   npx hardhat verify --network moca-devnet ${poolAddress} ${oracleAddress}`);
   console.log(`   npx hardhat verify --network moca-devnet ${usdcAddress}`);
+  console.log("\n📝 Oracle v2 Features:");
+  console.log("   ✅ 8 tiers initialized");
+  console.log("   ✅ 3 issuers registered");
+  console.log("   ✅ 5 credential types configured");
+  console.log("   ✅ ReentrancyGuard enabled");
   console.log("\n📝 Next steps:");
   console.log("   1. Update frontend .env with contract addresses");
   console.log("   2. Update backend .env with contract addresses");
