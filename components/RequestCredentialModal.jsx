@@ -134,6 +134,8 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
       setStep('review');
     } catch (err) {
       console.error('[ERROR] Error issuing credential:', err);
+      // Reset readyForAirKit so modal becomes visible again
+      setReadyForAirKit(false);
       setError(err.message || 'Failed to issue credential');
       setStep('error');
     }
@@ -222,6 +224,8 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
       }, 2000);
     } catch (err) {
       console.error('Error submitting credential:', err);
+      // Reset readyForAirKit to ensure modal is visible for error state
+      setReadyForAirKit(false);
       const errorMessage = handleTransactionError('Submit Credential', err);
       setError(errorMessage);
       setStep('error');
@@ -413,20 +417,24 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
 
           {/* Step 6: Error */}
           {step === 'error' && (
-            <div className="py-6 space-y-4">
-              <div className="p-4 rounded-xl border border-red-500/20 bg-red-50">
-                <div className="flex items-center gap-2">
-                  <XCircle className="h-4 w-4 text-red-900" />
-                  <p className="text-sm text-red-900 font-medium">
-                    Error
-                  </p>
+            <div className="py-6 space-y-6">
+              <div className="p-6 rounded-xl border border-black/10 bg-white">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center flex-shrink-0">
+                    <XCircle className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-black mb-1">
+                      Error
+                    </p>
+                    <p className="text-sm text-black/70 leading-relaxed">
+                      {error}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs text-red-700 mt-1">
-                  {error}
-                </p>
               </div>
               <button
-                className="w-full h-12 border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black font-medium"
+                className="w-full h-12 border border-black/20 bg-white rounded-md hover:bg-black/5 transition-all duration-300 hover:border-black/30 text-black font-medium"
                 onClick={() => setStep('request')}
               >
                 Try Again
