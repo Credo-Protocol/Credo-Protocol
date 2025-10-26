@@ -149,263 +149,228 @@ Click **"Save"** to update.
 
 **Dashboard Path**: Issuer → Schemas (in left sidebar)
 
-You need to create **10 schemas total**. All schemas will use your **single Issuer DID** from Step 2. They're differentiated by their names, descriptions, and credential subject properties.
+**⚠️ IMPORTANT**: According to [official MOCA documentation](https://docs.moca.network/airkit/usage/credential/schema-creation), schemas are created using the **Schema Builder UI**, NOT by pasting JSON. The dashboard provides a visual form builder.
 
-**Important**: For all schemas below, replace `[PASTE YOUR ISSUER_DID HERE]` with your actual Issuer DID from Step 2:
-```
-did:air:id:test:4P3gyKQFs7SYu1XBDirLU7WhJqRgDl
-```
+You need to create **10 schemas total**. All schemas will automatically use your **Issuer DID** from General Settings.
 
 ---
 
 #### Schema 1: Bank Balance - High
 
-**Configuration**:
+**Using the Schema Builder UI**:
 
-```json
-{
-  "schemaName": "Credo Bank Balance - High",
-  "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves 30-day average bank balance of $10,000 or more without revealing exact amount. Privacy-preserving bucketed credential issued by Credo Protocol.",
-  "schemaType": "BankBalance",
-  "category": "Financial",
-  "privacyLevel": "Bucketed",
-  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
-  "credentialSubject": {
-    "type": "object",
-    "properties": {
-      "balanceBucket": {
-        "type": "string",
-        "enum": ["BANK_BALANCE_HIGH"],
-        "description": "Balance bucket classification"
-      },
-      "bucketRange": {
-        "type": "string",
-        "const": "$10,000+",
-        "description": "Human-readable range (exact amount not disclosed)"
-      },
-      "weight": {
-        "type": "integer",
-        "const": 150,
-        "description": "Credit score weight for this credential"
-      },
-      "verifiedAt": {
-        "type": "integer",
-        "description": "Unix timestamp of verification"
-      },
-      "dataSource": {
-        "type": "string",
-        "const": "Plaid API",
-        "description": "Source of financial data"
-      },
-      "period": {
-        "type": "string",
-        "const": "30 days",
-        "description": "Averaging period for balance calculation"
-      }
-    },
-    "required": ["balanceBucket", "bucketRange", "weight", "verifiedAt"]
-  }
-}
-```
+1. Click **"Create New Schema"** button
+2. Fill in **Basic Information**:
+   ```
+   Title: Credo Bank Balance - High
+   Type: BankBalance
+   Description: Proves 30-day average bank balance of $10,000 or more without revealing exact amount. Privacy-preserving bucketed credential issued by Credo Protocol.
+   ```
 
-**Steps**:
-1. Click **"Create Schema"** (or "+ New Schema" button)
-2. Copy the JSON above
-3. Replace `[PASTE YOUR ISSUER_DID HERE]` with your actual Issuer DID from Step 2
-4. Paste into schema editor
-5. Click **"Validate"** to check JSON syntax
-6. Click **"Submit"** or **"Publish"**
-7. **Copy the generated Schema ID**
+3. Click **"Continue"** or **"Next"**
+
+4. **Add Attributes** (Click "+" for each):
+
+   **Attribute 1:**
+   ```
+   Name: balanceBucket
+   Type: String
+   Title: Balance Bucket
+   Description: Balance bucket classification
+   Required: ✅ Yes
+   ```
+
+   **Attribute 2:**
+   ```
+   Name: bucketRange
+   Type: String
+   Title: Bucket Range
+   Description: Human-readable range (e.g., $10,000+)
+   Required: ✅ Yes
+   ```
+
+   **Attribute 3:**
+   ```
+   Name: weight
+   Type: Number
+   Title: Credit Score Weight
+   Description: Weight value for credit scoring (150)
+   Required: ✅ Yes
+   ```
+
+   **Attribute 4:**
+   ```
+   Name: verifiedAt
+   Type: Number
+   Title: Verification Timestamp
+   Description: Unix timestamp of verification
+   Required: ✅ Yes
+   ```
+
+   **Attribute 5:**
+   ```
+   Name: dataSource
+   Type: String
+   Title: Data Source
+   Description: Source of financial data (Plaid API)
+   Required: No
+   ```
+
+   **Attribute 6:**
+   ```
+   Name: period
+   Type: String
+   Title: Period
+   Description: Averaging period (30 days)
+   Required: No
+   ```
+
+5. Click **"Publish"** to make schema available
+6. **Copy the generated Schema ID** (shown after publishing)
 
 **Save to Notes**:
 ```bash
-SCHEMA_BANK_HIGH=schema:moca:...[generated-id]
+SCHEMA_BANK_HIGH=schema:air:...[generated-id]
 ```
+
+---
+
+**✅ Schema Builder Tips** (from [official docs](https://docs.moca.network/airkit/usage/credential/schema-creation)):
+- Use camelCase for attribute names (e.g., `balanceBucket` not `balance_bucket`)
+- Choose appropriate data types: String, Number, Boolean, Date
+- Provide clear descriptions for each attribute
+- Mark fields as Required if they must always be present
 
 ---
 
 #### Schema 2: Bank Balance - Medium
 
-```json
-{
-  "schemaName": "Credo Bank Balance - Medium",
-  "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves 30-day average bank balance of $5,000-$10,000 without revealing exact amount. Issued by Credo Protocol.",
-  "schemaType": "BankBalance",
-  "category": "Financial",
-  "privacyLevel": "Bucketed",
-  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
-  "credentialSubject": {
-    "type": "object",
-    "properties": {
-      "balanceBucket": {
-        "type": "string",
-        "enum": ["BANK_BALANCE_MEDIUM"]
-      },
-      "bucketRange": {
-        "type": "string",
-        "const": "$5,000 - $10,000"
-      },
-      "weight": {
-        "type": "integer",
-        "const": 120
-      },
-      "verifiedAt": {
-        "type": "integer"
-      },
-      "dataSource": {
-        "type": "string",
-        "const": "Plaid API"
-      },
-      "period": {
-        "type": "string",
-        "const": "30 days"
-      }
-    },
-    "required": ["balanceBucket", "bucketRange", "weight", "verifiedAt"]
-  }
-}
+**Quick Config** (using Schema Builder):
+
+```
+Title: Credo Bank Balance - Medium
+Type: BankBalance
+Description: Proves 30-day average bank balance of $5,000-$10,000 without revealing exact amount. Issued by Credo Protocol.
+
+Attributes (same structure as Schema 1):
+- balanceBucket (String, Required)
+- bucketRange (String, Required) - value: "$5,000 - $10,000"
+- weight (Number, Required) - value: 120
+- verifiedAt (Number, Required)
+- dataSource (String, Optional) - "Plaid API"
+- period (String, Optional) - "30 days"
 ```
 
-**Steps**: Same as Schema 1, save as `SCHEMA_BANK_MEDIUM`
+**Save as**: `SCHEMA_BANK_MEDIUM`
 
 ---
 
 #### Schema 3: Bank Balance - Low
 
-```json
-{
-  "schemaName": "Credo Bank Balance - Low",
-  "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves 30-day average bank balance of $1,000-$5,000 without revealing exact amount. Issued by Credo Protocol.",
-  "schemaType": "BankBalance",
-  "category": "Financial",
-  "privacyLevel": "Bucketed",
-  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
-  "credentialSubject": {
-    "type": "object",
-    "properties": {
-      "balanceBucket": {"type": "string", "enum": ["BANK_BALANCE_LOW"]},
-      "bucketRange": {"type": "string", "const": "$1,000 - $5,000"},
-      "weight": {"type": "integer", "const": 80},
-      "verifiedAt": {"type": "integer"},
-      "dataSource": {"type": "string", "const": "Plaid API"},
-      "period": {"type": "string", "const": "30 days"}
-    },
-    "required": ["balanceBucket", "bucketRange", "weight", "verifiedAt"]
-  }
-}
+**Quick Config**:
+
+```
+Title: Credo Bank Balance - Low
+Type: BankBalance
+Description: Proves 30-day average bank balance of $1,000-$5,000 without revealing exact amount.
+
+Attributes:
+- balanceBucket (String, Required)
+- bucketRange (String, Required) - "$1,000 - $5,000"
+- weight (Number, Required) - 80
+- verifiedAt (Number, Required)
+- dataSource (String, Optional) - "Plaid API"
+- period (String, Optional) - "30 days"
 ```
 
-**Steps**: Same process, save as `SCHEMA_BANK_LOW`
+**Save as**: `SCHEMA_BANK_LOW`
 
 ---
 
 #### Schema 4: Bank Balance - Minimal
 
-```json
-{
-  "schemaName": "Credo Bank Balance - Minimal",
-  "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves 30-day average bank balance under $1,000. Issued by Credo Protocol.",
-  "schemaType": "BankBalance",
-  "category": "Financial",
-  "privacyLevel": "Bucketed",
-  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
-  "credentialSubject": {
-    "type": "object",
-    "properties": {
-      "balanceBucket": {"type": "string", "enum": ["BANK_BALANCE_MINIMAL"]},
-      "bucketRange": {"type": "string", "const": "Under $1,000"},
-      "weight": {"type": "integer", "const": 40},
-      "verifiedAt": {"type": "integer"},
-      "dataSource": {"type": "string", "const": "Plaid API"},
-      "period": {"type": "string", "const": "30 days"}
-    },
-    "required": ["balanceBucket", "bucketRange", "weight", "verifiedAt"]
-  }
-}
+**Quick Config**:
+
+```
+Title: Credo Bank Balance - Minimal
+Type: BankBalance
+Description: Proves 30-day average bank balance under $1,000.
+
+Attributes:
+- balanceBucket (String, Required)
+- bucketRange (String, Required) - "Under $1,000"
+- weight (Number, Required) - 40
+- verifiedAt (Number, Required)
+- dataSource (String, Optional) - "Plaid API"
+- period (String, Optional) - "30 days"
 ```
 
-**Steps**: Same process, save as `SCHEMA_BANK_MINIMAL`
+**Save as**: `SCHEMA_BANK_MINIMAL`
 
 ---
 
 #### Schemas 5-8: Income Range
 
-Follow the same pattern as Bank Balance schemas, but with these changes:
-- `issuerDid`: Use your **same ISSUER_DID** (Credo Protocol)
-- `schemaType`: Change to `"IncomeRange"`
-- `balanceBucket` → `incomeBucket`
-- `bucketRange`: Use income ranges
-- `dataSource`: Use "Mock Employer"
-- `period`: Use "Monthly"
+Follow the same Schema Builder UI process as Bank Balance schemas. **Quick reference table**:
 
-**Quick Reference**:
+| # | Title | Type | Range | Weight | Attributes |
+|---|-------|------|-------|--------|------------|
+| 5 | Credo Income Range - High | IncomeRange | $8,000+/month | 180 | incomeBucket, bucketRange, weight, verifiedAt, dataSource, period |
+| 6 | Credo Income Range - Medium | IncomeRange | $5,000-$8,000/month | 140 | (same attributes) |
+| 7 | Credo Income Range - Low | IncomeRange | $3,000-$5,000/month | 100 | (same attributes) |
+| 8 | Credo Income Range - Minimal | IncomeRange | Under $3,000/month | 50 | (same attributes) |
 
-| Schema | Bucket Name | Range | Weight | Save As |
-|--------|-------------|-------|--------|---------|
-| 5 | INCOME_HIGH | $8,000+/month | 180 | SCHEMA_INCOME_HIGH |
-| 6 | INCOME_MEDIUM | $5,000-$8,000/month | 140 | SCHEMA_INCOME_MEDIUM |
-| 7 | INCOME_LOW | $3,000-$5,000/month | 100 | SCHEMA_INCOME_LOW |
-| 8 | INCOME_MINIMAL | Under $3,000/month | 50 | SCHEMA_INCOME_MINIMAL |
+**Attribute Structure** (for all 4 Income schemas):
+```
+- incomeBucket (String, Required)
+- bucketRange (String, Required) - [use range from table above]
+- weight (Number, Required) - [use weight from table above]
+- verifiedAt (Number, Required)
+- dataSource (String, Optional) - "Mock Employer"
+- period (String, Optional) - "Monthly"
+```
+
+**Save as**: `SCHEMA_INCOME_HIGH`, `SCHEMA_INCOME_MEDIUM`, `SCHEMA_INCOME_LOW`, `SCHEMA_INCOME_MINIMAL`
 
 ---
 
-#### Schema 9: CEX History
+#### Schema 9: CEX Trading History
 
-```json
-{
-  "schemaName": "Credo CEX Trading History",
-  "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves active trading history on centralized exchanges. Issued by Credo Protocol.",
-  "schemaType": "ExchangeHistory",
-  "category": "Financial",
-  "privacyLevel": "Metadata",
-  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
-  "credentialSubject": {
-    "type": "object",
-    "properties": {
-      "credentialType": {"type": "string", "const": "CEX_HISTORY"},
-      "weight": {"type": "integer", "const": 80},
-      "verifiedAt": {"type": "integer"},
-      "dataSource": {"type": "string", "const": "Mock Exchange"}
-    },
-    "required": ["credentialType", "weight", "verifiedAt"]
-  }
-}
+**Quick Config**:
+
+```
+Title: Credo CEX Trading History
+Type: ExchangeHistory
+Description: Proves active trading history on centralized exchanges. Issued by Credo Protocol.
+
+Attributes:
+- credentialType (String, Required) - "CEX_HISTORY"
+- weight (Number, Required) - 80
+- verifiedAt (Number, Required)
+- dataSource (String, Optional) - "Mock Exchange"
 ```
 
-**Steps**: Use your ISSUER_DID, save as `SCHEMA_CEX_HISTORY`
+**Save as**: `SCHEMA_CEX_HISTORY`
 
 ---
 
 #### Schema 10: Proof of Employment
 
-```json
-{
-  "schemaName": "Credo Proof of Employment",
-  "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves current employment status without revealing employer details. Issued by Credo Protocol.",
-  "schemaType": "Employment",
-  "category": "Employment",
-  "privacyLevel": "Basic",
-  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
-  "credentialSubject": {
-    "type": "object",
-    "properties": {
-      "credentialType": {"type": "string", "const": "EMPLOYMENT"},
-      "weight": {"type": "integer", "const": 70},
-      "verifiedAt": {"type": "integer"},
-      "dataSource": {"type": "string", "const": "Mock Employer"}
-    },
-    "required": ["credentialType", "weight", "verifiedAt"]
-  }
-}
+**Quick Config**:
+
+```
+Title: Credo Proof of Employment
+Type: Employment
+Description: Proves current employment status without revealing employer details. Issued by Credo Protocol.
+
+Attributes:
+- credentialType (String, Required) - "EMPLOYMENT"
+- weight (Number, Required) - 70
+- verifiedAt (Number, Required)
+- dataSource (String, Optional) - "Mock Employer"
 ```
 
-**Steps**: Use your ISSUER_DID, save as `SCHEMA_EMPLOYMENT`
+**Save as**: `SCHEMA_EMPLOYMENT`
 
 ---
 
@@ -435,47 +400,87 @@ Other Schemas:
 
 ---
 
+### Step 4.5: About Issuance Programs (IMPORTANT NOTE - 5 min)
+
+**⚠️ Read This Before Continuing!**
+
+According to [MOCA Documentation](https://docs.moca.network/airkit/airkit-dashboard#_2-issuance-program), there are **Issuance Programs** (also called "Credentials" in the dashboard) that configure how credentials are issued:
+
+- **Accessible Until**: Date range for validity
+- **Maximum Issuance**: Cap on total credentials
+- **Expiration Duration**: Credential lifespan
+
+**For Credo Protocol's use case**, you have two options:
+
+#### **Option A: Skip Manual Creation** (Recommended ✅)
+Since you'll issue credentials **programmatically via the SDK** (`airService.issueCredential()`), you can skip manually creating issuance programs in the dashboard. The SDK can handle issuance directly with your schemas.
+
+**Pros**: Faster setup, more flexibility
+**Cons**: No dashboard-configured limits/expiration
+
+#### **Option B: Create Issuance Programs in Dashboard**
+Navigate to **Issuer → Credentials** and manually create 10 issuance programs (one per schema) with specific rules.
+
+**Pros**: Dashboard management, built-in limits
+**Cons**: More setup time, less flexible
+
+**Recommendation**: Proceed with Option A for now. You can add issuance programs later if needed.
+
+---
+
 ### Step 5: Create Verifier Programs (30 min)
 
-**Dashboard Path**: Credentials → Verifier Programs → Create Program
+**Dashboard Path**: Verifier → Programs (in left sidebar)
 
-For each of your 10 schemas, you need to create a matching verifier program.
+**⚠️ IMPORTANT**: According to [official MOCA documentation](https://docs.moca.network/airkit/airkit-dashboard#_1-verification-program-management), Verifier Programs define the logic for checking credential attributes using operators and values.
 
-#### Template for All Programs
+For each of your 10 schemas, you'll create a matching verification program.
 
-```yaml
-Program Name: Verify [Schema Name]
-Description: Verify [schema description] for credit score calculation
-Verifier DID: [YOUR_VERIFIER_DID]
-Associated Schema: [SELECT FROM DROPDOWN]
-Verification Rules:
-  - Credential must be valid and not expired
-  - Issuer must be trusted (in your issuer list)
-  - Credential must not be revoked
-  - Subject must match the requester address
-Acceptance Criteria:
-  - Issuer reputation score > 0
-  - Credential age < 1 year
-  - No revocation on record
-Auto-Accept: Yes (for testing)
+---
+
+#### How to Create a Verifier Program (Official Process)
+
+According to [MOCA's Verification Documentation](https://docs.moca.network/airkit/quickstart/verify-credentials#step-6-setup-verification-program):
+
+1. Navigate to **Verifier → Programs** in dashboard sidebar
+2. Click **"Create Program"** or **"+ New Program"**
+3. Fill in basic info:
+   ```
+   Program Name: Verify [Credential Name]
+   Description: Verify [credential type] for credit score calculation
+   ```
+4. **Select Schema**: Choose the schema this program will verify (from dropdown)
+5. **Define Verification Logic**: Add operators and attribute conditions
+   - Example: attribute "weight" operator "greater than" value "0"
+6. **Data Recovery**: Choose whether to allow data access (default: No)
+7. Click **"Apply"** to deploy the program
+8. **Copy the Program ID** (shown after deployment)
+
+---
+
+#### Program #1: Verify Bank Balance - High
+
+**Configuration**:
+```
+Program Name: Verify Bank Balance - High
+Description: Verify high bank balance credential for credit score oracle
+Schema: Credo Bank Balance - High (select from dropdown)
+
+Verification Logic:
+- Attribute: weight
+- Operator: greater than or equal to
+- Value: 0
+
+Data Recovery: No
 ```
 
-#### Create All 10 Programs
+**After creating, save**: `VERIFIER_PROGRAM_BANK_HIGH=[program-id]`
 
-**Quick Creation Process**:
+---
 
-1. Click **"Create Verifier Program"**
-2. Fill in:
-   - Program Name: `Verify Bank Balance - High`
-   - Description: `Verify high bank balance credential for credit scoring`
-   - Verifier DID: Select your verifier
-   - Associated Schema: Select `SCHEMA_BANK_HIGH` from dropdown
-3. Set verification rules (use template above)
-4. Enable "Auto-Accept" for testing
-5. Click **"Submit"**
-6. **Copy the Program ID**
+#### Quick Creation Guide for Remaining 9 Programs
 
-**Repeat for all 10 schemas**.
+**Follow the same process** for each schema. Here's your checklist:
 
 **Save to Notes**:
 ```bash
@@ -745,36 +750,71 @@ In Phase 5.2, you'll:
 
 ---
 
-## 🐛 Troubleshooting
+## ✅ Alignment with Official MOCA Documentation
 
-### "Can't create issuer - missing fields"
-- Ensure all required fields filled
-- Description must be at least 50 characters
-- Email must be valid format
+**This document has been verified against official MOCA documentation:**
 
-### "DID generation failed"
-- Check internet connection
-- Try refreshing dashboard
-- Contact MOCA support if persists
+| Section | Official Doc Reference | Verified |
+|---------|----------------------|----------|
+| General Settings | [Developer Dashboard](https://docs.moca.network/airkit/airkit-dashboard#_1-general-settings) | ✅ |
+| Schema Creation | [Schema Creation Guide](https://docs.moca.network/airkit/usage/credential/schema-creation) | ✅ |
+| Schema Builder UI | [Quickstart: Issue Credentials](https://docs.moca.network/airkit/quickstart/issue-credentials#step-4-create-schema-for-credential-issuance) | ✅ |
+| Verifier Programs | [Verification Program Management](https://docs.moca.network/airkit/airkit-dashboard#_1-verification-program-management) | ✅ |
+| Issuance Programs | [Issuance Program](https://docs.moca.network/airkit/airkit-dashboard#_2-issuance-program) | ✅ |
+| Gas Sponsorship | [Gas Sponsorship (Paymaster)](https://docs.moca.network/airkit/usage/account/paymaster) | ✅ |
+| Partner JWT | [SDK Authentication (Partner JWT)](https://docs.moca.network/airkit/usage/partner-authentication) | ✅ |
 
-### "Schema validation failed"
-- Check JSON syntax (use JSONLint.com)
-- Ensure issuerDid is valid format
-- All required fields must be present
+**Key Changes Made for Compliance**:
+- ✅ Replaced JSON-based schema creation with UI-based Schema Builder approach
+- ✅ Updated dashboard navigation paths to match official structure
+- ✅ Added clarification about 1 Issuer DID per partner account (official MOCA model)
+- ✅ Simplified verifier program creation to match dashboard process
+- ✅ Added note about issuance programs (optional for programmatic issuance)
 
-### "Paymaster not available"
-- Access may not be instant
-- Contact MOCA Discord #dev-chat
-- Can proceed without for testing (users pay gas)
-
-### "Can't top up wallet from faucet"
-- Faucet may have rate limits
-- Try again in 5 minutes
-- Use different browser if blocked
+**Last Verified**: Oct 26, 2025 using marcus-mcp-server MCP
 
 ---
 
-**Phase 5.1 Status**: ✅ Complete  
+## 🐛 Troubleshooting
+
+### "Can't find Schema Builder / Shows JSON editor"
+- Make sure you're in **Issuer → Schemas** section
+- Look for "Create New Schema" button (not "Create Schema")
+- The UI should show a visual form builder, not a code editor
+- If you see JSON editor, contact MOCA support - dashboard may have changed
+
+### "Schema validation failed"
+- Ensure all required attributes are marked correctly
+- Use descriptive names in camelCase format
+- Check that attribute types match (String, Number, Boolean, Date)
+- Review official docs: https://docs.moca.network/airkit/usage/credential/schema-creation
+
+### "Can't find Verifier Programs section"
+- Navigate to **Verifier** (not Issuer) in left sidebar
+- Click on **Programs** subsection
+- Should see list of existing programs and "Create Program" button
+
+### "Paymaster not available"
+- Access may need to be granted by MOCA team
+- Contact MOCA Discord #dev-chat with your Partner ID
+- Can proceed without for testing (users pay gas)
+- Reference: https://docs.moca.network/airkit/usage/account/paymaster
+
+### "Can't top up wallet from faucet"
+- Faucet URL: https://devnet-scan.mocachain.org/faucet
+- May have rate limits - try again in 5 minutes
+- Ensure you're copying the correct wallet address from dashboard
+- Use different browser if blocked
+
+### "Issuer DID not showing in General Settings"
+- You should have one automatically generated on account creation
+- Refresh the dashboard page
+- Check **Account → General** section carefully
+- If still missing, contact MOCA support - this should be automatic
+
+---
+
+**Phase 5.1 Status**: ✅ Complete & Verified Against Official MOCA Docs  
 **Next Phase**: Phase 5.2 - Backend Refactor  
 **Time to Next**: Ready to proceed immediately
 
