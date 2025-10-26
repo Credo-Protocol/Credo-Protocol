@@ -15,8 +15,53 @@
 
 const express = require('express');
 const { generateIssueToken } = require('../auth/jwt');
+const { ethers } = require('ethers');
 
 const router = express.Router();
+
+/**
+ * Helper: Get issuer private key and address for credential type
+ */
+function getIssuerCredentials(credentialType) {
+  // Derive issuer addresses from configured private keys to guarantee match
+  const bankKey = process.env.MOCK_BANK_PRIVATE_KEY;
+  const employerKey = process.env.MOCK_EMPLOYER_PRIVATE_KEY;
+  const exchangeKey = process.env.MOCK_EXCHANGE_PRIVATE_KEY;
+
+  const bankWallet = bankKey ? new ethers.Wallet(bankKey) : null;
+  const employerWallet = employerKey ? new ethers.Wallet(employerKey) : null;
+  const exchangeWallet = exchangeKey ? new ethers.Wallet(exchangeKey) : null;
+
+  const issuerMap = {
+    mockBank: {
+      address: bankWallet?.address,
+      privateKey: bankKey
+    },
+    mockEmployer: {
+      address: employerWallet?.address,
+      privateKey: employerKey
+    },
+    mockExchange: {
+      address: exchangeWallet?.address,
+      privateKey: exchangeKey
+    }
+  };
+  
+  // All bank balance credentials -> Bank issuer
+  if (credentialType.includes('bank')) {
+    return issuerMap.mockBank;
+  }
+  // All income credentials + employment -> Employer issuer
+  if (credentialType.includes('income') || credentialType === 'employment') {
+    return issuerMap.mockEmployer;
+  }
+  // CEX history -> Exchange issuer
+  if (credentialType.includes('cex')) {
+    return issuerMap.mockExchange;
+  }
+  // Fallback to bank issuer
+  return issuerMap.mockBank;
+}
 
 /**
  * GET /api/credentials/types
@@ -361,20 +406,16 @@ router.post('/prepare', async (req, res) => {
     
     const authToken = generateIssueToken(effectiveUserId, effectiveEmail);
     
-    console.log(`[Credentials] Prepared ${credentialType} for ${userAddress}`);
+    // Get issuer credentials for signing
+    const issuerCreds = getIssuerCredentials(credentialType);
     
-    // Return everything frontend needs for AIR Kit
-    res.json({
-      success: true,
-      authToken,
-      issuerDid: credentialMeta.issuerDid,
-      schemaId: credentialMeta.schemaId,  // Keep for reference
-      programId: credentialMeta.programId,  // THIS is what AIR Kit needs as credentialId!
-      credentialSubject: {
+    // Prepare credential subject data
+    const credentialSubject = {
         // Field names MUST match your schema exactly!
-        // Bank Balance schemas use: balanceBucket
-        // Income Range schemas use: incomeBucket
-        // DO NOT include 'id' - AIR Kit adds this automatically
+        // Bank Balance schemas: balanceBucket, bucketRange, weight, verifiedAt, dataSource, period
+        // Income Range schemas: incomeBucket, bucketRange, weight, verifiedAt, dataSource, period
+        // CEX History schema: credentialType, weight, verifiedAt, dataSource
+        // Employment schema: credentialType, weight, verifiedAt, dataSource
         ...(credentialType.includes('bank') ? {
           balanceBucket: credentialMeta.bucket,
           bucketRange: credentialMeta.range,
@@ -390,17 +431,72 @@ router.post('/prepare', async (req, res) => {
           dataSource: 'Employer Verification',
           period: 'Monthly'
         } : credentialType.includes('cex') ? {
-          tradingVolume: 'Active',
+          // CEX schema expects 'credentialType' field (not tradingVolume!)
+          credentialType: credentialMeta.bucket, // 'CEX_HISTORY'
+          weight: credentialMeta.weight,
           verifiedAt: Math.floor(Date.now() / 1000),
-          dataSource: 'CEX API',
-          weight: credentialMeta.weight
+          dataSource: 'Mock Exchange'
         } : {
-          employmentStatus: 'Verified',
+          // Employment schema expects 'credentialType' field (not employmentStatus!)
+          credentialType: credentialMeta.bucket, // 'EMPLOYMENT'
+          weight: credentialMeta.weight,
           verifiedAt: Math.floor(Date.now() / 1000),
-          dataSource: 'Employer',
-          weight: credentialMeta.weight
+          dataSource: 'Mock Employer'
         })
-      }
+    };
+    
+    // Generate signature for smart contract submission
+    // Contract expects: ABI-encoded(credentialType, subject, issuanceDate, weight)
+    // signed by the issuer's private key
+    
+    const issuanceDate = Math.floor(Date.now() / 1000);
+    const expirationDate = issuanceDate + (365 * 24 * 60 * 60); // 1 year from now
+    
+    // Extract the actual bucket value from credentialSubject
+    const bucketValue = credentialSubject.balanceBucket ||  // Bank Balance
+                        credentialSubject.incomeBucket ||   // Income Range
+                        credentialSubject.credentialType || // CEX History or Employment
+                        'VERIFIED';
+    
+    // Encode credential data (same format as contract expects)
+    const credentialData = ethers.AbiCoder.defaultAbiCoder().encode(
+      ['string', 'address', 'uint256', 'uint256'],
+      [bucketValue, userAddress, issuanceDate, credentialMeta.weight]
+    );
+    
+    // Hash and sign the credential data
+    // Contract: keccak256(credentialData) → toEthSignedMessageHash() → recover(signature)
+    // Backend must match: keccak256(credentialData) → add prefix → sign
+    
+    const credentialDataHash = ethers.keccak256(credentialData);
+    
+    // Add Ethereum signed message prefix (same as contract's toEthSignedMessageHash)
+    const ethSignedMessageHash = ethers.hashMessage(ethers.getBytes(credentialDataHash));
+    
+    // Sign the prefixed hash
+    const signingKey = new ethers.SigningKey(issuerCreds.privateKey);
+    const signature = signingKey.sign(ethSignedMessageHash).serialized;
+    
+    console.log(`[Credentials] Prepared ${credentialType} for ${userAddress}`);
+    console.log(`  Issuer: ${issuerCreds.address}`);
+    console.log(`  Bucket: ${bucketValue}`);
+    console.log(`  Signature: ${signature.substring(0, 20)}...`);
+    
+    // Return everything frontend needs for AIR Kit + contract
+    res.json({
+      success: true,
+      authToken,
+      issuerDid: credentialMeta.issuerDid,
+      issuerAddress: issuerCreds.address, // For contract submission
+      schemaId: credentialMeta.schemaId,
+      programId: credentialMeta.programId,
+      credentialSubject: credentialSubject,
+      // Contract submission data
+      signature: signature,
+      issuanceDate: issuanceDate,
+      expirationDate: expirationDate,
+      weight: credentialMeta.weight,
+      bucket: bucketValue
     });
     
   } catch (error) {
