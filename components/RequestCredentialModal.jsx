@@ -82,9 +82,19 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
 
       console.log('✅ Credential issued and stored:', issuedCredential);
 
-      // Convert AIR Kit credential format to legacy format for contract submission
-      // This allows backwards compatibility with existing oracle contract
-      const legacyFormatData = {
+      // Backend has already prepared everything for contract submission:
+      // - Encoded credential data
+      // - Signed with issuer's private key
+      // - Proper Ethereum addresses (not DIDs)
+      
+      console.log('🔍 Credential ready for contract:');
+      console.log('  Type:', issuedCredential.credentialType);
+      console.log('  Issuer:', issuedCredential.issuer);
+      console.log('  Subject:', issuedCredential.subject);
+      console.log('  Weight:', issuedCredential.weight);
+      console.log('  Signature:', issuedCredential.signature.substring(0, 20) + '...');
+      
+      const credentialForContract = {
         success: true,
         credential: {
           credentialType: issuedCredential.credentialType,
@@ -108,10 +118,10 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
             issuedCredential.weight
           ]
         ),
-        signature: issuedCredential.proof?.jws || '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+        signature: issuedCredential.signature
       };
 
-      setCredentialData(legacyFormatData);
+      setCredentialData(credentialForContract);
       setStep('review');
     } catch (err) {
       console.error('❌ Error issuing credential:', err);
@@ -135,7 +145,8 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
         providerType: provider?.constructor?.name 
       });
       
-      // Get signer - this should trigger AIR Kit popup
+      // Provider is already wrapped as ethers.BrowserProvider in useAirKit
+      // Just get the signer - this will trigger AIR Kit popup
       const signer = await provider.getSigner();
       console.log('✅ Signer obtained successfully:', {
         hasSigner: !!signer,
@@ -149,25 +160,30 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
         signer
       );
 
-      // Phase 2: Determine which parameters to use based on credential format
-      const isPhase2 = credentialData.credentialData !== undefined; // Phase 2 has credentialData field
+      // Backend has already:
+      // 1. Encoded the credential data
+      // 2. Signed it with the issuer's private key
+      // 3. Verified the issuer is registered
       
-      const submitParams = isPhase2 ? {
+      // Convert credentialType string to bytes32 hash
+      const credentialTypeHash = ethers.id(credentialData.credential.credentialType);
+      
+      const submitParams = {
         credentialData: credentialData.credentialData,
-        signature: credentialData.signature,
-        issuer: credentialData.credential.issuer,
-        credentialTypeHash: credentialData.credential.credentialTypeHash,
+        signature: credentialData.signature,  // Backend-signed with issuer's key
+        issuer: credentialData.credential.issuer,  // Issuer address from backend
+        credentialTypeHash: credentialTypeHash,
         expiresAt: credentialData.credential.expirationDate
-      } : {
-        // Legacy format
-        credentialData: credentialData.encodedData,
-        signature: credentialData.signature,
-        issuer: credentialData.credential.issuer,
-        credentialTypeHash: ethers.id('LEGACY_TYPE'), // Convert legacy to hash
-        expiresAt: credentialData.credential.expiresAt
       };
 
-      console.log('Submitting credential to oracle...', submitParams);
+      console.log('📝 Submitting credential to oracle...');
+      console.log('  Contract Address:', CONTRACTS.CREDIT_ORACLE);
+      console.log('  Credential Type:', credentialData.credential.credentialType);
+      console.log('  Credential Type Hash:', credentialTypeHash);
+      console.log('  Issuer:', submitParams.issuer);
+      console.log('  Subject:', credentialData.credential.subject);
+      console.log('  Expires At:', submitParams.expiresAt);
+      console.log('  Signature length:', submitParams.signature.length);
 
       // Submit credential to smart contract
       // This should trigger AIR Kit's wallet confirmation popup
@@ -203,8 +219,12 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
     }
   };
 
+  // Hide our modal when AIR Kit modal is showing (during 'issuing' step)
+  // This prevents z-index conflicts and ensures users can interact with AIR Kit
+  const shouldShowDialog = isOpen && step !== 'issuing';
+  
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={shouldShowDialog} onOpenChange={onClose}>
       <DialogContent className="max-w-md bg-white border-black/10">
         <DialogHeader>
           <DialogTitle className="text-black text-xl font-bold">{credential?.name}</DialogTitle>
