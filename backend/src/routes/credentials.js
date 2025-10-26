@@ -1,317 +1,391 @@
 /**
- * Credentials API Routes - Phase 2 Upgrade
+ * Credential API Routes - MOCA Official Integration
  * 
- * Handles credential issuance requests for both basic and advanced credentials.
- * Supports:
- * - Basic credentials: CEX History, Employment
- * - Advanced credentials: Bank Balance (bucketed), Income Range (bucketed)
+ * NEW APPROACH (Phase 5.2):
+ * - Backend prepares credential metadata
+ * - Frontend uses AIR Kit to issue credentials
+ * - No more manual signature generation
+ * 
+ * Flow:
+ * 1. GET /types - List all available credential types
+ * 2. POST /prepare - Generate auth token + metadata for issuance
+ * 3. Frontend uses AIR Kit to issue
+ * 4. Frontend submits to smart contract
  */
 
 const express = require('express');
+const { generateIssueToken } = require('../auth/jwt');
+
 const router = express.Router();
-const { ethers } = require('ethers');
 
 /**
  * GET /api/credentials/types
  * 
- * Returns all available credential types with metadata for the marketplace
+ * Returns all available credential types with schema metadata.
+ * Frontend uses this to display credential marketplace.
  */
-router.get('/types', (req, res) => {
+router.get('/types', async (req, res) => {
+  try {
+    const credentialTypes = [
+      // ============================================
+      // Bank Balance Credentials
+      // ============================================
+      {
+        id: 'bank-balance-high',
+        name: 'Bank Balance - High',
+        subtitle: '$10,000+ (30-day average)',
+        category: 'Financial',
+        issuerDid: process.env.BANK_ISSUER_DID,
+        schemaId: process.env.SCHEMA_BANK_HIGH,
+        weight: 150,
+        bucket: 'BANK_BALANCE_HIGH',
+        range: '$10,000+',
+        description: 'Proves 30-day average balance of $10k or more without revealing exact amount',
+        privacyLevel: 'Bucketed - Exact amount not disclosed',
+        icon: '💰',
+        color: 'green',
+        tier: 'Tier 1 (50% collateral)'
+      },
+      {
+        id: 'bank-balance-medium',
+        name: 'Bank Balance - Medium',
+        subtitle: '$5,000 - $10,000 (30-day avg)',
+        category: 'Financial',
+        issuerDid: process.env.BANK_ISSUER_DID,
+        schemaId: process.env.SCHEMA_BANK_MEDIUM,
+        weight: 120,
+        bucket: 'BANK_BALANCE_MEDIUM',
+        range: '$5,000 - $10,000',
+        description: 'Proves 30-day average balance of $5k-$10k',
+        privacyLevel: 'Bucketed',
+        icon: '💰',
+        color: 'blue',
+        tier: 'Tier 2 (60% collateral)'
+      },
+      {
+        id: 'bank-balance-low',
+        name: 'Bank Balance - Low',
+        subtitle: '$1,000 - $5,000 (30-day avg)',
+        category: 'Financial',
+        issuerDid: process.env.BANK_ISSUER_DID,
+        schemaId: process.env.SCHEMA_BANK_LOW,
+        weight: 80,
+        bucket: 'BANK_BALANCE_LOW',
+        range: '$1,000 - $5,000',
+        description: 'Proves 30-day average balance of $1k-$5k',
+        privacyLevel: 'Bucketed',
+        icon: '💰',
+        color: 'yellow',
+        tier: 'Tier 4 (90% collateral)'
+      },
+      {
+        id: 'bank-balance-minimal',
+        name: 'Bank Balance - Minimal',
+        subtitle: 'Under $1,000 (30-day avg)',
+        category: 'Financial',
+        issuerDid: process.env.BANK_ISSUER_DID,
+        schemaId: process.env.SCHEMA_BANK_MINIMAL,
+        weight: 40,
+        bucket: 'BANK_BALANCE_MINIMAL',
+        range: 'Under $1,000',
+        description: 'Proves 30-day average balance under $1k',
+        privacyLevel: 'Bucketed',
+        icon: '💰',
+        color: 'gray',
+        tier: 'Tier 7 (125% collateral)'
+      },
+      
+      // ============================================
+      // Income Range Credentials
+      // ============================================
+      {
+        id: 'income-high',
+        name: 'Income Range - High',
+        subtitle: '$8,000+ per month',
+        category: 'Employment',
+        issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
+        schemaId: process.env.SCHEMA_INCOME_HIGH,
+        weight: 180,
+        bucket: 'INCOME_HIGH',
+        range: '$8,000+ per month',
+        description: 'Proves monthly income of $8k or more without revealing exact salary',
+        privacyLevel: 'Bucketed - Exact salary not disclosed',
+        icon: '💼',
+        color: 'green',
+        tier: 'Tier 1 (50% collateral)'
+      },
+      {
+        id: 'income-medium',
+        name: 'Income Range - Medium',
+        subtitle: '$5,000 - $8,000 per month',
+        category: 'Employment',
+        issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
+        schemaId: process.env.SCHEMA_INCOME_MEDIUM,
+        weight: 140,
+        bucket: 'INCOME_MEDIUM',
+        range: '$5,000 - $8,000 per month',
+        description: 'Proves monthly income of $5k-$8k',
+        privacyLevel: 'Bucketed',
+        icon: '💼',
+        color: 'blue',
+        tier: 'Tier 2 (60% collateral)'
+      },
+      {
+        id: 'income-low',
+        name: 'Income Range - Low',
+        subtitle: '$3,000 - $5,000 per month',
+        category: 'Employment',
+        issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
+        schemaId: process.env.SCHEMA_INCOME_LOW,
+        weight: 100,
+        bucket: 'INCOME_LOW',
+        range: '$3,000 - $5,000 per month',
+        description: 'Proves monthly income of $3k-$5k',
+        privacyLevel: 'Bucketed',
+        icon: '💼',
+        color: 'yellow',
+        tier: 'Tier 3 (75% collateral)'
+      },
+      {
+        id: 'income-minimal',
+        name: 'Income Range - Minimal',
+        subtitle: 'Under $3,000 per month',
+        category: 'Employment',
+        issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
+        schemaId: process.env.SCHEMA_INCOME_MINIMAL,
+        weight: 50,
+        bucket: 'INCOME_MINIMAL',
+        range: 'Under $3,000 per month',
+        description: 'Proves monthly income under $3k',
+        privacyLevel: 'Bucketed',
+        icon: '💼',
+        color: 'gray',
+        tier: 'Tier 6 (110% collateral)'
+      },
+      
+      // ============================================
+      // Legacy Credentials
+      // ============================================
+      {
+        id: 'cex-history',
+        name: 'CEX Trading History',
+        subtitle: 'Proof of exchange activity',
+        category: 'Financial',
+        issuerDid: process.env.CEX_ISSUER_DID,
+        schemaId: process.env.SCHEMA_CEX_HISTORY,
+        weight: 80,
+        bucket: 'CEX_HISTORY',
+        description: 'Proves active trading history on centralized exchanges',
+        privacyLevel: 'Metadata only - no trade details',
+        icon: '📈',
+        color: 'purple',
+        tier: 'Tier 4 (90% collateral)'
+      },
+      {
+        id: 'employment',
+        name: 'Proof of Employment',
+        subtitle: 'Current employment status',
+        category: 'Employment',
+        issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
+        schemaId: process.env.SCHEMA_EMPLOYMENT,
+        weight: 70,
+        bucket: 'EMPLOYMENT',
+        description: 'Proves current employment status without revealing employer',
+        privacyLevel: 'Basic verification',
+        icon: '🏢',
+        color: 'indigo',
+        tier: 'Tier 5 (100% collateral)'
+      }
+    ];
+    
+    // Filter out any with missing env vars
+    const validCredentials = credentialTypes.filter(c => 
+      c.issuerDid && c.schemaId
+    );
+    
+    if (validCredentials.length < credentialTypes.length) {
+      console.warn(`[Credentials] ${credentialTypes.length - validCredentials.length} credentials missing env vars`);
+    }
+    
     res.json({
-        success: true,
-        credentialTypes: [
-            // Basic credentials (existing)
-            {
-                id: 'cex-history',
-                name: 'Proof of CEX Trading History',
-                description: 'Verify your centralized exchange account age and trading volume',
-                issuer: 'Mock Exchange',
-                weight: '80 pts',
-                category: 'Basic',
-                existing: true
-            },
-            {
-                id: 'employment',
-                name: 'Proof of Employment',
-                description: 'Verify current employment status',
-                issuer: 'Mock Employer',
-                weight: '70 pts',
-                category: 'Basic',
-                existing: true
-            },
-            // Advanced credentials (NEW)
-            {
-                id: 'bank-balance',
-                name: 'Bank Balance (30-day avg) 🆕',
-                description: 'Prove your average bank balance over 30 days without revealing exact amounts',
-                issuer: 'Mock Bank',
-                weight: '40-150 pts (bucket-based)',
-                category: 'Advanced',
-                privacyPreserving: true,
-                new: true,
-                badge: 'Privacy-First'
-            },
-            {
-                id: 'income-range',
-                name: 'Income Range 🆕',
-                description: 'Verify your monthly income bracket without disclosing exact salary',
-                issuer: 'Mock Employer',
-                weight: '50-180 pts (bucket-based)',
-                category: 'Advanced',
-                privacyPreserving: true,
-                new: true,
-                badge: 'Highest Weight'
-            }
-        ]
+      success: true,
+      count: validCredentials.length,
+      credentials: validCredentials
     });
+    
+  } catch (error) {
+    console.error('[Credentials] Error fetching types:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 /**
- * POST /api/credentials/request/bank-balance (NEW)
+ * POST /api/credentials/prepare
  * 
- * Issues a bucketed bank balance credential
- */
-router.post('/request/bank-balance', async (req, res) => {
-    try {
-        const { userAddress } = req.body;
-        
-        // Validate user address
-        if (!userAddress || !ethers.isAddress(userAddress)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Valid user address required'
-            });
-        }
-        
-        // Get bank issuer from app locals
-        const { mockBankIssuer } = req.app.locals;
-        
-        if (!mockBankIssuer) {
-            return res.status(500).json({
-                success: false,
-                error: 'Bank issuer not initialized'
-            });
-        }
-        
-        // Issue the bucketed credential
-        const result = await mockBankIssuer.issueBankBalanceCredential(userAddress);
-        
-        res.json({
-            success: true,
-            credential: result.credential,
-            credentialData: result.credentialData,  // Phase 2: needed for contract
-            signature: result.signature,
-            issuer: result.issuer,
-            message: `Bank balance credential issued: ${result.credential.metadata.display}`
-        });
-        
-    } catch (error) {
-        console.error('Error issuing bank balance credential:', error);
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
-});
-
-/**
- * POST /api/credentials/request/income-range (NEW)
+ * Prepares credential issuance by generating Partner JWT.
+ * Frontend receives everything needed to call AIR Kit.
  * 
- * Issues a bucketed income range credential
+ * Body:
+ *   - userAddress: Wallet address of credential subject
+ *   - credentialType: ID of credential type (e.g., 'bank-balance-high')
+ *   - userId: Optional internal user ID
+ *   - email: Optional user email (fallback generated if missing)
  */
-router.post('/request/income-range', async (req, res) => {
-    try {
-        const { userAddress } = req.body;
-        
-        // Validate user address
-        if (!userAddress || !ethers.isAddress(userAddress)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Valid user address required'
-            });
-        }
-        
-        // Get employer issuer from app locals
-        const { mockEmployerIssuer } = req.app.locals;
-        
-        if (!mockEmployerIssuer) {
-            return res.status(500).json({
-                success: false,
-                error: 'Employer issuer not initialized'
-            });
-        }
-        
-        // Issue the bucketed credential
-        const result = await mockEmployerIssuer.issueIncomeRangeCredential(userAddress);
-        
-        res.json({
-            success: true,
-            credential: result.credential,
-            credentialData: result.credentialData,  // Phase 2: needed for contract
-            signature: result.signature,
-            issuer: result.issuer,
-            message: `Income range credential issued: ${result.credential.metadata.display}`
-        });
-        
-    } catch (error) {
-        console.error('Error issuing income range credential:', error);
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
+router.post('/prepare', async (req, res) => {
+  try {
+    const { userAddress, credentialType, userId, email } = req.body;
+    
+    // Validate required fields
+    if (!userAddress || !credentialType) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: userAddress, credentialType'
+      });
     }
+    
+    // Map credential type to schema
+    const credentialMap = {
+      'bank-balance-high': {
+        issuerDid: process.env.BANK_ISSUER_DID,
+        schemaId: process.env.SCHEMA_BANK_HIGH,
+        bucket: 'BANK_BALANCE_HIGH',
+        range: '$10,000+',
+        weight: 150
+      },
+      'bank-balance-medium': {
+        issuerDid: process.env.BANK_ISSUER_DID,
+        schemaId: process.env.SCHEMA_BANK_MEDIUM,
+        bucket: 'BANK_BALANCE_MEDIUM',
+        range: '$5,000 - $10,000',
+        weight: 120
+      },
+      'bank-balance-low': {
+        issuerDid: process.env.BANK_ISSUER_DID,
+        schemaId: process.env.SCHEMA_BANK_LOW,
+        bucket: 'BANK_BALANCE_LOW',
+        range: '$1,000 - $5,000',
+        weight: 80
+      },
+      'bank-balance-minimal': {
+        issuerDid: process.env.BANK_ISSUER_DID,
+        schemaId: process.env.SCHEMA_BANK_MINIMAL,
+        bucket: 'BANK_BALANCE_MINIMAL',
+        range: 'Under $1,000',
+        weight: 40
+      },
+      'income-high': {
+        issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
+        schemaId: process.env.SCHEMA_INCOME_HIGH,
+        bucket: 'INCOME_HIGH',
+        range: '$8,000+ per month',
+        weight: 180
+      },
+      'income-medium': {
+        issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
+        schemaId: process.env.SCHEMA_INCOME_MEDIUM,
+        bucket: 'INCOME_MEDIUM',
+        range: '$5,000 - $8,000 per month',
+        weight: 140
+      },
+      'income-low': {
+        issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
+        schemaId: process.env.SCHEMA_INCOME_LOW,
+        bucket: 'INCOME_LOW',
+        range: '$3,000 - $5,000 per month',
+        weight: 100
+      },
+      'income-minimal': {
+        issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
+        schemaId: process.env.SCHEMA_INCOME_MINIMAL,
+        bucket: 'INCOME_MINIMAL',
+        range: 'Under $3,000 per month',
+        weight: 50
+      },
+      'cex-history': {
+        issuerDid: process.env.CEX_ISSUER_DID,
+        schemaId: process.env.SCHEMA_CEX_HISTORY,
+        bucket: 'CEX_HISTORY',
+        weight: 80
+      },
+      'employment': {
+        issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
+        schemaId: process.env.SCHEMA_EMPLOYMENT,
+        bucket: 'EMPLOYMENT',
+        weight: 70
+      }
+    };
+    
+    const credentialMeta = credentialMap[credentialType];
+    if (!credentialMeta) {
+      return res.status(400).json({
+        success: false,
+        error: `Unknown credential type: ${credentialType}`
+      });
+    }
+    
+    // Verify env vars exist
+    if (!credentialMeta.issuerDid || !credentialMeta.schemaId) {
+      return res.status(500).json({
+        success: false,
+        error: `Credential type ${credentialType} not properly configured (missing DID or schema)`
+      });
+    }
+    
+    // Generate Partner JWT with 'issue' scope
+    // Use provided userId/email or generate fallbacks
+    const effectiveUserId = userId || userAddress;
+    const effectiveEmail = email || `${userAddress.substring(0, 10)}@credo.local`;
+    
+    const authToken = generateIssueToken(effectiveUserId, effectiveEmail);
+    
+    console.log(`[Credentials] Prepared ${credentialType} for ${userAddress}`);
+    
+    // Return everything frontend needs for AIR Kit
+    res.json({
+      success: true,
+      authToken,
+      issuerDid: credentialMeta.issuerDid,
+      schemaId: credentialMeta.schemaId,
+      credentialSubject: {
+        // Data that will be stored in credential
+        credentialType: credentialMeta.bucket,
+        bucket: credentialMeta.bucket,
+        bucketRange: credentialMeta.range,
+        weight: credentialMeta.weight,
+        verifiedAt: Math.floor(Date.now() / 1000),
+        dataSource: credentialType.includes('bank') ? 'Plaid API (simulated)' : 
+                     credentialType.includes('income') ? 'Mock Employer' :
+                     credentialType.includes('cex') ? 'Mock Exchange' : 'Mock Provider',
+        period: credentialType.includes('bank') ? '30 days' : 
+                credentialType.includes('income') ? 'Monthly' : 'Current',
+        subject: userAddress
+      }
+    });
+    
+  } catch (error) {
+    console.error('[Credentials] Error preparing issuance:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 /**
- * Legacy endpoints (keep for backward compatibility)
- */
-
-/**
- * POST /api/credentials/request/cex
- * POST /api/credentials/request/cex-history (alias)
- * Issues CEX trading history credential
- */
-const handleCexCredential = async (req, res) => {
-    try {
-        const { userAddress } = req.body;
-        
-        if (!userAddress || !ethers.isAddress(userAddress)) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Valid address required' 
-            });
-        }
-        
-        const { mockExchangeIssuer } = req.app.locals;
-        
-        if (!mockExchangeIssuer) {
-            return res.status(500).json({
-                success: false,
-                error: 'Exchange issuer not initialized'
-            });
-        }
-        
-        const result = await mockExchangeIssuer.issueCredential(userAddress, 'cex-history');
-        res.json({ 
-            success: true, 
-            credential: result.credential,
-            credentialData: result.credentialData,
-            signature: result.signature,
-            issuer: result.issuer
-        });
-        
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-};
-
-router.post('/request/cex', handleCexCredential);
-router.post('/request/cex-history', handleCexCredential);
-
-/**
- * POST /api/credentials/request/employment
- * Issues basic employment credential
- */
-router.post('/request/employment', async (req, res) => {
-    try {
-        const { userAddress } = req.body;
-        
-        if (!userAddress || !ethers.isAddress(userAddress)) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Valid address required' 
-            });
-        }
-        
-        const { mockEmployerIssuer } = req.app.locals;
-        
-        if (!mockEmployerIssuer) {
-            return res.status(500).json({
-                success: false,
-                error: 'Employer issuer not initialized'
-            });
-        }
-        
-        const result = await mockEmployerIssuer.issueEmploymentCredential(userAddress);
-        res.json({ 
-            success: true,
-            credential: result.credential,
-            credentialData: result.credentialData,
-            signature: result.signature,
-            issuer: result.issuer
-        });
-        
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-/**
- * Legacy /request endpoint for backward compatibility
+ * POST /api/credentials/request (DEPRECATED)
+ * 
+ * Legacy endpoint - returns migration message
  */
 router.post('/request', async (req, res) => {
-    try {
-        const { userAddress, credentialType, mockData } = req.body;
-
-        if (!userAddress) {
-            return res.status(400).json({
-                success: false,
-                error: 'Missing required field: userAddress'
-            });
-        }
-
-        if (credentialType === undefined || credentialType === null) {
-            return res.status(400).json({
-                success: false,
-                error: 'Missing required field: credentialType'
-            });
-        }
-
-        const { mockExchangeIssuer, mockEmployerIssuer, mockBankIssuer } = req.app.locals;
-
-        let issuer;
-        switch(credentialType) {
-            case 2: // CEX History
-                issuer = mockExchangeIssuer;
-                break;
-            case 3: // Employment
-                issuer = mockEmployerIssuer;
-                break;
-            case 1: // Stable Balance
-                issuer = mockBankIssuer;
-                break;
-            default:
-                return res.status(400).json({
-                    success: false,
-                    error: `Invalid credential type: ${credentialType}. Must be 1, 2, or 3`
-                });
-        }
-
-        console.log(`Processing credential request for user ${userAddress} from ${issuer.name || 'issuer'}`);
-
-        const result = await issuer.issueCredential(userAddress, mockData || {});
-
-        if (!result || !result.credential || !result.signature) {
-            console.error('Issuer returned incomplete data:', result);
-            return res.status(500).json({
-                success: false,
-                error: 'Issuer returned incomplete credential data'
-            });
-        }
-
-        res.json(result);
-
-    } catch (error) {
-        console.error('Error issuing credential:');
-        console.error('  Message:', error.message);
-        console.error('  Stack:', error.stack);
-        res.status(500).json({
-            success: false,
-            error: error.message || 'Failed to issue credential'
-        });
-    }
+  res.status(410).json({
+    success: false,
+    error: 'This endpoint has been deprecated in Phase 5.2',
+    message: 'Use /api/credentials/prepare instead',
+    migration: 'See PHASE5.2-BACKEND-REFACTOR.md for details'
+  });
 });
 
 module.exports = router;
