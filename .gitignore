@@ -49,6 +49,12 @@ yarn-error.log*
 **/PHASE5.1-ENV-VARIABLES.env
 PHASE5.1-ENV-VARIABLES.env
 
+# RSA Keys for JWT signing (NEVER commit private keys!)
+*.key
+backend/*.key
+**/private.key
+**/public.key
+
 # vercel
 .vercel
 
