@@ -1,5 +1,6 @@
 /**
  * Score Builder Wizard Component (Phase 3 Part B)
+ * Clean white/black/grey minimalist theme
  * 
  * Interactive tool that helps users understand how to improve their credit score
  * 
@@ -16,7 +17,18 @@ import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
-import { AlertCircle, CheckCircle, TrendingUp, Lock, Unlock, Sparkles } from 'lucide-react';
+import { 
+    CheckCircle, 
+    TrendingUp, 
+    Lock, 
+    Unlock, 
+    Sparkles, 
+    DollarSign, 
+    Building2, 
+    TrendingUp as ChartIcon, 
+    Briefcase,
+    ArrowRight 
+} from 'lucide-react';
 
 export default function ScoreBuilderWizard({ 
     currentScore = 500, 
@@ -56,29 +68,29 @@ export default function ScoreBuilderWizard({
         {
             id: 'income-range',
             name: 'Income Range',
-            icon: '💰',
+            icon: DollarSign,
             points: '+50-180',
             avgPoints: 140,
             description: 'Highest impact - verify income bracket',
             new: true,
             badge: 'Highest Weight',
-            badgeColor: 'bg-purple-500'
+            badgeColor: 'bg-black text-white'
         },
         {
             id: 'bank-balance',
             name: 'Bank Balance (30d avg)',
-            icon: '🏦',
+            icon: Building2,
             points: '+40-150',
             avgPoints: 120,
             description: 'Prove financial stability',
             new: true,
             badge: 'Privacy-First',
-            badgeColor: 'bg-green-500'
+            badgeColor: 'bg-black text-white'
         },
         {
             id: 'cex-history',
             name: 'CEX Trading History',
-            icon: '📊',
+            icon: ChartIcon,
             points: '+80',
             avgPoints: 80,
             description: 'Show crypto experience'
@@ -86,7 +98,7 @@ export default function ScoreBuilderWizard({
         {
             id: 'employment',
             name: 'Employment Proof',
-            icon: '💼',
+            icon: Briefcase,
             points: '+70',
             avgPoints: 70,
             description: 'Verify job status'
@@ -146,63 +158,63 @@ export default function ScoreBuilderWizard({
         <div className="space-y-6">
             {/* Header */}
             <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-2">Build Your Credit Score</h2>
-                <p className="text-gray-600">
+                <h2 className="text-3xl md:text-4xl font-bold mb-2 text-black">Build Your Credit Score</h2>
+                <p className="text-black/60 text-lg">
                     Select credentials to see how they'll improve your borrowing power
                 </p>
             </div>
             
             {/* Current vs Simulated Score */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Current Score */}
-                <Card className="p-6 border-2">
-                    <div className="flex items-center justify-between mb-4">
+                <Card className="p-8 border border-black/10 bg-white hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
-                            <Lock className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm font-medium text-gray-500">Current Score</span>
+                            <Lock className="w-5 h-5 text-black/40" />
+                            <span className="text-sm font-medium text-black/50">Current Score</span>
                         </div>
                     </div>
-                    <p className="text-5xl font-bold mb-3">{currentScore}</p>
-                    <Badge className={`bg-${currentTier.color}-100 text-${currentTier.color}-700 border-${currentTier.color}-300`}>
+                    <p className="text-6xl font-bold mb-4 text-black">{currentScore}</p>
+                    <Badge className="bg-black/5 text-black border-black/10">
                         {currentTier.name}
                     </Badge>
-                    <div className="mt-4 space-y-2 text-sm text-gray-600">
-                        <div className="flex justify-between">
+                    <div className="mt-6 space-y-3 text-sm text-black/60">
+                        <div className="flex justify-between items-center py-2 border-b border-black/5">
                             <span>Collateral Required:</span>
-                            <span className="font-semibold">{currentTier.collateral}</span>
+                            <span className="font-semibold text-black">{currentTier.collateral}</span>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between items-center py-2">
                             <span>Borrow APR:</span>
-                            <span className="font-semibold">{currentTier.apr}</span>
+                            <span className="font-semibold text-black">{currentTier.apr}</span>
                         </div>
                     </div>
                 </Card>
                 
                 {/* Simulated Score */}
-                <Card className="p-6 border-2 border-blue-500 bg-blue-50">
-                    <div className="flex items-center justify-between mb-4">
+                <Card className="p-8 border-2 border-black bg-neutral-50 hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
-                            <Unlock className="w-5 h-5 text-blue-600" />
-                            <span className="text-sm font-medium text-blue-600">Simulated Score</span>
+                            <Unlock className="w-5 h-5 text-black" />
+                            <span className="text-sm font-medium text-black">Simulated Score</span>
                         </div>
                         {simulatedScore > currentScore && (
-                            <Badge className="bg-green-500 text-white">
+                            <Badge className="bg-black text-white">
                                 +{simulatedScore - currentScore} pts
                             </Badge>
                         )}
                     </div>
-                    <p className="text-5xl font-bold mb-3 text-blue-600">{simulatedScore}</p>
-                    <Badge className={`bg-${getCurrentTier(simulatedScore).color}-100 text-${getCurrentTier(simulatedScore).color}-700`}>
+                    <p className="text-6xl font-bold mb-4 text-black">{simulatedScore}</p>
+                    <Badge className="bg-black/10 text-black border-black/20">
                         {getCurrentTier(simulatedScore).name}
                     </Badge>
-                    <div className="mt-4 space-y-2 text-sm text-gray-700">
-                        <div className="flex justify-between">
+                    <div className="mt-6 space-y-3 text-sm text-black/60">
+                        <div className="flex justify-between items-center py-2 border-b border-black/10">
                             <span>Collateral Required:</span>
-                            <span className="font-semibold">{getCurrentTier(simulatedScore).collateral}</span>
+                            <span className="font-semibold text-black">{getCurrentTier(simulatedScore).collateral}</span>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between items-center py-2">
                             <span>Borrow APR:</span>
-                            <span className="font-semibold">{getCurrentTier(simulatedScore).apr}</span>
+                            <span className="font-semibold text-black">{getCurrentTier(simulatedScore).apr}</span>
                         </div>
                     </div>
                 </Card>
@@ -210,38 +222,38 @@ export default function ScoreBuilderWizard({
             
             {/* Progress to Next Tier */}
             {nextTier && (
-                <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50">
-                    <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold text-lg flex items-center gap-2">
-                            <TrendingUp className="w-5 h-5 text-blue-600" />
+                <Card className="p-8 border border-black/10 bg-white hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="font-semibold text-xl flex items-center gap-2 text-black">
+                            <TrendingUp className="w-6 h-6" />
                             Progress to {nextTier.name} Tier
                         </h3>
-                        <span className="text-sm font-medium text-gray-600">
+                        <span className="text-sm font-medium text-black/60">
                             {pointsToNextTier} points needed
                         </span>
                     </div>
                     
                     <Progress 
                         value={Math.min(((simulatedScore - currentTier.min) / (nextTier.min - currentTier.min)) * 100, 100)} 
-                        className="h-4 mb-3"
+                        className="h-3 mb-6"
                     />
                     
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-black/70">
                         <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600" />
-                            <span>Better collateral: <strong>{nextTier.collateral}</strong> vs {currentTier.collateral}</span>
+                            <CheckCircle className="w-5 h-5 text-black flex-shrink-0" />
+                            <span>Better collateral: <strong className="text-black">{nextTier.collateral}</strong> vs {currentTier.collateral}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600" />
-                            <span>Lower APR: <strong>{nextTier.apr}</strong> vs {currentTier.apr}</span>
+                            <CheckCircle className="w-5 h-5 text-black flex-shrink-0" />
+                            <span>Lower APR: <strong className="text-black">{nextTier.apr}</strong> vs {currentTier.apr}</span>
                         </div>
                     </div>
                     
                     {simulatedScore >= nextTier.min && (
-                        <div className="mt-4 p-3 bg-green-100 border border-green-300 rounded-lg">
-                            <p className="text-sm text-green-800 font-semibold flex items-center gap-2">
-                                <Sparkles className="w-5 h-5" />
-                                Selected credentials will unlock {nextTier.name} tier! 🎉
+                        <div className="mt-6 p-4 bg-black text-white rounded-xl">
+                            <p className="text-sm font-semibold flex items-center gap-2">
+                                <Sparkles className="w-5 h-5 flex-shrink-0" />
+                                Selected credentials will unlock {nextTier.name} tier!
                             </p>
                         </div>
                     )}
@@ -249,49 +261,52 @@ export default function ScoreBuilderWizard({
             )}
             
             {/* Credential Selector */}
-            <Card className="p-6">
-                <h3 className="font-semibold text-xl mb-4">Select Credentials to Request</h3>
+            <Card className="p-8 border border-black/10 bg-white hover:shadow-lg transition-all duration-300">
+                <h3 className="font-semibold text-2xl mb-6 text-black">Select Credentials to Request</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {availableCredentials.map(cred => {
                         const isSelected = selectedCredentials.some(c => c.id === cred.id);
                         const submitted = isSubmitted(cred.id);
+                        const IconComponent = cred.icon;
                         
                         return (
                             <div
                                 key={cred.id}
-                                className={`p-4 border-2 rounded-lg transition-all cursor-pointer ${
+                                className={`p-6 border-2 rounded-xl transition-all cursor-pointer ${
                                     submitted 
-                                        ? 'border-green-300 bg-green-50 cursor-not-allowed opacity-60'
+                                        ? 'border-black/20 bg-neutral-50 cursor-not-allowed opacity-60'
                                         : isSelected 
-                                        ? 'border-blue-500 bg-blue-50 shadow-md'
-                                        : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                                        ? 'border-black bg-neutral-50 shadow-md'
+                                        : 'border-black/10 hover:border-black/30 hover:shadow-sm bg-white'
                                 }`}
                                 onClick={() => !submitted && toggleCredential(cred)}
                             >
-                                <div className="flex items-start justify-between mb-2">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-3xl">{cred.icon}</span>
-                                        <div>
-                                            <div className="flex items-center gap-2">
-                                                <p className="font-semibold">{cred.name}</p>
-                                                {cred.new && <Badge className="bg-green-500 text-white text-xs">New</Badge>}
+                                <div className="flex items-start justify-between mb-3">
+                                    <div className="flex items-start gap-4 flex-1">
+                                        <div className="w-12 h-12 rounded-lg bg-black flex items-center justify-center text-white flex-shrink-0">
+                                            <IconComponent className="w-6 h-6" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                                                <p className="font-semibold text-black">{cred.name}</p>
+                                                {cred.new && <Badge className="bg-black text-white text-xs">New</Badge>}
                                             </div>
                                             {cred.badge && (
-                                                <Badge className={`mt-1 ${cred.badgeColor} text-white text-xs`}>
+                                                <Badge className={`mt-1 mb-2 ${cred.badgeColor} text-xs`}>
                                                     {cred.badge}
                                                 </Badge>
                                             )}
-                                            <p className="text-xs text-gray-500 mt-1">{cred.description}</p>
+                                            <p className="text-xs text-black/60 leading-relaxed">{cred.description}</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between mt-3">
-                                    <span className="text-sm font-bold text-blue-600">{cred.points}</span>
+                                <div className="flex items-center justify-between mt-4 pt-3 border-t border-black/10">
+                                    <span className="text-sm font-bold text-black">{cred.points}</span>
                                     {submitted && (
-                                        <CheckCircle className="w-5 h-5 text-green-600" />
+                                        <CheckCircle className="w-5 h-5 text-black" />
                                     )}
                                     {isSelected && !submitted && (
-                                        <Badge className="bg-blue-600 text-white">Selected</Badge>
+                                        <Badge className="bg-black text-white">Selected</Badge>
                                     )}
                                 </div>
                             </div>
@@ -302,13 +317,13 @@ export default function ScoreBuilderWizard({
             
             {/* Action Buttons */}
             {selectedCredentials.length > 0 && (
-                <Card className="p-4 bg-blue-50 border-blue-300">
-                    <div className="flex items-center justify-between">
+                <Card className="p-6 bg-neutral-50 border-2 border-black">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
-                            <p className="font-semibold text-blue-900">
+                            <p className="font-semibold text-black text-lg">
                                 {selectedCredentials.length} Credential{selectedCredentials.length > 1 ? 's' : ''} Selected
                             </p>
-                            <p className="text-sm text-blue-700">
+                            <p className="text-sm text-black/60 mt-1">
                                 Ready to request and improve your score
                             </p>
                         </div>
@@ -316,14 +331,16 @@ export default function ScoreBuilderWizard({
                             <Button 
                                 variant="outline" 
                                 onClick={() => setSelectedCredentials([])}
+                                className="border-black/20 hover:bg-black/5 hover:border-black/30 text-black"
                             >
                                 Clear
                             </Button>
                             <Button 
                                 onClick={handleRequestSelected}
-                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                className="bg-black hover:bg-black/90 text-white transition-all duration-300 hover:scale-[1.02] flex items-center gap-2"
                             >
-                                Go to Build Credit →
+                                Go to Build Credit
+                                <ArrowRight className="w-4 h-4" />
                             </Button>
                         </div>
                     </div>
