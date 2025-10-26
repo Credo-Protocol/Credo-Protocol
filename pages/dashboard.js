@@ -22,7 +22,7 @@ import Leaderboard from '@/components/Leaderboard';
 import ConnectButton from '@/components/auth/ConnectButton';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Droplets, Sparkles, CheckCircle, Home, ArrowRight } from 'lucide-react';
+import { Droplets, CheckCircle, Home, ArrowRight } from 'lucide-react';
 import { CONTRACTS, CREDIT_ORACLE_ABI, MOCA_CHAIN } from '@/lib/contracts';
 import { useAirKit } from '@/hooks/useAirKit';
 import { getBestProvider, callWithTimeout, getPublicProvider } from '@/lib/rpcProvider';
@@ -443,9 +443,8 @@ export default function Dashboard() {
           <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-6 bg-neutral-100 p-1 rounded-full border border-black/5">
             <TabsTrigger 
               value="builder"
-              className="rounded-full data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-lg transition-all flex items-center gap-2"
+              className="rounded-full data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-lg transition-all"
             >
-              <Sparkles className="w-4 h-4" />
               Score Builder
             </TabsTrigger>
             <TabsTrigger 

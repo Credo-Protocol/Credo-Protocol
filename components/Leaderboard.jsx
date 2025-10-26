@@ -9,11 +9,11 @@
  * - Top 10 users by credit score
  * - Live ranking with trophy icons
  * - Credential count and diversity bonus display
- * - Auto-refresh every 30 seconds
+ * - Manual refresh via button
  * - Event-based data aggregation from blockchain
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -28,12 +28,7 @@ export default function Leaderboard() {
     const [lastUpdate, setLastUpdate] = useState(null);
     const [error, setError] = useState(null);
     
-    useEffect(() => {
-        // Fetch leaderboard once on component mount
-        fetchLeaderboard();
-    }, []);
-    
-    const fetchLeaderboard = async () => {
+    const fetchLeaderboard = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
@@ -113,7 +108,12 @@ export default function Leaderboard() {
             setError(error.message);
             setLoading(false);
         }
-    };
+    }, []); // Empty dependency array - function never changes
+    
+    useEffect(() => {
+        // Fetch leaderboard once on component mount only
+        fetchLeaderboard();
+    }, [fetchLeaderboard]);
     
     // Get tier name based on score
     const getTierName = (score) => {
