@@ -88,11 +88,11 @@ async function main() {
     { name: "BANK_BALANCE_LOW", weight: 80, decay: 90, display: "Bank Balance (Low)" },
     { name: "BANK_BALANCE_MINIMAL", weight: 40, decay: 90, display: "Bank Balance (Minimal)" },
     
-    // Income Range Buckets (Phase 2)
-    { name: "INCOME_VERY_HIGH", weight: 180, decay: 180, display: "Income (Very High)" },
-    { name: "INCOME_HIGH", weight: 140, decay: 180, display: "Income (High)" },
-    { name: "INCOME_MEDIUM", weight: 100, decay: 180, display: "Income (Medium)" },
-    { name: "INCOME_LOW", weight: 50, decay: 180, display: "Income (Low)" },
+    // Income Range Buckets (Phase 2) - Aligned with backend
+    { name: "INCOME_HIGH", weight: 180, decay: 180, display: "Income (High - $8k+)" },
+    { name: "INCOME_MEDIUM", weight: 140, decay: 180, display: "Income (Medium - $5-8k)" },
+    { name: "INCOME_LOW", weight: 100, decay: 180, display: "Income (Low - $3-5k)" },
+    { name: "INCOME_MINIMAL", weight: 50, decay: 180, display: "Income (Minimal - <$3k)" },
     
     // Basic Existing Types
     { name: "CEX_HISTORY", weight: 80, decay: 180, display: "CEX Trading History" },
