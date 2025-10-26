@@ -17,6 +17,7 @@ require('dotenv').config();
 
 // Import routes
 const credentialsRouter = require('./routes/credentials');
+const { getJWKS } = require('./auth/jwks');
 
 // Create Express app
 const app = express();
@@ -59,6 +60,28 @@ try {
 
 // Routes
 app.use('/api/credentials', credentialsRouter);
+
+/**
+ * GET /.well-known/jwks.json
+ * 
+ * JWKS (JSON Web Key Set) endpoint for AIR Kit JWT validation
+ * AIR Kit calls this endpoint to get our public key for verifying Partner JWTs
+ * 
+ * Required by MOCA: https://docs.moca.network/airkit/usage/partner-authentication
+ */
+app.get('/.well-known/jwks.json', (req, res) => {
+  try {
+    const jwks = getJWKS();
+    console.log('📋 JWKS endpoint called - AIR Kit validating JWT');
+    res.json(jwks);
+  } catch (error) {
+    console.error('❌ JWKS generation failed:', error);
+    res.status(500).json({
+      error: 'JWKS generation failed',
+      message: error.message
+    });
+  }
+});
 
 /**
  * GET /health
@@ -104,6 +127,7 @@ app.get('/', (req, res) => {
     phase: 'Phase 5.2 - Backend Refactoring Complete',
     endpoints: {
       health: 'GET /health',
+      jwks: 'GET /.well-known/jwks.json',
       credentialTypes: 'GET /api/credentials/types',
       prepareCredential: 'POST /api/credentials/prepare'
     },
