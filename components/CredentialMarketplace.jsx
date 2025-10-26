@@ -7,10 +7,11 @@
  */
 
 import { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
 import CredentialCard from './CredentialCard';
 import RequestCredentialModal from './RequestCredentialModal';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BACKEND_URL } from '@/lib/contracts';
+import { BACKEND_URL, CONTRACTS, CREDIT_ORACLE_ABI } from '@/lib/contracts';
 
 export default function CredentialMarketplace({ userAddress, onCredentialSubmitted, provider }) {
   const [credentials, setCredentials] = useState([]);
@@ -25,12 +26,58 @@ export default function CredentialMarketplace({ userAddress, onCredentialSubmitt
     fetchCredentials();
   }, []);
 
-  // Reset submitted credentials when user changes
+  // Fetch submitted credentials from blockchain when user changes
   useEffect(() => {
-    if (userAddress) {
-      setSubmittedCredentialIds(new Set());
+    if (userAddress && provider) {
+      fetchSubmittedCredentials();
     }
-  }, [userAddress]);
+  }, [userAddress, provider]);
+
+  // Fetch user's submitted credentials from blockchain events
+  const fetchSubmittedCredentials = async () => {
+    try {
+      console.log('[FETCH] Fetching submitted credentials from blockchain...');
+      
+      // Create contract instance (read-only, no signer needed)
+      const oracleContract = new ethers.Contract(
+        CONTRACTS.CREDIT_ORACLE,
+        CREDIT_ORACLE_ABI,
+        provider
+      );
+
+      // Get current block number
+      const currentBlock = await provider.getBlockNumber();
+      console.log('[FETCH] Current block:', currentBlock);
+      
+      // Moca Chain RPC limit: max 10,000 blocks per query
+      // Query last 10,000 blocks to stay within limit
+      const fromBlock = Math.max(0, currentBlock - 10000);
+      
+      console.log('[FETCH] Querying from block', fromBlock, 'to', currentBlock);
+
+      // Query CredentialSubmitted events for this user
+      // Event signature: CredentialSubmitted(address indexed user, address indexed issuer, uint256 credentialType, uint256 newScore)
+      const filter = oracleContract.filters.CredentialSubmitted(userAddress);
+      const events = await oracleContract.queryFilter(filter, fromBlock, currentBlock);
+
+      console.log(`[FETCH] Found ${events.length} submitted credentials`);
+
+      // Extract credential type hashes from events
+      const submittedTypeHashes = new Set(
+        events.map(event => event.args.credentialType.toString())
+      );
+
+      console.log('[FETCH] Submitted credential type hashes:', Array.from(submittedTypeHashes));
+
+      // Store the hashes so we can check them when credentials load
+      setSubmittedCredentialIds(submittedTypeHashes);
+
+    } catch (err) {
+      console.error('[ERROR] Failed to fetch submitted credentials:', err);
+      // Don't fail the entire component if this fails
+      // User can still see credentials and request them
+    }
+  };
 
   const fetchCredentials = async () => {
     try {
@@ -64,13 +111,34 @@ export default function CredentialMarketplace({ userAddress, onCredentialSubmitt
   };
 
   const handleCredentialSuccess = () => {
-    // Mark credential as submitted
+    // Mark credential as submitted by adding its type hash
     if (selectedCredential) {
-      setSubmittedCredentialIds(prev => new Set([...prev, selectedCredential.id]));
+      // Calculate the hash of this credential's bucket (same as contract does)
+      const credentialTypeHash = ethers.id(selectedCredential.bucket);
+      const hashAsString = BigInt(credentialTypeHash).toString();
+      
+      console.log('[SUCCESS] Adding credential to submitted list:', {
+        id: selectedCredential.id,
+        bucket: selectedCredential.bucket,
+        hash: hashAsString
+      });
+      
+      setSubmittedCredentialIds(prev => new Set([...prev, hashAsString]));
     }
     
     // Notify parent component that a credential was submitted
     onCredentialSubmitted && onCredentialSubmitted();
+  };
+
+  // Helper function to check if a credential has been submitted
+  const isCredentialSubmitted = (credential) => {
+    if (!credential.bucket) return false;
+    
+    // Calculate the hash of this credential type
+    const credentialTypeHash = ethers.id(credential.bucket);
+    const hashAsString = BigInt(credentialTypeHash).toString();
+    
+    return submittedCredentialIds.has(hashAsString);
   };
 
   // Enhanced loading state with skeleton cards
@@ -148,7 +216,7 @@ export default function CredentialMarketplace({ userAddress, onCredentialSubmitt
             credential={credential}
             onRequest={handleRequestCredential}
             isLoading={false}
-            isSubmitted={submittedCredentialIds.has(credential.id)}
+            isSubmitted={isCredentialSubmitted(credential)}
           />
         ))}
       </div>
