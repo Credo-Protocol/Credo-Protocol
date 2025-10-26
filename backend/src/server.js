@@ -1,23 +1,19 @@
 /**
- * Credo Protocol Backend Server
+ * Credo Protocol Backend Server - Phase 5.2
  * 
- * Mock credential issuer service for the Credo Protocol hackathon MVP.
- * This server provides API endpoints for issuing verifiable credentials
- * that can be submitted to the CreditScoreOracle smart contract.
+ * MOCA Official Integration: Partner JWT Authentication
  * 
- * In production, this would integrate with real data providers (exchanges,
- * employers, banks) and implement proper authentication and rate limiting.
+ * This server provides API endpoints for preparing credential issuance
+ * that integrates with MOCA's AIR Kit platform. The backend generates
+ * Partner JWTs that authenticate the frontend to issue official MOCA
+ * credentials stored on decentralized storage (MCSP).
+ * 
+ * Migration: Replaced mock issuers with Partner JWT generation
  */
 
 const express = require('express');
 const cors = require('cors');
-const { ethers } = require('ethers');
 require('dotenv').config();
-
-// Import issuer classes
-const MockExchangeIssuer = require('./issuers/MockExchangeIssuer');
-const MockEmployerIssuer = require('./issuers/MockEmployerIssuer');
-const MockBankIssuer = require('./issuers/MockBankIssuer');
 
 // Import routes
 const credentialsRouter = require('./routes/credentials');
@@ -39,34 +35,25 @@ app.use((req, res, next) => {
   next();
 });
 
-// Initialize issuers from environment variables (Phase 2)
-let mockExchangeIssuer, mockEmployerIssuer, mockBankIssuer;
-
+// Validate MOCA environment variables (Phase 5.2)
 try {
-  // Validate private keys exist
-  if (!process.env.MOCK_EXCHANGE_PRIVATE_KEY || 
-      !process.env.MOCK_EMPLOYER_PRIVATE_KEY || 
-      !process.env.MOCK_BANK_PRIVATE_KEY) {
-    throw new Error('Missing private keys in .env file');
+  // Check required MOCA config
+  if (!process.env.PARTNER_ID || !process.env.PARTNER_SECRET) {
+    throw new Error('Missing MOCA credentials: PARTNER_ID and PARTNER_SECRET required');
+  }
+  
+  if (!process.env.ISSUER_DID) {
+    throw new Error('Missing ISSUER_DID - run Phase 5.1 setup first');
   }
 
-  // Create issuer instances (Phase 2: pass private keys directly)
-  mockExchangeIssuer = new MockExchangeIssuer(process.env.MOCK_EXCHANGE_PRIVATE_KEY);
-  mockEmployerIssuer = new MockEmployerIssuer(process.env.MOCK_EMPLOYER_PRIVATE_KEY);
-  mockBankIssuer = new MockBankIssuer(process.env.MOCK_BANK_PRIVATE_KEY);
-
-  // Store issuers in app.locals for access in routes
-  app.locals.mockExchangeIssuer = mockExchangeIssuer;
-  app.locals.mockEmployerIssuer = mockEmployerIssuer;
-  app.locals.mockBankIssuer = mockBankIssuer;
-
-  console.log('✅ Issuers initialized successfully (Phase 2):');
-  console.log(`   - Mock Exchange (${mockExchangeIssuer.issuerAddress})`);
-  console.log(`   - Mock Employer (${mockEmployerIssuer.issuerAddress})`);
-  console.log(`   - Mock Bank (${mockBankIssuer.issuerAddress})`);
+  console.log('✅ MOCA Integration initialized (Phase 5.2):');
+  console.log(`   - Partner ID: ${process.env.PARTNER_ID}`);
+  console.log(`   - Issuer DID: ${process.env.ISSUER_DID}`);
+  console.log(`   - Partner Secret: [hidden]`);
+  console.log('   - Backend ready to generate Partner JWTs');
 } catch (error) {
-  console.error('❌ Failed to initialize issuers:', error.message);
-  console.error('Please check your .env file has valid private keys.');
+  console.error('❌ Failed to initialize MOCA integration:', error.message);
+  console.error('Please complete Phase 5.1 setup and update .env file.');
   process.exit(1);
 }
 
@@ -76,32 +63,31 @@ app.use('/api/credentials', credentialsRouter);
 /**
  * GET /health
  * 
- * Health check endpoint to verify the service is running
- * and all issuers are properly initialized.
+ * Health check endpoint to verify MOCA integration
  */
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    service: 'Credo Protocol Mock Issuer Service (Phase 2)',
-    version: '2.0.0',
-    issuers: [
-      {
-        name: 'Mock Exchange',
-        address: mockExchangeIssuer.issuerAddress,
-        features: ['CEX History']
-      },
-      {
-        name: 'Mock Employer',
-        address: mockEmployerIssuer.issuerAddress,
-        features: ['Employment', 'Income Range (4 buckets)']
-      },
-      {
-        name: 'Mock Bank',
-        address: mockBankIssuer.issuerAddress,
-        features: ['Bank Balance (4 buckets)']
-      }
-    ]
+    service: 'Credo Protocol Backend - MOCA Integration',
+    version: '5.2.0',
+    integration: {
+      partnerId: process.env.PARTNER_ID,
+      issuerDid: process.env.ISSUER_DID,
+      mocaNetwork: 'MOCA Sandbox',
+      features: [
+        'Partner JWT Generation',
+        'Official AIR Kit Credentials',
+        'Decentralized Storage (MCSP)',
+        'Gas Sponsorship Ready'
+      ]
+    },
+    credentials: {
+      bankBalance: 4,
+      incomeRange: 4,
+      other: 2,
+      total: 10
+    }
   });
 });
 
@@ -112,16 +98,26 @@ app.get('/health', (req, res) => {
  */
 app.get('/', (req, res) => {
   res.json({
-    service: 'Credo Protocol Mock Issuer Service',
-    description: 'Backend service for issuing verifiable credentials',
-    version: '1.0.0',
+    service: 'Credo Protocol Backend - MOCA Integration',
+    description: 'Backend service for MOCA credential preparation and Partner JWT generation',
+    version: '5.2.0',
+    phase: 'Phase 5.2 - Backend Refactoring Complete',
     endpoints: {
       health: 'GET /health',
       credentialTypes: 'GET /api/credentials/types',
-      requestCredential: 'POST /api/credentials/request',
-      listIssuers: 'GET /api/credentials/issuers'
+      prepareCredential: 'POST /api/credentials/prepare'
     },
-    documentation: 'See README.md for full API documentation'
+    migration: {
+      status: 'Phase 5.2 Complete',
+      next: 'Phase 5.3 - Frontend Integration',
+      changes: [
+        'Replaced mock issuers with Partner JWT auth',
+        'Backend now prepares credentials for AIR Kit',
+        'Credentials stored on MOCA Chain Storage Providers',
+        'Gas sponsorship ready'
+      ]
+    },
+    documentation: 'See documents/wave 3/PHASE5.2-BACKEND-REFACTOR.md'
   });
 });
 
