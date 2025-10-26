@@ -18,11 +18,19 @@ export default function CredentialMarketplace({ userAddress, onCredentialSubmitt
   const [error, setError] = useState(null);
   const [selectedCredential, setSelectedCredential] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submittedCredentialIds, setSubmittedCredentialIds] = useState(new Set());
 
   // Fetch available credentials from backend
   useEffect(() => {
     fetchCredentials();
   }, []);
+
+  // Reset submitted credentials when user changes
+  useEffect(() => {
+    if (userAddress) {
+      setSubmittedCredentialIds(new Set());
+    }
+  }, [userAddress]);
 
   const fetchCredentials = async () => {
     try {
@@ -56,6 +64,11 @@ export default function CredentialMarketplace({ userAddress, onCredentialSubmitt
   };
 
   const handleCredentialSuccess = () => {
+    // Mark credential as submitted
+    if (selectedCredential) {
+      setSubmittedCredentialIds(prev => new Set([...prev, selectedCredential.id]));
+    }
+    
     // Notify parent component that a credential was submitted
     onCredentialSubmitted && onCredentialSubmitted();
   };
@@ -135,6 +148,7 @@ export default function CredentialMarketplace({ userAddress, onCredentialSubmitt
             credential={credential}
             onRequest={handleRequestCredential}
             isLoading={false}
+            isSubmitted={submittedCredentialIds.has(credential.id)}
           />
         ))}
       </div>

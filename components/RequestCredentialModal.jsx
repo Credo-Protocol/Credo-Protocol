@@ -19,7 +19,7 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { CheckCircle2, Loader2 } from 'lucide-react';
+import { CheckCircle2, Loader2, Lock, FileText, Zap, XCircle } from 'lucide-react';
 import { CONTRACTS, CREDIT_ORACLE_ABI } from '@/lib/contracts';
 import { handleTransactionError } from '@/lib/errorHandler';
 import { issueCredential } from '@/lib/credentialServices';
@@ -32,6 +32,7 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
   const [credentialData, setCredentialData] = useState(null);
   const [error, setError] = useState(null);
   const [txHash, setTxHash] = useState(null);
+  const [readyForAirKit, setReadyForAirKit] = useState(false); // Hide modal when AIR Kit is ready
 
   // Reset state when modal opens
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
       setError(null);
       setTxHash(null);
       setLoadingMessage('');
+      setReadyForAirKit(false);
     }
   }, [isOpen]);
 
@@ -55,7 +57,7 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
                               credential.credentialType === 3 ? 'employment' :
                               credential.credentialType === 1 ? 'bank-balance' : 'unknown');
 
-      console.log('🆕 Phase 5.3: Issuing credential via AIR Kit...', {
+      console.log('[NEW] Phase 5.3: Issuing credential via AIR Kit...', {
         userAddress,
         credentialType,
         credential
@@ -63,12 +65,16 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
 
       // Step 1: Preparing
       setStep('preparing');
-      setLoadingMessage('🔐 Generating auth token...');
-      await new Promise(resolve => setTimeout(resolve, 500)); // Brief pause for UX
+      setLoadingMessage('Generating auth token...');
+      await new Promise(resolve => setTimeout(resolve, 2500)); // 2.5 second pause for visibility
 
       // Step 2: Issuing via AIR Kit
       setStep('issuing');
-      setLoadingMessage('📝 Issuing credential via AIR Kit...');
+      setLoadingMessage('Issuing credential via AIR Kit...');
+      await new Promise(resolve => setTimeout(resolve, 800)); // Show second dot before AIR Kit modal
+      
+      // Hide our modal so AIR Kit can show
+      setReadyForAirKit(true);
       
       // Use the new credential service
       const issuedCredential = await issueCredential(
@@ -78,16 +84,19 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
       );
 
       // Step 3: Complete (stored on MCSP automatically)
-      setLoadingMessage('✅ Credential issued and stored on MCSP!');
+      setLoadingMessage('Credential issued and stored on MCSP!');
+      
+      // Show our modal again for review step
+      setReadyForAirKit(false);
 
-      console.log('✅ Credential issued and stored:', issuedCredential);
+      console.log('[SUCCESS] Credential issued and stored:', issuedCredential);
 
       // Backend has already prepared everything for contract submission:
       // - Encoded credential data
       // - Signed with issuer's private key
       // - Proper Ethereum addresses (not DIDs)
       
-      console.log('🔍 Credential ready for contract:');
+      console.log('[INFO] Credential ready for contract:');
       console.log('  Type:', issuedCredential.credentialType);
       console.log('  Issuer:', issuedCredential.issuer);
       console.log('  Subject:', issuedCredential.subject);
@@ -124,7 +133,7 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
       setCredentialData(credentialForContract);
       setStep('review');
     } catch (err) {
-      console.error('❌ Error issuing credential:', err);
+      console.error('[ERROR] Error issuing credential:', err);
       setError(err.message || 'Failed to issue credential');
       setStep('error');
     }
@@ -140,7 +149,7 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
         throw new Error('Please connect your wallet to submit credentials');
       }
 
-      console.log('🔐 Getting signer from provider...', { 
+      console.log('[LOCK] Getting signer from provider...', { 
         hasProvider: !!provider,
         providerType: provider?.constructor?.name 
       });
@@ -148,7 +157,7 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
       // Provider is already wrapped as ethers.BrowserProvider in useAirKit
       // Just get the signer - this will trigger AIR Kit popup
       const signer = await provider.getSigner();
-      console.log('✅ Signer obtained successfully:', {
+      console.log('[SUCCESS] Signer obtained successfully:', {
         hasSigner: !!signer,
         signerType: signer?.constructor?.name
       });
@@ -176,7 +185,7 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
         expiresAt: credentialData.credential.expirationDate
       };
 
-      console.log('📝 Submitting credential to oracle...');
+      console.log('[SUBMIT] Submitting credential to oracle...');
       console.log('  Contract Address:', CONTRACTS.CREDIT_ORACLE);
       console.log('  Credential Type:', credentialData.credential.credentialType);
       console.log('  Credential Type Hash:', credentialTypeHash);
@@ -187,7 +196,7 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
 
       // Submit credential to smart contract
       // This should trigger AIR Kit's wallet confirmation popup
-      console.log('🔐 Calling submitCredential - AIR Kit popup should appear now...');
+      console.log('[LOCK] Calling submitCredential - AIR Kit popup should appear now...');
       const tx = await oracleContract.submitCredential(
         submitParams.credentialData,
         submitParams.signature,
@@ -196,13 +205,13 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
         submitParams.expiresAt
       );
 
-      console.log('✅ Transaction sent:', tx.hash);
+      console.log('[SUCCESS] Transaction sent:', tx.hash);
       setTxHash(tx.hash);
 
       // Wait for transaction to be mined
-      console.log('⏳ Waiting for transaction confirmation...');
+      console.log('[WAIT] Waiting for transaction confirmation...');
       const receipt = await tx.wait();
-      console.log('✅ Transaction confirmed:', receipt);
+      console.log('[SUCCESS] Transaction confirmed:', receipt);
 
       setStep('success');
       
@@ -219,9 +228,9 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
     }
   };
 
-  // Hide our modal when AIR Kit modal is showing (during 'issuing' step)
+  // Hide modal when AIR Kit is ready to show (after we display the second dot)
   // This prevents z-index conflicts and ensures users can interact with AIR Kit
-  const shouldShowDialog = isOpen && step !== 'issuing';
+  const shouldShowDialog = isOpen && !readyForAirKit;
   
   return (
     <Dialog open={shouldShowDialog} onOpenChange={onClose}>
@@ -241,7 +250,8 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
                 </p>
                 {credential?.privacyPreserving && (
                   <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-green-50 border border-green-200">
-                    <span className="text-xs font-medium text-green-700">🔒 Privacy-Preserving</span>
+                    <Lock className="h-3 w-3 text-green-700" />
+                    <span className="text-xs font-medium text-green-700">Privacy-Preserving</span>
                   </div>
                 )}
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-black/10">
@@ -266,9 +276,13 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
                 <Loader2 className="h-12 w-12 animate-spin text-black" />
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium text-black">
-                  {loadingMessage}
-                </p>
+                <div className="flex items-center justify-center gap-2">
+                  {step === 'preparing' && <Lock className="h-4 w-4 text-black" />}
+                  {step === 'issuing' && <FileText className="h-4 w-4 text-black" />}
+                  <p className="text-sm font-medium text-black">
+                    {loadingMessage}
+                  </p>
+                </div>
                 <div className="flex justify-center gap-2">
                   <div className={`h-2 w-2 rounded-full ${step === 'preparing' ? 'bg-blue-500' : 'bg-gray-300'}`} />
                   <div className={`h-2 w-2 rounded-full ${step === 'issuing' ? 'bg-blue-500' : 'bg-gray-300'}`} />
@@ -276,13 +290,19 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
                 {step === 'issuing' && (
                   <div className="mt-2 space-y-1">
                     {process.env.NEXT_PUBLIC_PAYMASTER_POLICY_ID && (
-                      <p className="text-xs text-green-600">
-                        ⚡ Gas-sponsored - No MOCA tokens needed!
-                      </p>
+                      <div className="flex items-center justify-center gap-1">
+                        <Zap className="h-3 w-3 text-green-600" />
+                        <p className="text-xs text-green-600">
+                          Gas-sponsored - No MOCA tokens needed!
+                        </p>
+                      </div>
                     )}
-                    <p className="text-xs text-blue-600">
-                      🔒 Storing on MCSP (decentralized storage)
-                    </p>
+                    <div className="flex items-center justify-center gap-1">
+                      <Lock className="h-3 w-3 text-blue-600" />
+                      <p className="text-xs text-blue-600">
+                        Storing on MCSP (decentralized storage)
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -337,9 +357,12 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
                 {/* Phase 2: Show privacy note */}
                 {credentialData.credential.metadata?.privacyNote && (
                   <div className="pt-2 border-t border-black/5">
-                    <p className="text-xs text-green-600">
-                      🔒 {credentialData.credential.metadata.privacyNote}
-                    </p>
+                    <div className="flex items-center gap-1">
+                      <Lock className="h-3 w-3 text-green-600" />
+                      <p className="text-xs text-green-600">
+                        {credentialData.credential.metadata.privacyNote}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -392,9 +415,12 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
           {step === 'error' && (
             <div className="py-6 space-y-4">
               <div className="p-4 rounded-xl border border-red-500/20 bg-red-50">
-                <p className="text-sm text-red-900 font-medium">
-                  ✗ Error
-                </p>
+                <div className="flex items-center gap-2">
+                  <XCircle className="h-4 w-4 text-red-900" />
+                  <p className="text-sm text-red-900 font-medium">
+                    Error
+                  </p>
+                </div>
                 <p className="text-xs text-red-700 mt-1">
                   {error}
                 </p>
