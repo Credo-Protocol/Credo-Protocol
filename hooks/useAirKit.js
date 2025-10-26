@@ -84,7 +84,16 @@ export function useAirKit() {
         console.log('✅ AIR Provider obtained:', airProvider ? 'Yes' : 'No');
         
         if (airProvider) {
-          const ethersProvider = new ethers.BrowserProvider(airProvider);
+          // Wrap AIR Kit EIP-1193 provider with ethers.js
+          // Explicitly disable ENS - MOCA Chain doesn't support it
+          const ethersProvider = new ethers.BrowserProvider(
+            airProvider,
+            {
+              chainId: 5151,
+              name: 'moca-devnet',
+              ensAddress: null  // Disable ENS to prevent UNSUPPORTED_OPERATION errors
+            }
+          );
           const ethersSigner = await ethersProvider.getSigner();
           
           setProvider(ethersProvider);
