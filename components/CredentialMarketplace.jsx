@@ -131,12 +131,12 @@ export default function CredentialMarketplace({ userAddress, onCredentialSubmitt
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight mb-2">
-          Build Your Credit Score
+      <div className="mb-8">
+        <h2 className="text-3xl md:text-4xl font-bold mb-2 text-black">
+          Request Credentials
         </h2>
-        <p className="text-muted-foreground">
-          Connect data sources to increase your score and unlock better loan terms.
+        <p className="text-black/60 text-lg">
+          Connect your data sources and request verifiable credentials to build your credit score
         </p>
       </div>
 
