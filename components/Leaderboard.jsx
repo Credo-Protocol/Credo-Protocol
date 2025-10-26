@@ -1,5 +1,6 @@
 /**
  * Leaderboard Component (Phase 4)
+ * Clean white/black/grey minimalist theme
  * 
  * Displays top credit scores across the network
  * Demonstrates network effects and ecosystem adoption
@@ -16,7 +17,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Trophy, Medal, Award, RefreshCw, TrendingUp, AlertCircle } from 'lucide-react';
+import { Trophy, RefreshCw, TrendingUp, AlertCircle, FileCheck, Clock } from 'lucide-react';
 import { ethers } from 'ethers';
 import { CONTRACTS, CREDIT_ORACLE_ABI } from '@/lib/contracts';
 import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
@@ -129,21 +130,17 @@ export default function Leaderboard() {
         return 'Very Poor';
     };
     
-    // Get tier color classes
+    // Get tier color classes - minimalist black/white/grey theme
     const getTierColor = (score) => {
-        if (score >= 900) return 'bg-purple-100 text-purple-700 border-purple-300';
-        if (score >= 800) return 'bg-blue-100 text-blue-700 border-blue-300';
-        if (score >= 700) return 'bg-green-100 text-green-700 border-green-300';
-        if (score >= 600) return 'bg-yellow-100 text-yellow-700 border-yellow-300';
-        return 'bg-orange-100 text-orange-700 border-orange-300';
+        return 'bg-black text-white';
     };
     
-    // Get rank icon based on position
+    // Get rank icon based on position - minimalist theme
     const getRankIcon = (index) => {
-        if (index === 0) return <Trophy className="w-6 h-6 text-yellow-500" />;
-        if (index === 1) return <Medal className="w-6 h-6 text-gray-400" />;
-        if (index === 2) return <Award className="w-6 h-6 text-orange-600" />;
-        return <span className="text-lg font-bold text-gray-400">#{index + 1}</span>;
+        if (index === 0) return <Trophy className="w-6 h-6 text-black" />;
+        if (index === 1) return <Trophy className="w-5 h-5 text-black/60" />;
+        if (index === 2) return <Trophy className="w-5 h-5 text-black/40" />;
+        return <span className="text-lg font-bold text-black/30">#{index + 1}</span>;
     };
     
     // Format timestamp to relative time
@@ -159,15 +156,15 @@ export default function Leaderboard() {
     };
     
     return (
-        <Card className="p-6">
+        <Card className="p-8 border border-black/10 bg-white hover:shadow-lg transition-all duration-300">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-2xl font-bold flex items-center gap-2">
-                        <Trophy className="w-7 h-7 text-yellow-500" />
+                    <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2 text-black">
+                        <Trophy className="w-7 h-7" />
                         Top Credit Scores
                     </h2>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-black/60 mt-2">
                         Showing the highest-rated users on Moca Chain
                     </p>
                 </div>
@@ -175,16 +172,16 @@ export default function Leaderboard() {
                     onClick={fetchLeaderboard}
                     disabled={loading}
                     variant="outline"
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 border border-black/20 bg-white hover:bg-black/5 hover:border-black/30 text-black font-medium disabled:opacity-50"
                 >
                     <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                    Refresh
+                    <span>Refresh</span>
                 </Button>
             </div>
             
             {/* Last Update Time */}
             {lastUpdate && !loading && (
-                <p className="text-xs text-gray-500 mb-4 flex items-center gap-1">
+                <p className="text-xs text-black/50 mb-6 flex items-center gap-1">
                     <TrendingUp className="w-3 h-3" />
                     Last updated: {lastUpdate.toLocaleTimeString()}
                 </p>
@@ -193,70 +190,72 @@ export default function Leaderboard() {
             {/* Loading State */}
             {loading && leaders.length === 0 ? (
                 <div className="text-center py-12">
-                    <RefreshCw className="w-8 h-8 text-gray-400 animate-spin mx-auto mb-3" />
-                    <p className="text-gray-500">Fetching leaderboard data...</p>
-                    <p className="text-xs text-gray-400 mt-2">Scanning blockchain events</p>
+                    <RefreshCw className="w-8 h-8 text-black/40 animate-spin mx-auto mb-3" />
+                    <p className="text-black/60">Fetching leaderboard data...</p>
+                    <p className="text-xs text-black/40 mt-2">Scanning blockchain events</p>
                 </div>
             ) : error ? (
                 /* Error State */
                 <div className="text-center py-12">
-                    <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-3" />
-                    <p className="text-red-600 mb-2">Error loading leaderboard</p>
-                    <p className="text-sm text-gray-500">{error}</p>
+                    <AlertCircle className="w-8 h-8 text-black/40 mx-auto mb-3" />
+                    <p className="text-black font-semibold mb-2">Error loading leaderboard</p>
+                    <p className="text-sm text-black/60">{error}</p>
                     <Button
                         onClick={fetchLeaderboard}
                         variant="outline"
-                        className="mt-4"
+                        className="mt-4 border border-black/20 bg-white hover:bg-black/5 hover:border-black/30 text-black font-medium"
                     >
                         Try Again
                     </Button>
                 </div>
             ) : leaders.length === 0 ? (
                 /* Empty State */
-                <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg border-2 border-dashed border-gray-300">
-                    <Trophy className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-600 font-medium mb-2">No scores yet!</p>
-                    <p className="text-sm text-gray-500 mb-4">Be the first to build your credit score</p>
+                <div className="text-center py-12 bg-neutral-50 rounded-xl border-2 border-dashed border-black/10">
+                    <Trophy className="w-12 h-12 text-black/20 mx-auto mb-3" />
+                    <p className="text-black font-semibold mb-2">No scores yet!</p>
+                    <p className="text-sm text-black/60 mb-6">Be the first to build your credit score</p>
                     <Button
                         onClick={() => window.location.href = '/dashboard?tab=builder'}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        className="bg-black hover:bg-black/90 text-white transition-all duration-300 hover:scale-[1.02]"
                     >
                         Build Your Score
                     </Button>
                 </div>
             ) : (
                 /* Leaderboard List */
-                <div className="space-y-3">
+                <div className="space-y-4">
                     {leaders.map((leader, index) => (
                         <div
                             key={leader.address}
-                            className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all hover:shadow-md ${
-                                index === 0 ? 'border-yellow-300 bg-gradient-to-r from-yellow-50 to-orange-50 shadow-md' :
-                                index === 1 ? 'border-gray-300 bg-gray-50' :
-                                index === 2 ? 'border-orange-300 bg-orange-50' :
-                                'border-gray-200 hover:border-gray-300'
+                            className={`flex items-center justify-between p-6 rounded-xl border-2 transition-all hover:shadow-md ${
+                                index === 0 ? 'border-black bg-neutral-50 shadow-md' :
+                                index === 1 ? 'border-black/30 bg-white' :
+                                index === 2 ? 'border-black/20 bg-white' :
+                                'border-black/10 hover:border-black/20 bg-white'
                             }`}
                         >
                             {/* Left: Rank + Address Info */}
                             <div className="flex items-center gap-4">
-                                <div className="w-10 flex justify-center">
+                                <div className="w-12 flex justify-center">
                                     {getRankIcon(index)}
                                 </div>
                                 <div>
-                                    <p className="font-mono text-sm font-medium">
+                                    <p className="font-mono text-sm font-medium text-black">
                                         {leader.address.slice(0, 6)}...{leader.address.slice(-4)}
                                     </p>
-                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                        <p className="text-xs text-gray-500 flex items-center gap-1">
-                                            📝 {leader.credentialsCount} credential{leader.credentialsCount !== 1 ? 's' : ''}
+                                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                        <p className="text-xs text-black/60 flex items-center gap-1">
+                                            <FileCheck className="w-3 h-3" />
+                                            {leader.credentialsCount} credential{leader.credentialsCount !== 1 ? 's' : ''}
                                         </p>
                                         {leader.diversityBonus > 0 && (
-                                            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-300">
+                                            <Badge variant="outline" className="text-xs bg-black text-white border-black">
                                                 +{leader.diversityBonus}% bonus
                                             </Badge>
                                         )}
                                         {leader.timestamp && (
-                                            <span className="text-xs text-gray-400">
+                                            <span className="text-xs text-black/40 flex items-center gap-1">
+                                                <Clock className="w-3 h-3" />
                                                 {formatTimeAgo(leader.timestamp)}
                                             </span>
                                         )}
@@ -266,12 +265,7 @@ export default function Leaderboard() {
                             
                             {/* Right: Score + Tier */}
                             <div className="text-right">
-                                <p className={`text-3xl font-bold mb-1 ${
-                                    index === 0 ? 'text-yellow-600' :
-                                    index === 1 ? 'text-gray-600' :
-                                    index === 2 ? 'text-orange-600' :
-                                    'text-gray-700'
-                                }`}>
+                                <p className="text-4xl font-bold mb-2 text-black">
                                     {leader.score}
                                 </p>
                                 <Badge className={getTierColor(leader.score)}>
@@ -280,25 +274,6 @@ export default function Leaderboard() {
                             </div>
                         </div>
                     ))}
-                </div>
-            )}
-            
-            {/* Footer Info */}
-            {leaders.length > 0 && (
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-800 mb-2 font-medium">
-                        🎯 Want to climb the ranks?
-                    </p>
-                    <p className="text-xs text-blue-700">
-                        Submit more credentials to increase your score. Income Range and Bank Balance credentials have the highest impact!
-                    </p>
-                    <Button
-                        onClick={() => window.location.href = '/dashboard?tab=builder'}
-                        variant="outline"
-                        className="mt-3 text-xs border-blue-300 hover:bg-blue-100"
-                    >
-                        View Score Builder →
-                    </Button>
                 </div>
             )}
         </Card>
