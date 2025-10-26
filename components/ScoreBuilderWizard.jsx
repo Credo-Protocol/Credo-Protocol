@@ -272,7 +272,7 @@ export default function ScoreBuilderWizard({
                         return (
                             <div
                                 key={cred.id}
-                                className={`p-6 border-2 rounded-xl transition-all cursor-pointer ${
+                                className={`p-6 border-2 rounded-xl transition-all cursor-pointer flex flex-col h-full ${
                                     submitted 
                                         ? 'border-black/20 bg-neutral-50 cursor-not-allowed opacity-60'
                                         : isSelected 
@@ -281,23 +281,23 @@ export default function ScoreBuilderWizard({
                                 }`}
                                 onClick={() => !submitted && toggleCredential(cred)}
                             >
-                                <div className="flex items-start justify-between mb-3">
-                                    <div className="flex items-start gap-4 flex-1">
-                                        <div className="w-12 h-12 rounded-lg bg-black flex items-center justify-center text-white flex-shrink-0">
-                                            <IconComponent className="w-6 h-6" />
+                                <div className="flex items-start gap-4 flex-1">
+                                    <div className="w-12 h-12 rounded-lg bg-black flex items-center justify-center text-white flex-shrink-0">
+                                        <IconComponent className="w-6 h-6" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                                            <p className="font-semibold text-black">{cred.name}</p>
+                                            {cred.new && <Badge className="bg-black text-white text-xs">New</Badge>}
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 flex-wrap mb-1">
-                                                <p className="font-semibold text-black">{cred.name}</p>
-                                                {cred.new && <Badge className="bg-black text-white text-xs">New</Badge>}
-                                            </div>
+                                        <div className="min-h-[24px] mb-2">
                                             {cred.badge && (
-                                                <Badge className={`mt-1 mb-2 ${cred.badgeColor} text-xs`}>
+                                                <Badge className={`${cred.badgeColor} text-xs`}>
                                                     {cred.badge}
                                                 </Badge>
                                             )}
-                                            <p className="text-xs text-black/60 leading-relaxed">{cred.description}</p>
                                         </div>
+                                        <p className="text-xs text-black/60 leading-relaxed">{cred.description}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-black/10">
@@ -331,7 +331,7 @@ export default function ScoreBuilderWizard({
                             <Button 
                                 variant="outline" 
                                 onClick={() => setSelectedCredentials([])}
-                                className="border-black/20 hover:bg-black/5 hover:border-black/30 text-black"
+                                className="border border-black/20 bg-white hover:bg-black/5 hover:border-black/30 text-black font-medium"
                             >
                                 Clear
                             </Button>
