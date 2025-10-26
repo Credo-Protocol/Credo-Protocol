@@ -29,11 +29,8 @@ export default function Leaderboard() {
     const [error, setError] = useState(null);
     
     useEffect(() => {
+        // Fetch leaderboard once on component mount
         fetchLeaderboard();
-        
-        // Auto-refresh every 30 seconds
-        const interval = setInterval(fetchLeaderboard, 30000);
-        return () => clearInterval(interval);
     }, []);
     
     const fetchLeaderboard = async () => {
