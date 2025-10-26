@@ -1,22 +1,34 @@
 /**
- * RequestCredentialModal Component
+ * RequestCredentialModal Component - Phase 5.3
  * 
- * Handles the complete flow of requesting and submitting a credential:
- * 1. Request credential from backend issuer
- * 2. Display credential details
- * 3. Submit credential to CreditScoreOracle smart contract
- * 4. Show success/error states
+ * NEW FLOW (Official MOCA Integration):
+ * 1. Request credential preparation from backend (get Partner JWT)
+ * 2. Issue credential via AIR Kit (gas-sponsored!)
+ * 3. Retrieve credential from AIR Kit wallet (stored on MCSP)
+ * 4. Display credential details
+ * 5. Submit credential to CreditScoreOracle smart contract
+ * 6. Show success/error states
+ * 
+ * Changes from old flow:
+ * - Backend prepares (doesn't issue) credentials
+ * - AIR Kit handles issuance and storage
+ * - Credentials stored on MCSP (decentralized)
+ * - Gas sponsorship enabled (no MOCA tokens needed)
  */
 
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { CheckCircle2, Loader2 } from 'lucide-react';
-import { BACKEND_URL, CONTRACTS, CREDIT_ORACLE_ABI } from '@/lib/contracts';
+import { CONTRACTS, CREDIT_ORACLE_ABI } from '@/lib/contracts';
 import { handleTransactionError } from '@/lib/errorHandler';
+import { issueCredential } from '@/lib/credentialServices';
+import { useAirKit } from '@/hooks/useAirKit';
 
 export default function RequestCredentialModal({ credential, userAddress, isOpen, onClose, onSuccess, provider }) {
-  const [step, setStep] = useState('request'); // request, loading, review, submitting, success, error
+  const { userInfo } = useAirKit();
+  const [step, setStep] = useState('request'); // request, preparing, issuing, storing, review, submitting, success, error
+  const [loadingMessage, setLoadingMessage] = useState('');
   const [credentialData, setCredentialData] = useState(null);
   const [error, setError] = useState(null);
   const [txHash, setTxHash] = useState(null);
@@ -28,63 +40,82 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
       setCredentialData(null);
       setError(null);
       setTxHash(null);
+      setLoadingMessage('');
     }
   }, [isOpen]);
 
-  // Step 1: Request credential from backend
+  // Step 1: Request credential via AIR Kit (Phase 5.3)
   const handleRequestCredential = async () => {
     try {
-      setStep('loading');
       setError(null);
 
-      // Determine endpoint based on credential format
-      // Phase 2 credentials have 'id' field, legacy credentials have 'credentialType' field
-      let endpoint;
-      if (credential.id) {
-        // Phase 2 format: use specific endpoints
-        endpoint = `${BACKEND_URL}/api/credentials/request/${credential.id}`;
-      } else if (credential.credentialType !== undefined) {
-        // Legacy format: use old endpoint
-        endpoint = `${BACKEND_URL}/api/credentials/request`;
-      } else {
-        throw new Error('Invalid credential format');
-      }
+      // Get credential type ID
+      const credentialType = credential.id || 
+                             (credential.credentialType === 2 ? 'cex-history' :
+                              credential.credentialType === 3 ? 'employment' :
+                              credential.credentialType === 1 ? 'bank-balance' : 'unknown');
 
-      console.log('Requesting credential from backend...', {
+      console.log('🆕 Phase 5.3: Issuing credential via AIR Kit...', {
         userAddress,
-        endpoint,
-        credentialId: credential.id,
-        credentialType: credential.credentialType
+        credentialType,
+        credential
       });
 
-      const requestBody = credential.id 
-        ? { userAddress }  // Phase 2 format
-        : { userAddress, credentialType: credential.credentialType, mockData: {} }; // Legacy format
+      // Step 1: Preparing
+      setStep('preparing');
+      setLoadingMessage('🔐 Generating auth token...');
+      await new Promise(resolve => setTimeout(resolve, 500)); // Brief pause for UX
 
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Backend error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      // Step 2: Issuing via AIR Kit
+      setStep('issuing');
+      setLoadingMessage('📝 Issuing credential via AIR Kit...');
       
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to issue credential');
-      }
+      // Use the new credential service
+      const issuedCredential = await issueCredential(
+        userAddress,
+        credentialType,
+        userInfo
+      );
 
-      console.log('Credential issued successfully:', data);
-      setCredentialData(data);
+      // Step 3: Complete (stored on MCSP automatically)
+      setLoadingMessage('✅ Credential issued and stored on MCSP!');
+
+      console.log('✅ Credential issued and stored:', issuedCredential);
+
+      // Convert AIR Kit credential format to legacy format for contract submission
+      // This allows backwards compatibility with existing oracle contract
+      const legacyFormatData = {
+        success: true,
+        credential: {
+          credentialType: issuedCredential.credentialType,
+          issuer: issuedCredential.issuer,
+          subject: issuedCredential.subject,
+          issuanceDate: issuedCredential.issuanceDate,
+          expirationDate: issuedCredential.expirationDate,
+          metadata: {
+            weight: issuedCredential.weight,
+            display: `${issuedCredential.bucket} - ${issuedCredential.bucketRange}`,
+            privacyNote: 'Stored on MCSP (decentralized storage)',
+            storedOnMCSP: true
+          }
+        },
+        credentialData: ethers.AbiCoder.defaultAbiCoder().encode(
+          ['string', 'address', 'uint256', 'uint256'],
+          [
+            issuedCredential.credentialType,
+            issuedCredential.subject,
+            issuedCredential.issuanceDate,
+            issuedCredential.weight
+          ]
+        ),
+        signature: issuedCredential.proof?.jws || '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+      };
+
+      setCredentialData(legacyFormatData);
       setStep('review');
     } catch (err) {
-      console.error('Error requesting credential:', err);
-      setError(err.message);
+      console.error('❌ Error issuing credential:', err);
+      setError(err.message || 'Failed to issue credential');
       setStep('error');
     }
   };
@@ -208,13 +239,33 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
             </div>
           )}
 
-          {/* Step 2: Loading */}
-          {step === 'loading' && (
+          {/* Step 2: Loading - AIR Kit Issuance (Phase 5.3) */}
+          {(step === 'preparing' || step === 'issuing') && (
             <div className="py-12 text-center space-y-4">
               <div className="flex justify-center">
                 <Loader2 className="h-12 w-12 animate-spin text-black" />
               </div>
-              <p className="text-sm text-black/60">Requesting credential...</p>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-black">
+                  {loadingMessage}
+                </p>
+                <div className="flex justify-center gap-2">
+                  <div className={`h-2 w-2 rounded-full ${step === 'preparing' ? 'bg-blue-500' : 'bg-gray-300'}`} />
+                  <div className={`h-2 w-2 rounded-full ${step === 'issuing' ? 'bg-blue-500' : 'bg-gray-300'}`} />
+                </div>
+                {step === 'issuing' && (
+                  <div className="mt-2 space-y-1">
+                    {process.env.NEXT_PUBLIC_PAYMASTER_POLICY_ID && (
+                      <p className="text-xs text-green-600">
+                        ⚡ Gas-sponsored - No MOCA tokens needed!
+                      </p>
+                    )}
+                    <p className="text-xs text-blue-600">
+                      🔒 Storing on MCSP (decentralized storage)
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
