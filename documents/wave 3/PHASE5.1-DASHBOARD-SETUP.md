@@ -11,12 +11,12 @@
 
 Register your project as an official MOCA credential issuer and verifier in the AIR Kit Dashboard. This establishes your project's identity in the MOCA ecosystem and unlocks gas sponsorship.
 
-**Why This Phase**: Without official Issuer DIDs and schemas, your credentials won't be recognized by the MOCA ecosystem. This is the foundation for true integration.
+**Why This Phase**: Without official Issuer DID and schemas, your credentials won't be recognized by the MOCA ecosystem. This is the foundation for true integration.
 
 **What You'll Get**:
-- ✅ 3 Official Issuer DIDs (Bank, Employment, CEX)
+- ✅ 1 Official Issuer DID (Credo Protocol) - **Note**: Each partner account gets 1 Issuer DID per MOCA documentation
 - ✅ 1 Verifier DID for credit score oracle
-- ✅ 10 Published credential schemas
+- ✅ 10 Published credential schemas (differentiated by type, not issuer)
 - ✅ 10 Verifier programs
 - ✅ Gas sponsorship enabled (paymaster)
 - ✅ Partner secret for backend JWT
@@ -28,18 +28,18 @@ Register your project as an official MOCA credential issuer and verifier in the 
 By the end of this phase, you'll have:
 
 ```yaml
-Issuers:
-  - Bank Balance Issuer (DID: did:moca:...)
-  - Employment Issuer (DID: did:moca:...)
-  - CEX History Issuer (DID: did:moca:...)
+Issuer:
+  - Credo Protocol (DID: did:air:id:test:... - from General Settings)
+    Issues all 10 credential types with clear schema differentiation
 
 Verifier:
-  - Credo Protocol (DID: did:moca:...)
+  - Credo Protocol (DID: did:key:... - from General Settings)
 
-Schemas:
+Schemas (all issued by Credo Protocol):
   - 4 Bank Balance schemas (High/Medium/Low/Minimal)
-  - 4 Income Range schemas (High/Medium/Low/Minimal)
-  - 2 Legacy schemas (CEX/Employment)
+  - 4 Income Range schemas (High/Medium/Low/Minimal)  
+  - 1 CEX History schema
+  - 1 Employment Status schema
 
 Verifier Programs:
   - 10 programs (one per schema)
@@ -49,6 +49,8 @@ Gas Sponsorship:
   - Policy configured
   - Wallet funded
 ```
+
+**Architecture Note**: This follows MOCA's standard model where Credo Protocol acts as a credential aggregator (like Plaid or Civic), issuing verifiable credentials for various data types under one trusted issuer identity.
 
 ---
 
@@ -64,187 +66,95 @@ Gas Sponsorship:
 4. You should see your existing partner account
 
 **Verify Your Partner ID**:
-- Go to Settings → API Keys
+- Go to **Account → General**
 - You should see your Partner ID (already in `.env.local`)
-- If you don't have one, click "Create Partner Account"
 
 **Save for Reference**:
 ```bash
 PARTNER_ID=[your-existing-partner-id]
 ```
 
+**Status Check**: ✅ Dashboard accessed, Partner ID confirmed
+
 ---
 
-### Step 2: Register Issuer #1 - Bank Balance (15 min)
+### Step 2: Verify Your Issuer DID & Verifier DID (5 min)
 
-**Dashboard Path**: Credentials → Issuers → Create New Issuer
+**Dashboard Path**: Account → General
 
-#### Configuration
+According to [MOCA's official documentation](https://docs.moca.network/airkit/airkit-dashboard), each partner account automatically gets **1 Issuer DID** and **1 Verifier DID** upon account creation.
+
+#### Locate Your DIDs
+
+On the **General Settings** page, you'll see:
 
 ```yaml
-Issuer Name: Credo Bank Balance Issuer
-Description: Issues privacy-preserving bank balance credentials in 4 bucketed ranges (High: $10k+, Medium: $5k-$10k, Low: $1k-$5k, Minimal: <$1k). Credentials prove financial stability without revealing exact amounts.
-Category: Financial Services
-Type: Automated Issuer
-Trust Level: Sandbox (request Verified after testing)
-Contact Email: [your-email]
-Website: https://credo-protocol.vercel.app
-Logo URL: [optional - can add later]
+Partner ID: 954fe820-050d-49fb-b22e-884922aa6cef
+Issuer DID: did:air:id:test:4P3gyKQFs7SYu1XBDirLU7WhJqRgDl
+Verifier DID: did:key:81eGFbL7uQQFjvbTMAyQv4XtzTv7wJJLpe
+Name: AIR Partner e6ada70dcb524d9ba15c9f5080c0cf6f
+Website URL: https://air3.com
 ```
 
-#### Steps
-
-1. Click **"Create New Issuer"** button
-2. Fill in all fields (copy from configuration above)
-3. Click **"Submit"**
-4. Wait for DID generation (5-10 seconds)
-5. **IMPORTANT**: Copy the generated DID immediately
-
-**Save to Notes** (you'll add to backend `.env` later):
+**Copy both DIDs to your notes**:
 ```bash
-BANK_ISSUER_DID=did:moca:...[your-generated-did]
+# From General Settings
+ISSUER_DID=did:air:id:test:4P3gyKQFs7SYu1XBDirLU7WhJqRgDl
+VERIFIER_DID=did:key:81eGFbL7uQQFjvbTMAyQv4XtzTv7wJJLpe
 ```
 
-#### Top Up Fee Wallet
+**Important**: You'll use this **ONE Issuer DID** for all 10 credential schemas. Each schema will have a unique name and structure to differentiate credential types (Bank Balance, Income, Employment, CEX History).
 
-1. On the issuer details page, find "Fee Wallet"
-2. Copy the wallet address
+#### Top Up Fee Wallet (Issuer)
+
+1. Navigate to **Issuer → Fee Wallet** in the left sidebar
+2. Copy the wallet address displayed
 3. Open [Moca Devnet Faucet](https://devnet-scan.mocachain.org/faucet)
 4. Paste wallet address
-5. Request 100 test MOCA
+5. Request **100 test MOCA**
 6. Confirm transaction
-7. Return to dashboard - balance should update
+7. Return to dashboard - balance should update to ~100 MOCA
 
-**Status Check**: ✅ Bank Issuer DID created and funded
+#### Top Up Fee Wallet (Verifier)
+
+1. Navigate to **Verifier → Fee Wallet** in the left sidebar
+2. Copy the wallet address displayed
+3. Use faucet to send **100 test MOCA**
+4. Confirm balance updated to ~100 MOCA
+
+**Status Check**: ✅ Issuer DID and Verifier DID confirmed and wallets funded
 
 ---
 
-### Step 3: Register Issuer #2 - Employment/Income (15 min)
+### Step 3: Update General Settings (Optional, 5 min)
 
-**Dashboard Path**: Credentials → Issuers → Create New Issuer
+**Dashboard Path**: Account → General
 
-#### Configuration
+You can optionally update your partner account information to better reflect Credo Protocol:
 
 ```yaml
-Issuer Name: Credo Employment Issuer
-Description: Issues income range credentials without revealing exact salary (High: $8k+/mo, Medium: $5k-$8k/mo, Low: $3k-$5k/mo, Minimal: <$3k/mo). Also issues proof of employment credentials.
-Category: Employment & Identity
-Type: Automated Issuer
-Trust Level: Sandbox
-Contact Email: [your-email]
-Website: https://credo-protocol.vercel.app
-Logo URL: [optional]
+Name: Credo Protocol
+Website URL: https://credo-protocol.vercel.app
+Logo URL: [your-logo-url if you have one]
+JWKS URL: [leave empty for now - we'll handle JWT in backend]
 ```
 
-#### Steps
+Click **"Save"** to update.
 
-1. Click **"Create New Issuer"**
-2. Fill in all fields
-3. Submit and wait for DID
-4. **Copy the DID**
-
-**Save to Notes**:
-```bash
-EMPLOYMENT_ISSUER_DID=did:moca:...[your-generated-did]
-```
-
-#### Top Up Fee Wallet
-
-1. Copy fee wallet address from issuer page
-2. Use faucet to send 100 test MOCA
-3. Confirm balance updated
-
-**Status Check**: ✅ Employment Issuer DID created and funded
+**Status Check**: ✅ General settings updated (optional)
 
 ---
 
-### Step 4: Register Issuer #3 - CEX History (15 min)
+### Step 4: Create Credential Schemas (45 min)
 
-**Dashboard Path**: Credentials → Issuers → Create New Issuer
+**Dashboard Path**: Issuer → Schemas (in left sidebar)
 
-#### Configuration
+You need to create **10 schemas total**. All schemas will use your **single Issuer DID** from Step 2. They're differentiated by their names, descriptions, and credential subject properties.
 
-```yaml
-Issuer Name: Credo CEX History Issuer
-Description: Issues exchange trading history credentials proving active participation in cryptocurrency markets. Verifies user has trading history on centralized exchanges.
-Category: Financial Services
-Type: Automated Issuer
-Trust Level: Sandbox
-Contact Email: [your-email]
-Website: https://credo-protocol.vercel.app
-Logo URL: [optional]
+**Important**: For all schemas below, replace `[PASTE YOUR ISSUER_DID HERE]` with your actual Issuer DID from Step 2:
 ```
-
-#### Steps
-
-1. Click **"Create New Issuer"**
-2. Fill in all fields
-3. Submit and wait for DID
-4. **Copy the DID**
-
-**Save to Notes**:
-```bash
-CEX_ISSUER_DID=did:moca:...[your-generated-did]
+did:air:id:test:4P3gyKQFs7SYu1XBDirLU7WhJqRgDl
 ```
-
-#### Top Up Fee Wallet
-
-1. Copy fee wallet address
-2. Use faucet to send 100 test MOCA
-3. Confirm balance updated
-
-**Status Check**: ✅ CEX Issuer DID created and funded
-
----
-
-### Step 5: Register Verifier (15 min)
-
-**Dashboard Path**: Credentials → Verifiers → Create New Verifier
-
-#### Configuration
-
-```yaml
-Verifier Name: Credo Protocol
-Description: Verifies credentials for credit score calculation in undercollateralized lending. Automated on-chain verification via CreditScoreOracle smart contract.
-Purpose: Credit Scoring & DeFi Lending
-Verification Method: On-Chain Smart Contract
-Smart Contract: [Your CreditScoreOracle address]
-Contact Email: [your-email]
-Website: https://credo-protocol.vercel.app
-Logo URL: [optional]
-```
-
-#### Steps
-
-1. Click **"Create New Verifier"**
-2. Fill in all fields
-3. For "Smart Contract" field, use your deployed oracle address:
-   ```
-   0x82Adc3540672eA15C2B9fF9dFCf01BF8d81F2Cd2
-   ```
-4. Submit and wait for DID
-5. **Copy the Verifier DID**
-
-**Save to Notes**:
-```bash
-VERIFIER_DID=did:moca:...[your-generated-did]
-```
-
-#### Top Up Verifier Fee Wallet
-
-1. Copy verifier fee wallet address
-2. Use faucet to send 100 test MOCA
-3. Confirm balance updated
-
-**Status Check**: ✅ Verifier DID created and funded
-
----
-
-### Step 6: Create Credential Schemas (45 min)
-
-**Dashboard Path**: Credentials → Schemas → Create Schema
-
-You need to create **10 schemas total**. I'll provide detailed templates for the first few, then a checklist for the rest.
 
 ---
 
@@ -256,11 +166,11 @@ You need to create **10 schemas total**. I'll provide detailed templates for the
 {
   "schemaName": "Credo Bank Balance - High",
   "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves 30-day average bank balance of $10,000 or more without revealing exact amount. Privacy-preserving bucketed credential.",
+  "schemaDescription": "Proves 30-day average bank balance of $10,000 or more without revealing exact amount. Privacy-preserving bucketed credential issued by Credo Protocol.",
   "schemaType": "BankBalance",
   "category": "Financial",
   "privacyLevel": "Bucketed",
-  "issuerDid": "[PASTE YOUR BANK_ISSUER_DID HERE]",
+  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
   "credentialSubject": {
     "type": "object",
     "properties": {
@@ -300,12 +210,12 @@ You need to create **10 schemas total**. I'll provide detailed templates for the
 ```
 
 **Steps**:
-1. Click **"Create Schema"**
+1. Click **"Create Schema"** (or "+ New Schema" button)
 2. Copy the JSON above
-3. Replace `[PASTE YOUR BANK_ISSUER_DID HERE]` with your actual Bank Issuer DID
+3. Replace `[PASTE YOUR ISSUER_DID HERE]` with your actual Issuer DID from Step 2
 4. Paste into schema editor
 5. Click **"Validate"** to check JSON syntax
-6. Click **"Submit"**
+6. Click **"Submit"** or **"Publish"**
 7. **Copy the generated Schema ID**
 
 **Save to Notes**:
@@ -321,11 +231,11 @@ SCHEMA_BANK_HIGH=schema:moca:...[generated-id]
 {
   "schemaName": "Credo Bank Balance - Medium",
   "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves 30-day average bank balance of $5,000-$10,000 without revealing exact amount.",
+  "schemaDescription": "Proves 30-day average bank balance of $5,000-$10,000 without revealing exact amount. Issued by Credo Protocol.",
   "schemaType": "BankBalance",
   "category": "Financial",
   "privacyLevel": "Bucketed",
-  "issuerDid": "[PASTE YOUR BANK_ISSUER_DID HERE]",
+  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
   "credentialSubject": {
     "type": "object",
     "properties": {
@@ -368,11 +278,11 @@ SCHEMA_BANK_HIGH=schema:moca:...[generated-id]
 {
   "schemaName": "Credo Bank Balance - Low",
   "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves 30-day average bank balance of $1,000-$5,000 without revealing exact amount.",
+  "schemaDescription": "Proves 30-day average bank balance of $1,000-$5,000 without revealing exact amount. Issued by Credo Protocol.",
   "schemaType": "BankBalance",
   "category": "Financial",
   "privacyLevel": "Bucketed",
-  "issuerDid": "[PASTE YOUR BANK_ISSUER_DID HERE]",
+  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
   "credentialSubject": {
     "type": "object",
     "properties": {
@@ -398,11 +308,11 @@ SCHEMA_BANK_HIGH=schema:moca:...[generated-id]
 {
   "schemaName": "Credo Bank Balance - Minimal",
   "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves 30-day average bank balance under $1,000.",
+  "schemaDescription": "Proves 30-day average bank balance under $1,000. Issued by Credo Protocol.",
   "schemaType": "BankBalance",
   "category": "Financial",
   "privacyLevel": "Bucketed",
-  "issuerDid": "[PASTE YOUR BANK_ISSUER_DID HERE]",
+  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
   "credentialSubject": {
     "type": "object",
     "properties": {
@@ -424,8 +334,9 @@ SCHEMA_BANK_HIGH=schema:moca:...[generated-id]
 
 #### Schemas 5-8: Income Range
 
-Follow the same pattern, but replace:
-- `issuerDid`: Use `EMPLOYMENT_ISSUER_DID`
+Follow the same pattern as Bank Balance schemas, but with these changes:
+- `issuerDid`: Use your **same ISSUER_DID** (Credo Protocol)
+- `schemaType`: Change to `"IncomeRange"`
 - `balanceBucket` → `incomeBucket`
 - `bucketRange`: Use income ranges
 - `dataSource`: Use "Mock Employer"
@@ -448,11 +359,11 @@ Follow the same pattern, but replace:
 {
   "schemaName": "Credo CEX Trading History",
   "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves active trading history on centralized exchanges.",
+  "schemaDescription": "Proves active trading history on centralized exchanges. Issued by Credo Protocol.",
   "schemaType": "ExchangeHistory",
   "category": "Financial",
   "privacyLevel": "Metadata",
-  "issuerDid": "[PASTE YOUR CEX_ISSUER_DID HERE]",
+  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
   "credentialSubject": {
     "type": "object",
     "properties": {
@@ -466,7 +377,7 @@ Follow the same pattern, but replace:
 }
 ```
 
-**Steps**: Use CEX_ISSUER_DID, save as `SCHEMA_CEX_HISTORY`
+**Steps**: Use your ISSUER_DID, save as `SCHEMA_CEX_HISTORY`
 
 ---
 
@@ -476,11 +387,11 @@ Follow the same pattern, but replace:
 {
   "schemaName": "Credo Proof of Employment",
   "schemaVersion": "1.0.0",
-  "schemaDescription": "Proves current employment status without revealing employer details.",
+  "schemaDescription": "Proves current employment status without revealing employer details. Issued by Credo Protocol.",
   "schemaType": "Employment",
   "category": "Employment",
   "privacyLevel": "Basic",
-  "issuerDid": "[PASTE YOUR EMPLOYMENT_ISSUER_DID HERE]",
+  "issuerDid": "[PASTE YOUR ISSUER_DID HERE]",
   "credentialSubject": {
     "type": "object",
     "properties": {
@@ -494,35 +405,37 @@ Follow the same pattern, but replace:
 }
 ```
 
-**Steps**: Use EMPLOYMENT_ISSUER_DID, save as `SCHEMA_EMPLOYMENT`
+**Steps**: Use your ISSUER_DID, save as `SCHEMA_EMPLOYMENT`
 
 ---
 
 **Schema Creation Checklist**:
 
 ```markdown
-Bank Balance Schemas (Use BANK_ISSUER_DID):
+All schemas use your single ISSUER_DID (did:air:id:test:4P3gyKQFs7SYu1XBDirLU7WhJqRgDl)
+
+Bank Balance Schemas:
 - [ ] SCHEMA_BANK_HIGH ($10k+, weight: 150)
 - [ ] SCHEMA_BANK_MEDIUM ($5k-$10k, weight: 120)
 - [ ] SCHEMA_BANK_LOW ($1k-$5k, weight: 80)
 - [ ] SCHEMA_BANK_MINIMAL (<$1k, weight: 40)
 
-Income Range Schemas (Use EMPLOYMENT_ISSUER_DID):
+Income Range Schemas:
 - [ ] SCHEMA_INCOME_HIGH ($8k+/mo, weight: 180)
 - [ ] SCHEMA_INCOME_MEDIUM ($5k-$8k/mo, weight: 140)
 - [ ] SCHEMA_INCOME_LOW ($3k-$5k/mo, weight: 100)
 - [ ] SCHEMA_INCOME_MINIMAL (<$3k/mo, weight: 50)
 
-Legacy Schemas:
-- [ ] SCHEMA_CEX_HISTORY (Use CEX_ISSUER_DID, weight: 80)
-- [ ] SCHEMA_EMPLOYMENT (Use EMPLOYMENT_ISSUER_DID, weight: 70)
+Other Schemas:
+- [ ] SCHEMA_CEX_HISTORY (weight: 80)
+- [ ] SCHEMA_EMPLOYMENT (weight: 70)
 ```
 
 **Status Check**: ✅ All 10 schemas created and Schema IDs saved
 
 ---
 
-### Step 7: Create Verifier Programs (30 min)
+### Step 5: Create Verifier Programs (30 min)
 
 **Dashboard Path**: Credentials → Verifier Programs → Create Program
 
@@ -596,7 +509,7 @@ VERIFIER_PROGRAM_EMPLOYMENT=[program-id]
 
 ---
 
-### Step 8: Enable Gas Sponsorship (20 min)
+### Step 6: Enable Gas Sponsorship (20 min)
 
 **Dashboard Path**: Settings → Gas Sponsorship → Configure Paymaster
 
@@ -680,7 +593,7 @@ PAYMASTER_POLICY_ID=[policy-id]
 
 ---
 
-### Step 9: Generate Partner Secret (10 min)
+### Step 7: Generate Partner Secret (10 min)
 
 **Dashboard Path**: Settings → API Keys → Create Secret
 
@@ -724,14 +637,10 @@ Before proceeding to Phase 5.2, verify:
 - [ ] Accessed AIR Kit Dashboard successfully
 - [ ] Partner ID confirmed
 
-### Issuers
-- [ ] Bank Balance Issuer DID created
-- [ ] Employment Issuer DID created
-- [ ] CEX History Issuer DID created
-- [ ] All 3 issuer fee wallets funded (100 MOCA each)
-
-### Verifier
-- [ ] Verifier DID created
+### Issuer & Verifier
+- [ ] Issuer DID confirmed (from General Settings)
+- [ ] Verifier DID confirmed (from General Settings)
+- [ ] Issuer fee wallet funded (100 MOCA)
 - [ ] Verifier fee wallet funded (100 MOCA)
 
 ### Schemas
@@ -762,48 +671,46 @@ Before proceeding to Phase 5.2, verify:
 
 ```bash
 # Partner Authentication
-PARTNER_ID=[from-dashboard]
-PARTNER_SECRET=[generated-secret]
+PARTNER_ID=[from-step-1]
+PARTNER_SECRET=[from-step-7]
 
-# Issuer DIDs
-BANK_ISSUER_DID=did:moca:...[from-step-2]
-EMPLOYMENT_ISSUER_DID=did:moca:...[from-step-3]
-CEX_ISSUER_DID=did:moca:...[from-step-4]
+# Issuer & Verifier DIDs (from General Settings - Step 2)
+ISSUER_DID=did:air:id:test:...[from-step-2]
+VERIFIER_DID=did:key:...[from-step-2]
 
-# Verifier
-VERIFIER_DID=did:moca:...[from-step-5]
+# Schema IDs - Bank Balance (from Step 4)
+SCHEMA_BANK_HIGH=schema:moca:...[from-step-4]
+SCHEMA_BANK_MEDIUM=schema:moca:...[from-step-4]
+SCHEMA_BANK_LOW=schema:moca:...[from-step-4]
+SCHEMA_BANK_MINIMAL=schema:moca:...[from-step-4]
 
-# Schema IDs - Bank Balance
-SCHEMA_BANK_HIGH=schema:moca:...[from-step-6]
-SCHEMA_BANK_MEDIUM=schema:moca:...[from-step-6]
-SCHEMA_BANK_LOW=schema:moca:...[from-step-6]
-SCHEMA_BANK_MINIMAL=schema:moca:...[from-step-6]
+# Schema IDs - Income (from Step 4)
+SCHEMA_INCOME_HIGH=schema:moca:...[from-step-4]
+SCHEMA_INCOME_MEDIUM=schema:moca:...[from-step-4]
+SCHEMA_INCOME_LOW=schema:moca:...[from-step-4]
+SCHEMA_INCOME_MINIMAL=schema:moca:...[from-step-4]
 
-# Schema IDs - Income
-SCHEMA_INCOME_HIGH=schema:moca:...[from-step-6]
-SCHEMA_INCOME_MEDIUM=schema:moca:...[from-step-6]
-SCHEMA_INCOME_LOW=schema:moca:...[from-step-6]
-SCHEMA_INCOME_MINIMAL=schema:moca:...[from-step-6]
+# Schema IDs - Other (from Step 4)
+SCHEMA_CEX_HISTORY=schema:moca:...[from-step-4]
+SCHEMA_EMPLOYMENT=schema:moca:...[from-step-4]
 
-# Schema IDs - Legacy
-SCHEMA_CEX_HISTORY=schema:moca:...[from-step-6]
-SCHEMA_EMPLOYMENT=schema:moca:...[from-step-6]
+# Verifier Program IDs (from Step 5)
+VERIFIER_PROGRAM_BANK_HIGH=[from-step-5]
+VERIFIER_PROGRAM_BANK_MEDIUM=[from-step-5]
+VERIFIER_PROGRAM_BANK_LOW=[from-step-5]
+VERIFIER_PROGRAM_BANK_MINIMAL=[from-step-5]
+VERIFIER_PROGRAM_INCOME_HIGH=[from-step-5]
+VERIFIER_PROGRAM_INCOME_MEDIUM=[from-step-5]
+VERIFIER_PROGRAM_INCOME_LOW=[from-step-5]
+VERIFIER_PROGRAM_INCOME_MINIMAL=[from-step-5]
+VERIFIER_PROGRAM_CEX_HISTORY=[from-step-5]
+VERIFIER_PROGRAM_EMPLOYMENT=[from-step-5]
 
-# Verifier Program IDs
-VERIFIER_PROGRAM_BANK_HIGH=[from-step-7]
-VERIFIER_PROGRAM_BANK_MEDIUM=[from-step-7]
-VERIFIER_PROGRAM_BANK_LOW=[from-step-7]
-VERIFIER_PROGRAM_BANK_MINIMAL=[from-step-7]
-VERIFIER_PROGRAM_INCOME_HIGH=[from-step-7]
-VERIFIER_PROGRAM_INCOME_MEDIUM=[from-step-7]
-VERIFIER_PROGRAM_INCOME_LOW=[from-step-7]
-VERIFIER_PROGRAM_INCOME_MINIMAL=[from-step-7]
-VERIFIER_PROGRAM_CEX_HISTORY=[from-step-7]
-VERIFIER_PROGRAM_EMPLOYMENT=[from-step-7]
-
-# Gas Sponsorship
-PAYMASTER_POLICY_ID=[from-step-8]
+# Gas Sponsorship (from Step 6)
+PAYMASTER_POLICY_ID=[from-step-6]
 ```
+
+**Note**: All 10 schemas use the **same Issuer DID** (Credo Protocol). Schemas are differentiated by their names, types, and credential subject properties.
 
 ---
 
@@ -811,13 +718,15 @@ PAYMASTER_POLICY_ID=[from-step-8]
 
 After Phase 5.1, you now have:
 
-✅ **Official MOCA Identity**: 3 Issuer DIDs + 1 Verifier DID  
-✅ **Public Schema Registry**: 10 published, discoverable schemas  
+✅ **Official MOCA Identity**: 1 Issuer DID (Credo Protocol) + 1 Verifier DID  
+✅ **Public Schema Registry**: 10 published, discoverable schemas (all issued by Credo Protocol)  
 ✅ **Verification Infrastructure**: 10 verifier programs  
 ✅ **Gas Sponsorship**: Paymaster enabled and funded  
 ✅ **Backend Authentication**: Partner secret for JWT generation  
 
 **Your project is now officially registered in the MOCA ecosystem!** 🎊
+
+**Architecture**: Credo Protocol acts as a trusted credential aggregator (similar to Plaid or Civic), issuing verifiable credentials for various financial and identity data types under one unified issuer identity. This is the standard MOCA model and aligns with official documentation.
 
 ---
 
