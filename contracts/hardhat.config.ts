@@ -54,5 +54,24 @@ module.exports = {
     outputFile: "gas-report.txt",
     noColors: true,
   },
+  // Etherscan verification configuration for Moca Chain
+  etherscan: {
+    apiKey: {
+      "moca-devnet": process.env.MOCA_SCAN_API_KEY || "no-api-key-needed" // Moca may not require API key
+    },
+    customChains: [
+      {
+        network: "moca-devnet",
+        chainId: 5151,
+        urls: {
+          apiURL: "https://devnet-scan.mocachain.org/api",
+          browserURL: "https://devnet-scan.mocachain.org"
+        }
+      }
+    ]
+  },
+  sourcify: {
+    enabled: false // Disable Sourcify, use Etherscan API
+  }
 };
 
