@@ -37,6 +37,7 @@ router.get('/types', async (req, res) => {
         category: 'Financial',
         issuerDid: process.env.BANK_ISSUER_DID,
         schemaId: process.env.SCHEMA_BANK_HIGH,
+        programId: process.env.PROGRAM_BANK_HIGH,
         weight: 150,
         bucket: 'BANK_BALANCE_HIGH',
         range: '$10,000+',
@@ -53,6 +54,7 @@ router.get('/types', async (req, res) => {
         category: 'Financial',
         issuerDid: process.env.BANK_ISSUER_DID,
         schemaId: process.env.SCHEMA_BANK_MEDIUM,
+        programId: process.env.PROGRAM_BANK_MEDIUM,
         weight: 120,
         bucket: 'BANK_BALANCE_MEDIUM',
         range: '$5,000 - $10,000',
@@ -69,6 +71,7 @@ router.get('/types', async (req, res) => {
         category: 'Financial',
         issuerDid: process.env.BANK_ISSUER_DID,
         schemaId: process.env.SCHEMA_BANK_LOW,
+        programId: process.env.PROGRAM_BANK_LOW,
         weight: 80,
         bucket: 'BANK_BALANCE_LOW',
         range: '$1,000 - $5,000',
@@ -85,6 +88,7 @@ router.get('/types', async (req, res) => {
         category: 'Financial',
         issuerDid: process.env.BANK_ISSUER_DID,
         schemaId: process.env.SCHEMA_BANK_MINIMAL,
+        programId: process.env.PROGRAM_BANK_MINIMAL,
         weight: 40,
         bucket: 'BANK_BALANCE_MINIMAL',
         range: 'Under $1,000',
@@ -105,6 +109,7 @@ router.get('/types', async (req, res) => {
         category: 'Employment',
         issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
         schemaId: process.env.SCHEMA_INCOME_HIGH,
+        programId: process.env.PROGRAM_INCOME_HIGH,
         weight: 180,
         bucket: 'INCOME_HIGH',
         range: '$8,000+ per month',
@@ -121,6 +126,7 @@ router.get('/types', async (req, res) => {
         category: 'Employment',
         issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
         schemaId: process.env.SCHEMA_INCOME_MEDIUM,
+        programId: process.env.PROGRAM_INCOME_MEDIUM,
         weight: 140,
         bucket: 'INCOME_MEDIUM',
         range: '$5,000 - $8,000 per month',
@@ -137,6 +143,7 @@ router.get('/types', async (req, res) => {
         category: 'Employment',
         issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
         schemaId: process.env.SCHEMA_INCOME_LOW,
+        programId: process.env.PROGRAM_INCOME_LOW,
         weight: 100,
         bucket: 'INCOME_LOW',
         range: '$3,000 - $5,000 per month',
@@ -153,6 +160,7 @@ router.get('/types', async (req, res) => {
         category: 'Employment',
         issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
         schemaId: process.env.SCHEMA_INCOME_MINIMAL,
+        programId: process.env.PROGRAM_INCOME_MINIMAL,
         weight: 50,
         bucket: 'INCOME_MINIMAL',
         range: 'Under $3,000 per month',
@@ -173,6 +181,7 @@ router.get('/types', async (req, res) => {
         category: 'Financial',
         issuerDid: process.env.CEX_ISSUER_DID,
         schemaId: process.env.SCHEMA_CEX_HISTORY,
+        programId: process.env.PROGRAM_CEX_HISTORY,
         weight: 80,
         bucket: 'CEX_HISTORY',
         description: 'Proves active trading history on centralized exchanges',
@@ -188,6 +197,7 @@ router.get('/types', async (req, res) => {
         category: 'Employment',
         issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
         schemaId: process.env.SCHEMA_EMPLOYMENT,
+        programId: process.env.PROGRAM_EMPLOYMENT,
         weight: 70,
         bucket: 'EMPLOYMENT',
         description: 'Proves current employment status without revealing employer',
@@ -200,7 +210,7 @@ router.get('/types', async (req, res) => {
     
     // Filter out any with missing env vars
     const validCredentials = credentialTypes.filter(c => 
-      c.issuerDid && c.schemaId
+      c.issuerDid && c.schemaId && c.programId
     );
     
     if (validCredentials.length < credentialTypes.length) {
@@ -251,6 +261,7 @@ router.post('/prepare', async (req, res) => {
       'bank-balance-high': {
         issuerDid: process.env.BANK_ISSUER_DID,
         schemaId: process.env.SCHEMA_BANK_HIGH,
+        programId: process.env.PROGRAM_BANK_HIGH,
         bucket: 'BANK_BALANCE_HIGH',
         range: '$10,000+',
         weight: 150
@@ -258,6 +269,7 @@ router.post('/prepare', async (req, res) => {
       'bank-balance-medium': {
         issuerDid: process.env.BANK_ISSUER_DID,
         schemaId: process.env.SCHEMA_BANK_MEDIUM,
+        programId: process.env.PROGRAM_BANK_MEDIUM,
         bucket: 'BANK_BALANCE_MEDIUM',
         range: '$5,000 - $10,000',
         weight: 120
@@ -265,6 +277,7 @@ router.post('/prepare', async (req, res) => {
       'bank-balance-low': {
         issuerDid: process.env.BANK_ISSUER_DID,
         schemaId: process.env.SCHEMA_BANK_LOW,
+        programId: process.env.PROGRAM_BANK_LOW,
         bucket: 'BANK_BALANCE_LOW',
         range: '$1,000 - $5,000',
         weight: 80
@@ -272,6 +285,7 @@ router.post('/prepare', async (req, res) => {
       'bank-balance-minimal': {
         issuerDid: process.env.BANK_ISSUER_DID,
         schemaId: process.env.SCHEMA_BANK_MINIMAL,
+        programId: process.env.PROGRAM_BANK_MINIMAL,
         bucket: 'BANK_BALANCE_MINIMAL',
         range: 'Under $1,000',
         weight: 40
@@ -279,6 +293,7 @@ router.post('/prepare', async (req, res) => {
       'income-high': {
         issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
         schemaId: process.env.SCHEMA_INCOME_HIGH,
+        programId: process.env.PROGRAM_INCOME_HIGH,
         bucket: 'INCOME_HIGH',
         range: '$8,000+ per month',
         weight: 180
@@ -286,6 +301,7 @@ router.post('/prepare', async (req, res) => {
       'income-medium': {
         issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
         schemaId: process.env.SCHEMA_INCOME_MEDIUM,
+        programId: process.env.PROGRAM_INCOME_MEDIUM,
         bucket: 'INCOME_MEDIUM',
         range: '$5,000 - $8,000 per month',
         weight: 140
@@ -293,6 +309,7 @@ router.post('/prepare', async (req, res) => {
       'income-low': {
         issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
         schemaId: process.env.SCHEMA_INCOME_LOW,
+        programId: process.env.PROGRAM_INCOME_LOW,
         bucket: 'INCOME_LOW',
         range: '$3,000 - $5,000 per month',
         weight: 100
@@ -300,6 +317,7 @@ router.post('/prepare', async (req, res) => {
       'income-minimal': {
         issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
         schemaId: process.env.SCHEMA_INCOME_MINIMAL,
+        programId: process.env.PROGRAM_INCOME_MINIMAL,
         bucket: 'INCOME_MINIMAL',
         range: 'Under $3,000 per month',
         weight: 50
@@ -307,12 +325,14 @@ router.post('/prepare', async (req, res) => {
       'cex-history': {
         issuerDid: process.env.CEX_ISSUER_DID,
         schemaId: process.env.SCHEMA_CEX_HISTORY,
+        programId: process.env.PROGRAM_CEX_HISTORY,
         bucket: 'CEX_HISTORY',
         weight: 80
       },
       'employment': {
         issuerDid: process.env.EMPLOYMENT_ISSUER_DID,
         schemaId: process.env.SCHEMA_EMPLOYMENT,
+        programId: process.env.PROGRAM_EMPLOYMENT,
         bucket: 'EMPLOYMENT',
         weight: 70
       }
@@ -327,10 +347,10 @@ router.post('/prepare', async (req, res) => {
     }
     
     // Verify env vars exist
-    if (!credentialMeta.issuerDid || !credentialMeta.schemaId) {
+    if (!credentialMeta.issuerDid || !credentialMeta.schemaId || !credentialMeta.programId) {
       return res.status(500).json({
         success: false,
-        error: `Credential type ${credentialType} not properly configured (missing DID or schema)`
+        error: `Credential type ${credentialType} not properly configured (missing DID, schema, or program ID)`
       });
     }
     
@@ -348,20 +368,38 @@ router.post('/prepare', async (req, res) => {
       success: true,
       authToken,
       issuerDid: credentialMeta.issuerDid,
-      schemaId: credentialMeta.schemaId,
+      schemaId: credentialMeta.schemaId,  // Keep for reference
+      programId: credentialMeta.programId,  // THIS is what AIR Kit needs as credentialId!
       credentialSubject: {
-        // Data that will be stored in credential
-        credentialType: credentialMeta.bucket,
-        bucket: credentialMeta.bucket,
-        bucketRange: credentialMeta.range,
-        weight: credentialMeta.weight,
-        verifiedAt: Math.floor(Date.now() / 1000),
-        dataSource: credentialType.includes('bank') ? 'Plaid API (simulated)' : 
-                     credentialType.includes('income') ? 'Mock Employer' :
-                     credentialType.includes('cex') ? 'Mock Exchange' : 'Mock Provider',
-        period: credentialType.includes('bank') ? '30 days' : 
-                credentialType.includes('income') ? 'Monthly' : 'Current',
-        subject: userAddress
+        // Field names MUST match your schema exactly!
+        // Bank Balance schemas use: balanceBucket
+        // Income Range schemas use: incomeBucket
+        // DO NOT include 'id' - AIR Kit adds this automatically
+        ...(credentialType.includes('bank') ? {
+          balanceBucket: credentialMeta.bucket,
+          bucketRange: credentialMeta.range,
+          weight: credentialMeta.weight,
+          verifiedAt: Math.floor(Date.now() / 1000),
+          dataSource: 'Plaid API',
+          period: '30 days'
+        } : credentialType.includes('income') ? {
+          incomeBucket: credentialMeta.bucket,
+          bucketRange: credentialMeta.range,
+          weight: credentialMeta.weight,
+          verifiedAt: Math.floor(Date.now() / 1000),
+          dataSource: 'Employer Verification',
+          period: 'Monthly'
+        } : credentialType.includes('cex') ? {
+          tradingVolume: 'Active',
+          verifiedAt: Math.floor(Date.now() / 1000),
+          dataSource: 'CEX API',
+          weight: credentialMeta.weight
+        } : {
+          employmentStatus: 'Verified',
+          verifiedAt: Math.floor(Date.now() / 1000),
+          dataSource: 'Employer',
+          weight: credentialMeta.weight
+        })
       }
     });
     
