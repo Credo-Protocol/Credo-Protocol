@@ -275,11 +275,11 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
 
           {/* Step 2: Loading - AIR Kit Issuance (Phase 5.3) */}
           {(step === 'preparing' || step === 'issuing') && (
-            <div className="py-12 text-center space-y-4">
+            <div className="py-12 text-center space-y-6">
               <div className="flex justify-center">
                 <Loader2 className="h-12 w-12 animate-spin text-black" />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <div className="flex items-center justify-center gap-2">
                   {step === 'preparing' && <Lock className="h-4 w-4 text-black" />}
                   {step === 'issuing' && <FileText className="h-4 w-4 text-black" />}
@@ -288,25 +288,19 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
                   </p>
                 </div>
                 <div className="flex justify-center gap-2">
-                  <div className={`h-2 w-2 rounded-full ${step === 'preparing' ? 'bg-blue-500' : 'bg-gray-300'}`} />
-                  <div className={`h-2 w-2 rounded-full ${step === 'issuing' ? 'bg-blue-500' : 'bg-gray-300'}`} />
+                  <div className={`h-2 w-2 rounded-full ${step === 'preparing' ? 'bg-black' : 'bg-black/20'}`} />
+                  <div className={`h-2 w-2 rounded-full ${step === 'issuing' ? 'bg-black' : 'bg-black/20'}`} />
                 </div>
                 {step === 'issuing' && (
-                  <div className="mt-2 space-y-1">
+                  <div className="mt-4 space-y-2">
                     {process.env.NEXT_PUBLIC_PAYMASTER_POLICY_ID && (
-                      <div className="flex items-center justify-center gap-1">
-                        <Zap className="h-3 w-3 text-green-600" />
-                        <p className="text-xs text-green-600">
-                          Gas-sponsored - No MOCA tokens needed!
-                        </p>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-center gap-1">
-                      <Lock className="h-3 w-3 text-blue-600" />
-                      <p className="text-xs text-blue-600">
-                        Storing on MCSP (decentralized storage)
+                      <p className="text-xs text-black/60">
+                        Gas-sponsored - No MOCA tokens needed
                       </p>
-                    </div>
+                    )}
+                    <p className="text-xs text-black/60">
+                      Storing on MCSP (decentralized storage)
+                    </p>
                   </div>
                 )}
               </div>
@@ -316,14 +310,16 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
           {/* Step 3: Review Credential */}
           {step === 'review' && credentialData && (
             <div className="py-4 space-y-4">
-              <div className="p-4 rounded-xl border border-green-500/20 bg-green-50">
+              <div className="p-6 rounded-xl border border-black/10 bg-white">
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-sm text-green-900 font-medium">
+                  <div className="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-black">
                       Credential verified!
                     </p>
-                    <p className="text-xs text-green-700 mt-1">
+                    <p className="text-xs text-black/60 mt-1">
                       Ready to submit to blockchain
                     </p>
                   </div>
@@ -360,10 +356,10 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
                 </div>
                 {/* Phase 2: Show privacy note */}
                 {credentialData.credential.metadata?.privacyNote && (
-                  <div className="pt-2 border-t border-black/5">
-                    <div className="flex items-center gap-1">
-                      <Lock className="h-3 w-3 text-green-600" />
-                      <p className="text-xs text-green-600">
+                  <div className="pt-3 mt-3 border-t border-black/10">
+                    <div className="flex items-center gap-2">
+                      <Lock className="h-3 w-3 text-black/60" />
+                      <p className="text-xs text-black/60">
                         {credentialData.credential.metadata.privacyNote}
                       </p>
                     </div>

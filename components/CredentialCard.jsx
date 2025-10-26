@@ -1,5 +1,6 @@
 /**
  * CredentialCard Component - Phase 2 Upgrade
+ * Clean white/black/grey minimalist theme
  * 
  * Displays credential types with support for:
  * - Basic credentials (existing)
@@ -10,22 +11,22 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Sparkles, TrendingUp, CheckCircle2 } from 'lucide-react';
+import { Shield, TrendingUp, CheckCircle2 } from 'lucide-react';
 
 export default function CredentialCard({ credential, onRequest, isLoading, isSubmitted = false }) {
   // Check if this is a new Phase 2 credential (from /types endpoint)
   const isPhase2Format = credential.category !== undefined;
   
   return (
-    <Card className={`flex flex-col h-full transition-all ${
+    <Card className={`flex flex-col h-full transition-all duration-300 ${
       isSubmitted 
-        ? 'bg-green-50 border-green-200 opacity-75' 
-        : 'hover:shadow-lg'
+        ? 'bg-neutral-50 border-black/10 opacity-75' 
+        : 'border-black/10 bg-white hover:shadow-lg'
     }`}>
       <CardHeader>
         {/* Submitted Badge */}
         {isSubmitted && (
-          <Badge className="w-fit mb-2 bg-green-600 text-white">
+          <Badge className="w-fit mb-3 bg-green-600 text-white">
             <CheckCircle2 className="w-3 h-3 mr-1" />
             Already Submitted
           </Badge>
@@ -33,32 +34,23 @@ export default function CredentialCard({ credential, onRequest, isLoading, isSub
         
         <div className="flex justify-between items-start mb-2">
           <div className="flex items-center gap-2 flex-1">
-            <CardTitle className="text-xl">
+            <CardTitle className="text-xl text-black">
               {isPhase2Format ? credential.name : credential.name}
             </CardTitle>
-            {credential.new && !isSubmitted && (
-              <Sparkles className="w-4 h-4 text-yellow-500 flex-shrink-0" />
-            )}
           </div>
-          <Badge variant="secondary" className="ml-2">
+          <Badge className="ml-2 bg-black text-white">
             {isPhase2Format ? credential.weight : `+${credential.scoreWeight} pts`}
           </Badge>
         </div>
         
         {/* Category Badge for Phase 2 */}
         {credential.badge && (
-          <Badge 
-            className={`w-fit mb-2 ${
-              credential.badge === 'Privacy-First' 
-                ? 'bg-green-500 text-white' 
-                : 'bg-purple-500 text-white'
-            }`}
-          >
+          <Badge className="w-fit mb-2 bg-black text-white">
             {credential.badge}
           </Badge>
         )}
         
-        <CardDescription>{credential.description}</CardDescription>
+        <CardDescription className="text-black/60">{credential.description}</CardDescription>
       </CardHeader>
       
       <CardContent className="flex-1 space-y-3">
