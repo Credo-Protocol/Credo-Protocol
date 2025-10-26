@@ -4,17 +4,17 @@
  * Based on MOCA documentation:
  * https://docs.moca.network/airkit/usage/partner-authentication
  * 
- * Partner JWTs are used by frontend to authenticate with AIR Kit
- * when issuing or verifying credentials.
- * 
- * Flow:
- * 1. Frontend calls your backend: "Give me auth token"
- * 2. Backend generates JWT signed with Partner Secret
- * 3. Frontend passes JWT to airService.credential.issue()
- * 4. AIR Kit validates JWT and proceeds with credential issuance
+ * Uses RS256 with RSA key pair as required by MOCA:
+ * - Private key (private.key) for signing
+ * - Public key (public.key) exposed via JWKS endpoint
+ * - Kid (Key ID) header for key identification
+ * - AIR Kit validates using our JWKS URL
  */
 
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require('path');
+const { getKid } = require('./jwks');
 
 /**
  * Generate Partner JWT for credential issuance
@@ -50,19 +50,27 @@ function generatePartnerJWT(userId, email, scope = 'issue', expiresIn = 3600) {
   // JWT payload as per MOCA spec
   const payload = {
     partnerId: process.env.PARTNER_ID,
-    partnerUserId: userId,
-    email: email,
     scope: scope,
     iat: now,                  // Issued at
-    exp: now + expiresIn       // Expiration
+    exp: now + 300             // 5 minutes expiry (MOCA recommendation)
   };
   
-  // Sign with HS256 (required by MOCA)
-  const token = jwt.sign(payload, process.env.PARTNER_SECRET, {
-    algorithm: 'HS256'
+  // Load private key for RS256 signing
+  const privateKeyPath = path.join(__dirname, '../../private.key');
+  const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
+  
+  // Get consistent kid (Key ID) - must match JWKS
+  const kid = getKid();
+  
+  // Sign with RS256 (required by MOCA)
+  const token = jwt.sign(payload, privateKey, {
+    algorithm: 'RS256',
+    header: {
+      kid: kid
+    }
   });
   
-  console.log(`[JWT] Generated ${scope} token for user ${userId} (expires in ${expiresIn}s)`);
+  console.log(`[JWT] ✅ Generated ${scope} token (RS256, expires in 300s, kid: ${kid})`);
   return token;
 }
 
@@ -74,14 +82,18 @@ function generatePartnerJWT(userId, email, scope = 'issue', expiresIn = 3600) {
  */
 function verifyPartnerJWT(token) {
   try {
-    const decoded = jwt.verify(token, process.env.PARTNER_SECRET, {
-      algorithms: ['HS256']
+    // Load public key for verification
+    const publicKeyPath = path.join(__dirname, '../../public.key');
+    const publicKey = fs.readFileSync(publicKeyPath, 'utf8');
+    
+    const decoded = jwt.verify(token, publicKey, {
+      algorithms: ['RS256']
     });
     
-    console.log('[JWT] Token verified successfully');
+    console.log('[JWT] ✅ Token verified successfully');
     return { valid: true, payload: decoded };
   } catch (error) {
-    console.error('[JWT] Token verification failed:', error.message);
+    console.error('[JWT] ❌ Token verification failed:', error.message);
     return { valid: false, error: error.message };
   }
 }
