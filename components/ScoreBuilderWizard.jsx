@@ -288,7 +288,7 @@ export default function ScoreBuilderWizard({
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 flex-wrap mb-1">
                                             <p className="font-semibold text-black">{cred.name}</p>
-                                            {cred.new && <Badge className="bg-black text-white text-xs">New</Badge>}
+                                            {cred.new && <Badge className="bg-green-600 text-white text-xs">New</Badge>}
                                         </div>
                                         <div className="min-h-[24px] mb-2">
                                             {cred.badge && (
