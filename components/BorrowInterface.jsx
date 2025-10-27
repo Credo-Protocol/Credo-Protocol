@@ -243,6 +243,16 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
     setInputValue(value.toFixed(2));
   };
 
+  // Ensure caret starts at the end on mousedown (prevents initial left flicker)
+  const handleMouseDownInput = (e) => {
+    e.preventDefault();
+    if (inputRef.current) {
+      inputRef.current.focus({ preventScroll: true });
+      const length = inputRef.current.value.length;
+      inputRef.current.setSelectionRange(length, length);
+    }
+  };
+
   // Calculate required collateral based on borrow amount and collateral factor
   const requiredCollateral = (borrowAmount * collateralFactor) / 100;
 
@@ -316,6 +326,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
                   value={inputValue}
                   onKeyDown={handlePaymentInput}
                   onChange={() => {}} // Prevent default onChange
+                  onMouseDown={handleMouseDownInput}
                   onFocus={(e) => {
                     // Move cursor to the end when focused
                     const length = e.target.value.length;
