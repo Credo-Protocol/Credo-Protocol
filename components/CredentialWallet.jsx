@@ -251,19 +251,6 @@ export function CredentialWallet() {
             })}
           </div>
         )}
-
-        {/* Info footer */}
-        {credentials.length > 0 && (
-          <div className="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
-            <p className="text-xs text-blue-700 flex items-start gap-2">
-              <Lock className="h-4 w-4 flex-shrink-0 mt-0.5" />
-              <span>
-                <strong>Decentralized Storage:</strong> Your credentials are stored on MOCA Chain Storage Providers (MCSP), 
-                ensuring privacy and availability across the MOCA ecosystem.
-              </span>
-            </p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

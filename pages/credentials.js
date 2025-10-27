@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAirKit } from '@/hooks/useAirKit';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
+import { Lock, Database, Clock, Ban } from 'lucide-react';
 
 export default function CredentialsPage() {
   const router = useRouter();
@@ -111,8 +112,62 @@ export default function CredentialsPage() {
           </TabsList>
 
           {/* Wallet Tab */}
-          <TabsContent value="wallet">
+          <TabsContent value="wallet" className="space-y-6">
             <CredentialWallet />
+            
+            {/* Info Section */}
+            <div className="p-6 rounded-lg border border-black/10 bg-neutral-50">
+              <h3 className="font-semibold text-lg mb-4 text-black">About Credentials</h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    <Lock className="h-5 w-5 text-black/60" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm">
+                      <strong className="text-black font-medium">Privacy-Preserving:</strong>{' '}
+                      <span className="text-black/70">Credentials use zero-knowledge proofs to verify claims without revealing exact data.</span>
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    <Database className="h-5 w-5 text-black/60" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm">
+                      <strong className="text-black font-medium">Decentralized Storage:</strong>{' '}
+                      <span className="text-black/70">All credentials are stored on MOCA Chain Storage Providers (MCSP).</span>
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    <Clock className="h-5 w-5 text-black/60" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm">
+                      <strong className="text-black font-medium">Validity Period:</strong>{' '}
+                      <span className="text-black/70">Credentials expire after 1 year. You'll see warnings 30 days before expiry.</span>
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    <Ban className="h-5 w-5 text-black/60" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm">
+                      <strong className="text-black font-medium">Revocation:</strong>{' '}
+                      <span className="text-black/70">Issuers can revoke credentials if needed. You'll be notified if this happens.</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           {/* Marketplace Tab */}
@@ -124,25 +179,6 @@ export default function CredentialsPage() {
             />
           </TabsContent>
         </Tabs>
-
-        {/* Info Section */}
-        <div className="mt-12 p-6 rounded-2xl border border-black/10 bg-gradient-to-br from-blue-50 to-purple-50">
-          <h3 className="font-semibold text-lg mb-3">About Credentials</h3>
-          <div className="space-y-2 text-sm text-black/70">
-            <p>
-              <strong>🔒 Privacy-Preserving:</strong> Credentials use zero-knowledge proofs to verify claims without revealing exact data.
-            </p>
-            <p>
-              <strong>📦 Decentralized Storage:</strong> All credentials are stored on MOCA Chain Storage Providers (MCSP).
-            </p>
-            <p>
-              <strong>⏰ Validity Period:</strong> Credentials expire after 1 year. You'll see warnings 30 days before expiry.
-            </p>
-            <p>
-              <strong>🚫 Revocation:</strong> Issuers can revoke credentials if needed. You'll be notified if this happens.
-            </p>
-          </div>
-        </div>
       </main>
     </div>
   );
