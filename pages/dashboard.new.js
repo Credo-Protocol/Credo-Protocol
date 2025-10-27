@@ -11,7 +11,6 @@ import { ethers } from 'ethers';
 import Link from 'next/link';
 import CreditScoreCard from '@/components/CreditScoreCard';
 import AppNav from '@/components/layout/AppNav';
-import ConnectButton from '@/components/auth/ConnectButton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Wallet, TrendingUp, BarChart3, Sparkles } from 'lucide-react';
@@ -149,40 +148,37 @@ export default function Dashboard() {
     }
   };
 
-  // If already connected, render the page immediately (no loading screen)
-  // Only show loading/connect screens if not connected
-  if (!isConnected) {
-    // Show loading only if AIR Kit is still initializing
-    if (airKitLoading) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-white text-black relative overflow-hidden">
-          <RetroGrid className="opacity-50" />
-          <div className="max-w-md w-full p-8 space-y-6 text-center relative z-10">
-            <h1 className="text-5xl md:text-6xl font-bold">Credo Protocol</h1>
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-            </div>
-            <p className="text-sm text-black/60">Initializing AIR Kit...</p>
+  // Show loading while initializing
+  if (airKitLoading && !isConnected) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white text-black relative overflow-hidden">
+        <RetroGrid className="opacity-50" />
+        <div className="max-w-md w-full p-8 space-y-6 text-center relative z-10">
+          <h1 className="text-5xl md:text-6xl font-bold">Credo Protocol</h1>
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
           </div>
+          <p className="text-sm text-black/60">Initializing AIR Kit...</p>
         </div>
-      );
-    }
-    
-    // Not connected - show connect button
+      </div>
+    );
+  }
+
+  // Show connect screen
+  if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white text-black relative overflow-hidden">
         <RetroGrid className="opacity-50" />
         <div className="max-w-md w-full p-8 space-y-6 text-center relative z-10">
           <h1 className="text-5xl md:text-6xl font-bold">Credo Protocol</h1>
           <AnimatedShinyText className="text-xl">
-            Identity-Backed DeFi Lending
+            Please connect to continue
           </AnimatedShinyText>
           <div className="flex justify-center py-8">
-            <ConnectButton size="lg" onConnectionChange={handleConnectionChange} />
+            <Link href="/">
+              <Button size="lg">Go to Home</Button>
+            </Link>
           </div>
-          <p className="text-sm text-black/60">
-            Connect with AIR Kit to access your dashboard
-          </p>
         </div>
       </div>
     );
@@ -222,47 +218,48 @@ export default function Dashboard() {
           </div>
 
           {/* Collateral Factor Card */}
-          <Card className="hover:shadow-lg transition-shadow flex flex-col">
-            <CardContent className="flex-1 flex flex-col items-center justify-center py-12 px-6 text-center">
-              <p className="text-sm text-black/60 mb-6">Your Collateral Factor</p>
-              <AuroraText 
-                className={`text-8xl font-bold mb-6 leading-none ${
-                  creditScore >= 900 ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500' : 
-                  creditScore >= 800 ? 'bg-gradient-to-r from-green-500 via-lime-500 to-emerald-500' :
-                  creditScore >= 700 ? 'bg-gradient-to-r from-lime-500 via-yellow-500 to-green-500' :
-                  creditScore >= 600 ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500' :
-                  creditScore >= 500 ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
-                  'bg-gradient-to-r from-red-500 via-rose-500 to-pink-500'
-                }`}
-              >
-                {creditScore >= 900 ? '50%' : 
-                 creditScore >= 800 ? '60%' :
-                 creditScore >= 700 ? '75%' :
-                 creditScore >= 600 ? '90%' :
-                 creditScore >= 500 ? '100%' :
-                 creditScore >= 400 ? '110%' : '125%'}
-              </AuroraText>
-              <p className="text-sm text-black/70 font-medium">
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardDescription>Your Collateral Factor</CardDescription>
+              <CardTitle className="text-6xl text-center py-6">
+                <AuroraText 
+                  className={`${
+                    creditScore >= 900 ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500' : 
+                    creditScore >= 800 ? 'bg-gradient-to-r from-green-500 via-lime-500 to-emerald-500' :
+                    creditScore >= 700 ? 'bg-gradient-to-r from-lime-500 via-yellow-500 to-green-500' :
+                    creditScore >= 600 ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500' :
+                    creditScore >= 500 ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
+                    'bg-gradient-to-r from-red-500 via-rose-500 to-pink-500'
+                  }`}
+                >
+                  {creditScore >= 900 ? '50%' : 
+                   creditScore >= 800 ? '60%' :
+                   creditScore >= 700 ? '75%' :
+                   creditScore >= 600 ? '90%' :
+                   creditScore >= 500 ? '100%' :
+                   creditScore >= 400 ? '110%' : '125%'}
+                </AuroraText>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-center text-black/60">
                 Required collateral for borrowing
               </p>
             </CardContent>
           </Card>
 
           {/* Login Method Card */}
-          <Card className="hover:shadow-lg transition-shadow flex flex-col">
-            <CardContent className="flex-1 flex flex-col items-center justify-center py-12 px-6 text-center">
-              <p className="text-sm text-black/60 mb-6">Login Method</p>
-              <h3 className="text-6xl font-bold text-black mb-6 leading-tight">
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardDescription>Login Method</CardDescription>
+              <CardTitle className="text-4xl text-center py-6">
                 {userInfo?.user?.email ? 'Email / Google' : 'Moca ID'}
-              </h3>
-              <div className="space-y-1">
-                <p className="text-sm text-black/70 font-medium">
-                  AIR Kit SSO
-                </p>
-                <p className="text-xs text-black/50">
-                  Moca Chain Devnet
-                </p>
-              </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-center text-black/60">
+                AIR Kit SSO • Moca Chain Devnet
+              </p>
             </CardContent>
           </Card>
         </div>
