@@ -168,11 +168,18 @@ async function main() {
   console.log("   ✅ 4 bank balance buckets (40-150 pts)");
   console.log("   ✅ 4 income range buckets (50-180 pts)");
   console.log("   ✅ ReentrancyGuard enabled");
+  console.log("\n⚠️  CRITICAL NEXT STEP - REGISTER ISSUERS:");
+  console.log("   Run this command NOW to register issuers:");
+  console.log("   npx hardhat run --network moca-devnet scripts/register-deployer-issuer.ts");
+  console.log("   ");
+  console.log("   ⚠️  Without this step, credential submissions will FAIL!");
+  console.log("   ⚠️  You'll see 'missing revert data' errors!");
   console.log("\n📝 Next steps:");
-  console.log("   1. Update frontend .env with contract addresses");
-  console.log("   2. Update backend .env with contract addresses");
-  console.log("   3. Verify contracts on explorer (optional)");
-  console.log("   4. Test the deployed contracts");
+  console.log("   1. Register issuers (see above) ← DO THIS FIRST!");
+  console.log("   2. Update frontend .env with contract addresses");
+  console.log("   3. Update backend .env with contract addresses");
+  console.log("   4. Verify contracts on explorer (optional)");
+  console.log("   5. Test the deployed contracts");
   console.log("\n✨ Ready to start building your frontend!\n");
 }
 
