@@ -11,6 +11,7 @@ import { ethers } from 'ethers';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, CheckCircle2, TrendingUp, Info } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI } from '@/lib/contracts';
+import { Badge } from '@/components/ui/badge';
 import { handleTransactionError } from '@/lib/errorHandler';
 import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 
@@ -18,6 +19,8 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
   const [repayAmount, setRepayAmount] = useState('');
   const [balance, setBalance] = useState(0);
   const [borrowed, setBorrowed] = useState(0);
+  const [totalOwed, setTotalOwed] = useState(0);
+  const [interestOwed, setInterestOwed] = useState(0);
   const [allowance, setAllowance] = useState(0);
   const [loading, setLoading] = useState(false);
   const [approving, setApproving] = useState(false);
@@ -64,6 +67,20 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
         { timeout: 30000, retries: 2 }
       );
       const borrFormatted = Number(ethers.formatUnits(borr, 6));
+
+      // Get total owed (principal + interest)
+      const owed = await callWithTimeout(
+        () => lendingPool.getBorrowBalanceWithInterest(userAddress, CONTRACTS.MOCK_USDC),
+        { timeout: 30000, retries: 2 }
+      );
+      const owedFormatted = Number(ethers.formatUnits(owed, 6));
+
+      // Get interest only
+      const interest = await callWithTimeout(
+        () => lendingPool.getAccruedInterest(userAddress, CONTRACTS.MOCK_USDC),
+        { timeout: 30000, retries: 2 }
+      );
+      const interestFormatted = Number(ethers.formatUnits(interest, 6));
       
       // Get current allowance for LendingPool with timeout and retry
       const allow = await callWithTimeout(
@@ -74,9 +91,11 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
 
       setBalance(balFormatted);
       setBorrowed(borrFormatted);
+      setTotalOwed(owedFormatted);
+      setInterestOwed(interestFormatted);
       setAllowance(allowFormatted);
       
-      console.log('Balance:', balFormatted, 'USDC, Borrowed:', borrFormatted, 'USDC, Allowance:', allowFormatted, 'USDC');
+      console.log('Balance:', balFormatted, 'USDC, Borrowed:', borrFormatted, 'USDC, Interest:', interestFormatted, 'USDC, Total Owed:', owedFormatted, 'USDC, Allowance:', allowFormatted, 'USDC');
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Failed to fetch data');
@@ -182,11 +201,6 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
       return;
     }
 
-    if (parseFloat(repayAmount) > borrowed) {
-      setError('Repay amount exceeds borrowed amount');
-      return;
-    }
-
     // Check if we need approval
     if (parseFloat(repayAmount) > allowance) {
       setStep(2); // Need approval
@@ -218,14 +232,33 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
             <>
               {/* Balance and Borrowed Display */}
               <div className="p-6 rounded-xl border border-black/10 bg-white">
+                <div className="mb-2 flex items-center gap-2">
+                  <Badge variant="secondary">Summary</Badge>
+                  <span className="text-xs text-black/60">Total Owed = Principal + Accrued Interest</span>
+                </div>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <p className="text-sm text-black/60">Your Balance</p>
                     <p className="text-lg font-bold text-black">{balance.toFixed(2)} USDC</p>
                   </div>
                   <div>
-                    <p className="text-sm text-black/60">Borrowed</p>
-                    <p className="text-lg font-bold text-red-500">{borrowed.toFixed(2)} USDC</p>
+                    <p className="text-sm text-black/60">Total Owed</p>
+                    <p className="text-lg font-bold text-red-500">{totalOwed.toFixed(2)} USDC</p>
+                  </div>
+                </div>
+
+                {/* Interest Breakdown */}
+                <div className="mb-1">
+                  <Badge variant="secondary">Breakdown</Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <p className="text-sm text-black/60">Principal</p>
+                    <p className="text-lg font-semibold text-black">{borrowed.toFixed(2)} USDC</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-black/60">Accrued Interest</p>
+                    <p className={`text-lg font-semibold ${interestOwed > 0 ? 'text-orange-600' : 'text-black'}`}>+{interestOwed.toFixed(2)} USDC</p>
                   </div>
                 </div>
 
@@ -241,46 +274,52 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
                       className="w-full px-4 py-3 pr-16 text-lg border border-black/20 rounded-md focus:outline-none focus:ring-2 focus:ring-black/20 bg-white text-black"
                       step="0.01"
                       min="0"
-                      max={Math.min(balance, borrowed)}
+                      max={Math.min(balance, totalOwed)}
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-black/60">
                       USDC
                     </div>
                   </div>
+                  <p className="text-xs text-black/60">Tip: "Pay Total" includes accrued interest. The contract caps to the exact amount owed.</p>
                   <div className="flex gap-2">
                     <button
                       className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => setRepayAmount((borrowed * 0.25).toFixed(2))}
+                      onClick={() => setRepayAmount((totalOwed * 0.25).toFixed(2))}
                       disabled={balance === 0}
                     >
                       25%
                     </button>
                     <button
                       className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => setRepayAmount((borrowed * 0.5).toFixed(2))}
+                      onClick={() => setRepayAmount((totalOwed * 0.5).toFixed(2))}
                       disabled={balance === 0}
                     >
                       50%
                     </button>
                     <button
                       className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => setRepayAmount((borrowed * 0.75).toFixed(2))}
+                      onClick={() => setRepayAmount((totalOwed * 0.75).toFixed(2))}
                       disabled={balance === 0}
                     >
                       75%
                     </button>
                     <button
                       className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => setRepayAmount(Math.min(balance, borrowed).toFixed(2))}
+                      // Add a small buffer to cover interest accrued between fetch and repay
+                      onClick={() => {
+                        const buffer = 0.10; // 10 cents buffer; contract will clamp to total owed
+                        const target = Math.min(balance, totalOwed + buffer);
+                        setRepayAmount(target.toFixed(2));
+                      }}
                       disabled={balance === 0}
                     >
-                      Max
+                      Pay Total
                     </button>
                   </div>
                 </div>
               </div>
 
-              {borrowed === 0 && (
+              {totalOwed === 0 && (
                 <div className="p-4 rounded-xl border border-black/10 bg-neutral-50">
                   <div className="flex items-start gap-3">
                     <Info className="h-5 w-5 text-black/60 mt-0.5 flex-shrink-0" />
@@ -300,7 +339,7 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
               <button
                 className="w-full h-12 bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                 onClick={handleContinue}
-                disabled={loading || borrowed === 0}
+                disabled={loading || totalOwed === 0}
               >
                 Continue
               </button>
@@ -381,7 +420,7 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
                 <div className="flex items-center justify-between pt-4 border-t border-black/10">
                   <span className="text-sm text-black/60">New Debt</span>
                   <span className="text-lg font-semibold text-black">
-                    {(borrowed - parseFloat(repayAmount)).toFixed(2)} USDC
+                    {Math.max(0, totalOwed - parseFloat(repayAmount || '0')).toFixed(2)} USDC
                   </span>
                 </div>
               </div>
