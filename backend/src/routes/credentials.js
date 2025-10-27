@@ -16,6 +16,7 @@
 const express = require('express');
 const { generateIssueToken } = require('../auth/jwt');
 const { ethers } = require('ethers');
+const credentialStore = require('../utils/credentialStore');
 
 const router = express.Router();
 
@@ -501,6 +502,158 @@ router.post('/prepare', async (req, res) => {
     
   } catch (error) {
     console.error('[Credentials] Error preparing issuance:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/credentials/track
+ * 
+ * Track a credential after successful AIR Kit issuance.
+ * Frontend calls this after airService.issueCredential() succeeds.
+ */
+router.post('/track', async (req, res) => {
+  try {
+    const {
+      userAddress,
+      credentialType,
+      credentialId,
+      bucket,
+      weight,
+      issuanceDate,
+      expirationDate,
+      issuerDid,
+      schemaId
+    } = req.body;
+
+    if (!userAddress || !credentialId || !bucket) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: userAddress, credentialId, bucket'
+      });
+    }
+
+    const credential = credentialStore.trackIssuedCredential({
+      userAddress,
+      credentialType,
+      credentialId,
+      bucket,
+      weight,
+      issuanceDate,
+      expirationDate,
+      issuerDid,
+      schemaId
+    });
+
+    res.json({
+      success: true,
+      credential
+    });
+
+  } catch (error) {
+    console.error('[Credentials] Error tracking:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/credentials/user/:address
+ * 
+ * Get all credentials for a user with their current status.
+ * Returns active, expired, and revoked credentials.
+ */
+router.get('/user/:address', async (req, res) => {
+  try {
+    const { address } = req.params;
+
+    if (!address) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing user address'
+      });
+    }
+
+    const credentials = credentialStore.getUserCredentials(address);
+
+    res.json({
+      success: true,
+      count: credentials.length,
+      credentials,
+      stats: {
+        active: credentials.filter(c => c.status === 'active').length,
+        expired: credentials.filter(c => c.status === 'expired').length,
+        revoked: credentials.filter(c => c.status === 'revoked').length
+      }
+    });
+
+  } catch (error) {
+    console.error('[Credentials] Error fetching user credentials:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/credentials/revoke
+ * 
+ * Revoke a credential.
+ * In production, this should require authentication and authorization.
+ */
+router.post('/revoke', async (req, res) => {
+  try {
+    const { credentialId, reason } = req.body;
+
+    if (!credentialId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing credentialId'
+      });
+    }
+
+    const credential = credentialStore.revokeCredential(credentialId, reason);
+
+    // In production: Also notify holder and update AIR Kit Dashboard
+    console.log(`[Credentials] Revoked ${credentialId}. Holder should be notified.`);
+
+    res.json({
+      success: true,
+      credential,
+      message: 'Credential revoked successfully'
+    });
+
+  } catch (error) {
+    console.error('[Credentials] Error revoking:', error);
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/credentials/stats
+ * 
+ * Get credential statistics across the platform.
+ */
+router.get('/stats', async (req, res) => {
+  try {
+    const stats = credentialStore.getStats();
+
+    res.json({
+      success: true,
+      stats
+    });
+
+  } catch (error) {
+    console.error('[Credentials] Error fetching stats:', error);
     res.status(500).json({
       success: false,
       error: error.message
