@@ -24,11 +24,21 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
+  origin: '*', // Allow all origins for JWKS endpoint (AIR Kit needs access)
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ngrok compatibility middleware
+// ngrok free tier sometimes adds warnings that can interfere with API calls
+app.use((req, res, next) => {
+  // Allow ngrok to work properly
+  res.setHeader('ngrok-skip-browser-warning', 'true');
+  next();
+});
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -68,11 +78,23 @@ app.use('/api/credentials', credentialsRouter);
  * AIR Kit calls this endpoint to get our public key for verifying Partner JWTs
  * 
  * Required by MOCA: https://docs.moca.network/airkit/usage/partner-authentication
+ * 
+ * IMPORTANT: This endpoint MUST be publicly accessible for AIR Kit to work.
+ * Configure this URL in MOCA Developer Dashboard under your Partner settings.
  */
 app.get('/.well-known/jwks.json', (req, res) => {
   try {
     const jwks = getJWKS();
-    console.log('📋 JWKS endpoint called - AIR Kit validating JWT');
+    console.log('📋 JWKS endpoint called');
+    console.log('   User-Agent:', req.headers['user-agent'] || 'Unknown');
+    console.log('   Origin:', req.headers['origin'] || 'Direct request');
+    console.log('   Kid:', jwks.keys[0]?.kid);
+    
+    // Set proper headers for JWKS response
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow AIR Kit to fetch
+    
     res.json(jwks);
   } catch (error) {
     console.error('❌ JWKS generation failed:', error);
