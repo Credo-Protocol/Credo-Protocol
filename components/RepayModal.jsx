@@ -432,7 +432,7 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
                 </div>
                 <div className="flex items-center justify-between pt-4 border-t border-black/10">
                   <span className="text-sm text-black/60">New Debt</span>
-                  <span className="text-lg font-semibold text-black">
+                  <span className="text-lg font-semibold text-green-600">
                     {Math.max(0, totalOwed - parseFloat(repayAmount || '0')).toFixed(2)} USDC
                   </span>
                 </div>
