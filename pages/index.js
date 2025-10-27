@@ -211,37 +211,47 @@ export default function Home() {
           </motion.h2>
           
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={{
               visible: {
                 transition: {
-                  staggerChildren: 0.15
+                  staggerChildren: 0.1
                 }
               }
             }}
           >
             <FeatureCard
               icon={<TrendingUp className="w-10 h-10" />}
-              title="Dynamic Collateral"
-              description="Collateral requirements from 50-150% based on your credit score. High scores mean better terms and more capital efficiency."
+              title="Score Builder Wizard"
+              description="Interactive simulation tool. Preview score changes before submitting credentials. See exactly what unlocks your next tier with real-time progress tracking."
             />
             <FeatureCard
               icon={<Lock className="w-10 h-10" />}
-              title="Privacy-Preserving"
-              description="Zero-Knowledge Proofs keep your data private while proving creditworthiness on-chain."
+              title="Privacy-Preserving Buckets"
+              description="Prove income ($3k-$8k+) or balance ($1k-$10k+) ranges without revealing exact amounts. Only brackets disclosed, never specific numbers."
             />
             <FeatureCard
               icon={<Shield className="w-10 h-10" />}
-              title="Verifiable Credentials"
-              description="Credentials from trusted issuers are cryptographically verified and stored securely."
+              title="Official AIR Kit Integration"
+              description="W3C verifiable credentials from registered Issuer DIDs. Stored on MCSP decentralized storage. Discoverable across the MOCA ecosystem."
+            />
+            <FeatureCard
+              icon={<BarChart3 className="w-10 h-10" />}
+              title="Time-Based Interest"
+              description="Borrow with 5-18% APR based on credit tier. Watch interest accrue every 5 seconds. Transparent breakdown of principal + interest."
+            />
+            <FeatureCard
+              icon={<Sparkles className="w-10 h-10" />}
+              title="Live Leaderboard"
+              description="Track top credit scores across the network. See how you rank against other users. Trophy rewards for top 3 positions."
             />
             <FeatureCard
               icon={<Zap className="w-10 h-10" />}
-              title="Instant Loans"
-              description="Once your score is built, borrow instantly with transparent terms and no hidden fees."
+              title="Composable Credit API"
+              description="Public REST endpoint for any dApp to query credit scores. CORS enabled. Use Credo scores in GameFi, DAOs, NFTs, and more."
             />
           </motion.div>
         </div>
@@ -460,10 +470,10 @@ export default function Home() {
               <div>
                 <h4 className="font-semibold text-lg mb-4">Resources</h4>
                 <ul className="space-y-3">
-                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">How It Works</a></li>
-                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Security</a></li>
-                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Privacy Policy</a></li>
-                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Terms of Service</a></li>
+                  <li><a href="https://github.com/marcusmattus/Credo-Protocol" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">GitHub</a></li>
+                  <li><a href="https://devnet-scan.mocachain.org" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">Block Explorer</a></li>
+                  <li><a href="https://www.youtube.com/watch?v=l05PbqsKPZY" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">Demo Video</a></li>
+                  <li><a href="https://x.com/marcustan1337" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">Contact</a></li>
                 </ul>
               </div>
             </div>
@@ -472,10 +482,10 @@ export default function Home() {
             <div className="border-t border-white/10 pt-8">
               <div className="text-center">
                 <p className="text-white/60">
-                  © 2025 Credo Protocol. Built on Moca Chain.
+                  © 2025 Credo Protocol. Built on Moca Chain • Wave 3 Live
                 </p>
                 <p className="text-white/40 text-sm mt-1">
-                  Transforming trust into capital, one credential at a time.
+                  Privacy-preserving credit • Official MOCA integration • Composable for the ecosystem
                 </p>
               </div>
             </div>
