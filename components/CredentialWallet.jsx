@@ -70,8 +70,9 @@ export function CredentialWallet() {
     loadCredentials(true);
   };
 
-  // Loading state
-  if (loading) {
+  // Loading state - shown while credentials are being fetched
+  // No need for "not connected" state since users can't access this page without being connected
+  if (loading || !isConnected || !userAddress) {
     return (
       <Card>
         <CardHeader>
@@ -80,36 +81,13 @@ export function CredentialWallet() {
             My Credentials
           </CardTitle>
           <CardDescription>
-            Loading your AIR Kit wallet...
+            Loading your credentials...
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <Skeleton className="h-20 w-full" />
           <Skeleton className="h-20 w-full" />
           <Skeleton className="h-20 w-full" />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Not connected state
-  if (!isConnected || !userAddress) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Wallet className="h-5 w-5" />
-            My Credentials
-          </CardTitle>
-          <CardDescription>
-            Connect your wallet to view credentials
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            <Wallet className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p className="text-sm">Please connect your wallet to view your credentials</p>
-          </div>
         </CardContent>
       </Card>
     );

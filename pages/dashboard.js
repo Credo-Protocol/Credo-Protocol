@@ -158,7 +158,7 @@ export default function Dashboard() {
         <div className="min-h-screen flex items-center justify-center bg-white text-black relative overflow-hidden">
           <RetroGrid className="opacity-50" />
           <div className="max-w-md w-full p-8 space-y-6 text-center relative z-10">
-            <h1 className="text-5xl md:text-6xl font-bold">Credo Protocol</h1>
+            <h1 className="text-5xl font-bold">Credo Protocol</h1>
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
             </div>
@@ -173,7 +173,7 @@ export default function Dashboard() {
       <div className="min-h-screen flex items-center justify-center bg-white text-black relative overflow-hidden">
         <RetroGrid className="opacity-50" />
         <div className="max-w-md w-full p-8 space-y-6 text-center relative z-10">
-          <h1 className="text-5xl md:text-6xl font-bold">Credo Protocol</h1>
+          <h1 className="text-5xl font-bold">Credo Protocol</h1>
           <AnimatedShinyText className="text-xl">
             Identity-Backed DeFi Lending
           </AnimatedShinyText>
