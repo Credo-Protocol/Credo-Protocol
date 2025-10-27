@@ -10,12 +10,12 @@ All contracts have been successfully redeployed and all documentation updated.
 
 **Network:** Moca Chain Devnet (Chain ID: 5151)  
 **Deployer:** 0x32F91E4E2c60A9C16cAE736D3b42152B331c147F  
-**Timestamp:** 2025-10-27T03:49:45.776Z
+**Timestamp:** 2025-10-27T04:15:06.820Z (Latest Deployment)
 
 ### Smart Contracts:
-- **CreditScoreOracle v2:** `0xE8F32cD64626044c64CE7b9e58bfB98A9f026cc3`
-- **LendingPool:** `0xF72a2eC49655F67147DC6e0d397991C9c3a12685`
-- **MockUSDC:** `0xDC44715B0208022a04fC00fF70f7C12d7D8F8dAc`
+- **CreditScoreOracle v2:** `0x12ad1aBfBde99Ce4D37fB18A5e622A619d59f705`
+- **LendingPool v2:** `0x3c30Cd9c071B9ee307C251a3e120DA6e8dde7bd4`
+- **MockUSDC:** `0xDBa63296abD241Ed9d485F890C63975452f1CD47`
 
 ### Issuer Addresses:
 - **Mock Exchange:** `0x499CEB20A05A1eF76D6805f293ea9fD570d6A431`

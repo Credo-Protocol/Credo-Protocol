@@ -59,12 +59,14 @@ npm run deploy:devnet
 ```
 🎉 DEPLOYMENT COMPLETE!
 📋 Contract Addresses:
-   CreditScoreOracle: 0xE8F32cD64626044c64CE7b9e58bfB98A9f026cc3 (example - yours will differ)
-   LendingPool:       0xF72a2eC49655F67147DC6e0d397991C9c3a12685 (example)
-   MockUSDC:          0xDC44715B0208022a04fC00fF70f7C12d7D8F8dAc (example)
+   CreditScoreOracle: 0x12ad1aBfBde99Ce4D37fB18A5e622A619d59f705 (your addresses will vary)
+   LendingPool:       0x3c30Cd9c071B9ee307C251a3e120DA6e8dde7bd4
+   MockUSDC:          0xDBa63296abD241Ed9d485F890C63975452f1CD47
 ```
 
 **IMPORTANT:** Copy these addresses - you'll need them for Step 3!
+
+**Latest Successful Deployment:** October 27, 2025 at 4:15 AM UTC
 
 ### 2.1 ⚠️ CRITICAL: Register Issuers
 
