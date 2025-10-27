@@ -1,9 +1,9 @@
 # Credo Protocol
 
-> **Moca Network Proof of Build - Wave 2 Submission**  
-> **Identity-Backed DeFi Lending on Moca Chain**
+> **Moca Network Proof of Build - Wave 3 Submission**  
+> **Identity-Backed DeFi Lending with Official MOCA Integration**
 
-Credo Protocol is an undercollateralized lending platform on Moca Chain, built for the Moca Network Proof of Build. It leverages the AIR Kit to generate privacy-preserving, on-chain credit scores from verifiable credentials, unlocking fair access to capital in DeFi.
+Credo Protocol is an undercollateralized lending platform on Moca Chain Testnet, built for the Moca Network Proof of Build. It leverages official AIR Kit credential services to generate privacy-preserving, on-chain credit scores from verifiable credentials, unlocking fair access to capital in DeFi.
 
 [![Moca Chain](https://img.shields.io/badge/Moca_Chain-Devnet-blue)](https://devnet-scan.mocachain.org)
 [![Buildathon](https://img.shields.io/badge/Buildathon-Wave_2-purple)]()
@@ -11,6 +11,103 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain, built f
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ![Credo Protocol Landing Page](public/landingpage.jpeg)
+
+---
+
+## 🎉 Wave 3 Updates (Oct 27, 2025)
+
+### New Features
+
+#### 🔐 Advanced Privacy-Preserving Credentials
+- **Income Range Buckets**: Verify monthly income without revealing exact salary (50-180 pts)
+- **Bank Balance (30-day avg)**: Prove financial stability in bucket ranges (40-150 pts)
+- **Privacy-First Design**: Only range disclosed (e.g., "$5k-$10k"), exact amounts never revealed
+- **10 Credential Types**: 4 income buckets + 4 balance buckets + 2 legacy types
+
+#### 🏗️ Official MOCA Integration
+- **AIR Kit Issuer DIDs**: Official registered issuer with reputation tracking
+- **Decentralized Storage**: Credentials stored on MOCA Chain Storage Providers (MCSP)
+- **Gas Sponsorship**: Zero-friction credential issuance (no MOCA tokens required!)
+- **Ecosystem Interoperability**: Credentials discoverable by any MOCA dApp
+- **Public Schema Registry**: Official schemas published for third-party use
+
+#### 🎯 Crystal-Clear User Journey
+- **Score Builder Wizard**: See exactly what unlocks your next tier
+- **Real-Time Simulation**: Preview score changes before submitting credentials
+- **Progress Tracking**: Visual progress bar showing "200 pts to next tier"
+- **Transparent Breakdown**: View per-credential contributions with trust scores
+- **AIR Wallet Integration**: View all credentials in one place
+
+#### ⚡ Production-Ready Protocol
+- **Interest Accrual**: Time-based interest (5-18% APR based on credit tier)
+- **Live Interest Display**: Watch interest accrue every 5 seconds in real-time
+- **Dynamic APR**: Lower rates for higher scores (5% vs 18%)
+- **Testnet Deployment**: Live on Moca testnet for production testing
+
+#### 🌐 Ecosystem Integration
+- **Composable Credit API**: Public `/api/score/:address` endpoint
+- **CORS Enabled**: Any dApp can query credit scores
+- **Leaderboard**: Track top credit scores across the network
+- **Integration Guide**: Docs for third-party developers
+- **True MOCA Participant**: Full integration with AIR Kit credential services
+
+### Updated Contracts (Moca Devnet - Chain ID: 5151)
+
+| Contract | Devnet Address | Version |
+|----------|----------------|---------|
+| **CreditScoreOracle v2** | `0xCB4404FC84Fe4Ddc29Db14553dae0Eb45BaE4259` | Wave 3 |
+| **LendingPool v2** | `0x63b5F2a515Eaa7bAEDBe67eA8047212093Ed8B83` | Wave 3 |
+| **MockUSDC** | `0xA057C871fA8Ff35fe3E72bE2060d7176Eca8391a` | Wave 3 |
+
+[View on Explorer](https://devnet-scan.mocachain.org)
+
+### What's Different from Wave 2
+
+**Wave 2 (Devnet)** → **Wave 3 (Testnet)**
+- 3 basic credentials → 10 bucketed credentials (privacy-first)
+- Custom mock issuers → Official AIR Kit Issuer DIDs
+- Local credential storage → MOCA Chain Storage Providers (MCSP)
+- Users pay gas → Gas-sponsored credential issuance
+- Isolated credentials → Interoperable MOCA ecosystem credentials
+- Static scoring → Transparent on-chain registries
+- No interest → Time-based interest accrual (5-18% APR)
+- No UX guidance → Score Builder Wizard with simulation
+- Isolated protocol → Composable API for ecosystem
+- No leaderboard → Top 10 leaderboard with live updates
+
+### Try It Now
+
+1. **Visit**: [https://credo-protocol.vercel.app](https://credo-protocol.vercel.app)
+2. **Login**: One-click with Moca ID (Google/Email/Wallet)
+3. **Build Score**: Navigate to "Score Builder" tab
+4. **See Your Tier**: View borrowing power and APR
+5. **Check API**: `curl https://credo-protocol.vercel.app/api/score/YOUR_ADDRESS`
+
+---
+
+## 📊 Wave 3 Highlights
+
+### For Users
+- 🎯 **2x Better Terms**: Income credentials unlock up to 50% collateral (vs 150% standard)
+- 🔒 **Privacy Protected**: Prove creditworthiness without revealing sensitive data
+- 📈 **Clear Path**: Know exactly which credentials unlock better rates
+- ⚡ **Real-Time Feedback**: Watch your score and interest update live
+
+### For Developers
+- 🔌 **Plug & Play**: Public API returns credit scores in one request
+- 📚 **Well Documented**: Integration guide + code examples
+- 🏗️ **Composable**: Use Credo scores in any dApp (DAOs, GameFi, NFTs)
+- 🔗 **On-Chain**: All logic transparent and verifiable
+- 🔐 **MOCA Native**: Uses official Issuer DIDs and credential schemas
+- 🌐 **Discoverable**: Credentials appear in AIR Kit wallet
+
+### For the Ecosystem
+- 🚀 **Moca ID Adoption**: Requires Moca login, drives identity usage
+- 🛠️ **AIR Kit Showcase**: Deep integration with Account + Credential Services
+- 🎯 **True Integration**: Official MOCA infrastructure (not just SSO)
+- 🧱 **Infrastructure Primitive**: Foundational layer for DeFi identity
+- 💡 **Innovation**: Brings TradFi credit concepts to Web3
+- ⚡ **Gas Sponsorship**: Demonstrates seamless UX with paymaster
 
 ---
 
