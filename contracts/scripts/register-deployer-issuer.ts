@@ -1,17 +1,32 @@
 import { ethers } from "hardhat";
+import * as fs from "fs";
+import * as path from "path";
 
 /**
  * Register the deployer address as an issuer in the CreditScoreOracle
  * This allows the deployer to submit credentials for testing
+ * 
+ * This script automatically reads the Oracle address from deployed-addresses.json
  */
 async function main() {
   console.log("🔐 Registering Deployer as Issuer\n");
   console.log("=" .repeat(60));
 
-  // Use the correct Oracle address from deployed-addresses.json
-  const ORACLE_ADDRESS = "0xFA1F2920F107FE2199CC5f389349e3F2292387BD";
+  // Read Oracle address from deployed-addresses.json
+  const deployedAddressesPath = path.join(__dirname, "..", "deployed-addresses.json");
   
-  console.log("📍 Oracle Address:", ORACLE_ADDRESS);
+  if (!fs.existsSync(deployedAddressesPath)) {
+    throw new Error("❌ deployed-addresses.json not found! Please deploy contracts first.");
+  }
+  
+  const deployedData = JSON.parse(fs.readFileSync(deployedAddressesPath, "utf-8"));
+  const ORACLE_ADDRESS = deployedData.contracts.CreditScoreOracle;
+  
+  if (!ORACLE_ADDRESS) {
+    throw new Error("❌ CreditScoreOracle address not found in deployed-addresses.json");
+  }
+  
+  console.log("📍 Oracle Address:", ORACLE_ADDRESS, "(from deployed-addresses.json)");
 
   // Get deployer signer
   const [deployer] = await ethers.getSigners();
@@ -58,10 +73,11 @@ async function main() {
   // Also register the mock issuers on the correct contract
   console.log("\n⚙️  Registering mock issuers on correct contract...");
   
+  // Read mock issuer addresses from deployed-addresses.json
   const mockIssuers = [
-    { address: "0x499CEB20A05A1eF76D6805f293ea9fD570d6A431", name: "Mock Exchange" },
-    { address: "0x22a052d047E8EDC3A75010588B034d66db9bBCE1", name: "Mock Employer" },
-    { address: "0x3cb42f88131DBe9D0b53E0c945c6e1F76Ea0220E", name: "Mock Bank" }
+    { address: deployedData.issuers.mockExchange, name: "Mock Exchange" },
+    { address: deployedData.issuers.mockEmployer, name: "Mock Employer" },
+    { address: deployedData.issuers.mockBank, name: "Mock Bank" }
   ];
 
   for (const issuer of mockIssuers) {

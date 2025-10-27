@@ -1,0 +1,23 @@
+{
+  "network": "moca-devnet",
+  "chainId": 5151,
+  "timestamp": "2025-10-27T02:42:14.480Z",
+  "deployer": "0x32F91E4E2c60A9C16cAE736D3b42152B331c147F",
+  "contracts": {
+    "CreditScoreOracle": "0xFA1F2920F107FE2199CC5f389349e3F2292387BD",
+    "LendingPool": "0x7BAb12286A13F7Fd49E363CDC2D45b4e8788Cf8b",
+    "MockUSDC": "0x71fE1A58701B251C7A38381f7CFb5fF44c00D181"
+  },
+  "issuers": {
+    "mockExchange": "0x499CEB20A05A1eF76D6805f293ea9fD570d6A431",
+    "mockEmployer": "0x22a052d047E8EDC3A75010588B034d66db9bBCE1",
+    "mockBank": "0x3cb42f88131DBe9D0b53E0c945c6e1F76Ea0220E"
+  },
+  "configuration": {
+    "baseInterestRate": "5%",
+    "liquidationThreshold": "80%",
+    "liquidationBonus": "5%",
+    "tiersInitialized": true,
+    "credentialTypesCount": 11
+  }
+}
