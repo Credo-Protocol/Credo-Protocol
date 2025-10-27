@@ -19,6 +19,7 @@ import { Loader2, TrendingDown, Info, CheckCircle2 } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, calculateCollateralFactor, getScoreColor } from '@/lib/contracts';
 import { handleTransactionError } from '@/lib/errorHandler';
 import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
+import { AuroraText } from '@/components/ui/aurora-text';
 
 export default function BorrowInterface({ userAddress, creditScore, onSuccess, provider }) {
   const [borrowAmount, setBorrowAmount] = useState(0);
@@ -281,14 +282,25 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Credit Score Info */}
-        <div className="p-6 bg-muted rounded-lg space-y-4">
-          <div className="text-center space-y-2">
+        <div className="max-w-xl mx-auto p-6 bg-muted rounded-lg space-y-6">
+          <div className="text-center space-y-3">
             <span className="text-base font-medium block text-muted-foreground">Your Credit Score</span>
-            <span className={`text-5xl font-bold block ${scoreColor}`}>{creditScore}</span>
+            <span className={`text-8xl font-bold block ${scoreColor}`}>{creditScore}</span>
           </div>
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-3">
             <span className="text-base font-medium block text-muted-foreground">Collateral Factor</span>
-            <span className="text-4xl font-bold block">{collateralFactor}%</span>
+            <AuroraText 
+              className={`text-7xl font-bold leading-none ${
+                creditScore >= 900 ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500' : 
+                creditScore >= 800 ? 'bg-gradient-to-r from-green-500 via-lime-500 to-emerald-500' :
+                creditScore >= 700 ? 'bg-gradient-to-r from-lime-500 via-yellow-500 to-green-500' :
+                creditScore >= 600 ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500' :
+                creditScore >= 500 ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
+                'bg-gradient-to-r from-red-500 via-rose-500 to-pink-500'
+              }`}
+            >
+              {collateralFactor}%
+            </AuroraText>
           </div>
         </div>
 
