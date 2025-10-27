@@ -14,7 +14,7 @@ import AppNav from '@/components/layout/AppNav';
 import ConnectButton from '@/components/auth/ConnectButton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Wallet, TrendingUp, BarChart3, Sparkles } from 'lucide-react';
+import { ArrowRight, Wallet, TrendingUp, BarChart3, Sparkles, Coins, Droplets } from 'lucide-react';
 import { CONTRACTS, CREDIT_ORACLE_ABI } from '@/lib/contracts';
 import { useAirKit } from '@/hooks/useAirKit';
 import { getBestProvider, callWithTimeout, getPublicProvider } from '@/lib/rpcProvider';
@@ -268,7 +268,7 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Links */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <QuickLinkCard
             href="/credentials"
             icon={<Wallet className="w-8 h-8" />}
@@ -278,7 +278,7 @@ export default function Dashboard() {
           />
           <QuickLinkCard
             href="/lending"
-            icon={<TrendingUp className="w-8 h-8" />}
+            icon={<Coins className="w-8 h-8" />}
             title="Lending Pool"
             description="Supply liquidity or borrow with your credit score"
             gradient="from-blue-500 to-cyan-500"
@@ -289,6 +289,13 @@ export default function Dashboard() {
             title="Score Builder"
             description="Simulate and optimize your credit score"
             gradient="from-green-500 to-emerald-500"
+          />
+          <QuickLinkCard
+            href="/faucet"
+            icon={<Droplets className="w-8 h-8" />}
+            title="Faucet"
+            description="Get test tokens for Moca Chain Devnet"
+            gradient="from-cyan-500 to-blue-500"
           />
         </div>
       </main>
@@ -302,7 +309,7 @@ function QuickLinkCard({ href, icon, title, description, gradient }) {
     <Link href={href}>
       <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-black/20 h-full">
         <CardContent className="p-6">
-          <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform`}>
+          <div className="w-16 h-16 rounded-xl bg-black flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
             {icon}
           </div>
           <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
