@@ -284,11 +284,11 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
         {/* Credit Score Info */}
         <div className="max-w-xl mx-auto p-6 bg-muted rounded-lg space-y-6">
           <div className="text-center space-y-3">
-            <span className="text-base font-medium block text-muted-foreground">Your Credit Score</span>
+            <span className="text-base font-medium block text-black">Your Credit Score</span>
             <span className={`text-8xl font-bold block ${scoreColor}`}>{creditScore}</span>
           </div>
           <div className="text-center space-y-3">
-            <span className="text-base font-medium block text-muted-foreground">Collateral Factor</span>
+            <span className="text-base font-medium block text-black">Collateral Factor</span>
             <AuroraText 
               className={`text-7xl font-bold leading-none ${
                 creditScore >= 900 ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500' : 

@@ -95,11 +95,11 @@ By the end of this demo, judges should understand:
 > 
 > **[Point to Credit Score Card - top left]**
 > 
-> "Current credit score: **[YOUR_SCORE]** - that's **[YOUR_TIER]** tier. This is fetched from our **CreditScoreOracle smart contract** via a `getCreditScore(address)` view call. The contract computes this on-chain based on my submitted credentials."
+> "Current credit score: **[YOUR_SCORE]** - that's **[YOUR_TIER]** tier. This is fetched from our **CreditScoreOracle smart contract** via a get credit score view call. The contract computes this on-chain based on my submitted credentials."
 > 
 > **[Point to Collateral Factor Card - center]**
 > 
-> "My collateral factor is **[YOUR_FACTOR]%** - this is calculated client-side based on the tier returned from `getTierForScore()`. The large animated number shows exactly how much collateral I need to borrow."
+> "My collateral factor is **[YOUR_FACTOR]%** - this is calculated client-side based on the tier returned from the get tier for score function. The large animated number shows exactly how much collateral I need to borrow."
 > 
 > **[Point to Login Method Card - right]**
 > 
@@ -141,7 +141,7 @@ By the end of this demo, judges should understand:
 > 
 > **[Select Bank Balance credential]**
 > 
-> "Add Bank Balance... now **[NEW_SCORE]**. Notice the **'Privacy-First'** and **'Highest Weight'** badges. These are **bucketed credentials** - the smart contract only stores `INCOME_HIGH` or `BANK_BALANCE_MEDIUM` as bytes32 hashes, never exact amounts. Privacy-first by design - we use **range proofs** conceptually."
+> "Add Bank Balance... now **[NEW_SCORE]**. Notice the **'Privacy-First'** and **'Highest Weight'** badges. These are **bucketed credentials** - the smart contract only stores bucket names like Income High or Bank Balance Medium as cryptographic hashes, never exact amounts. Privacy-first by design - we use **range proofs** conceptually."
 
 **Time Check**: 1:40
 
@@ -171,7 +171,7 @@ By the end of this demo, judges should understand:
 > 
 > **[Step 1 completes quickly]**
 > 
-> "The backend also exposes a **JWKS endpoint** at `/.well-known/jwks.json` - this is how MOCA's AIR Kit validates our identity cryptographically. No shared secrets, just public key cryptography."
+> "The backend also exposes a **JWKS endpoint** at the well-known jwks.json path - this is how MOCA's AIR Kit validates our identity cryptographically. No shared secrets, just public key cryptography."
 > 
 > **[Step 2: Issue credential - Processing begins]**
 > 
@@ -189,7 +189,7 @@ By the end of this demo, judges should understand:
 > 
 > **[Point to loading indicator]**
 > 
-> **Step 4**: The credential gets added to my AIR Kit wallet automatically. If you go to the AIR Kit Dashboard right now at `dashboard.air3.com`, you'd see this credential listed under our Issuer DID.
+> **Step 4**: The credential gets added to my AIR Kit wallet automatically. If you go to the AIR Kit Dashboard right now, you'd see this credential listed under our Issuer DID.
 > 
 > **Step 5**: Any MOCA dApp can now discover and verify this credential. It's ecosystem-interoperable, not siloed to Credo."
 > 
@@ -214,6 +214,47 @@ By the end of this demo, judges should understand:
 > 
 > That's **real MOCA Credential Services** - not mock signatures we generated ourselves!"
 > 
+> **[Navigate to "My Wallet" tab]**
+> 
+> "Now let me show you how users view their credentials."
+> 
+> **[Page switches to wallet tab showing issued credentials]**
+> 
+> "Here's where we made a **pragmatic architectural choice**. You can see my issued credentials with full details - type, issuance date, expiry status, MCSP storage badge."
+> 
+> **[Point to credential cards]**
+> 
+> "Interestingly, **AIR Kit doesn't currently provide a programmatic API** to retrieve a user's full credential wallet. According to MOCA's documentation, credentials are:
+> - ✅ Encrypted and stored on MCSP
+> - ✅ Controlled by the user (self-sovereign)
+> - ✅ Only accessed during verification credential flows via built-in UI
+> 
+> There's no get credentials method to list them."
+> 
+> **[Point to the credential list]**
+> 
+> "So we built a **lightweight issuer tracking system**: When we issue a credential, we keep track of **what Credo Protocol issued** - just the credential ID, the bucket type like 'Income High', issuance date, and expiration date. This is **not storing the actual credential** - that's encrypted on MCSP. We're just tracking **'what credentials did Credo Protocol issue to this user?'** as the issuer.
+> 
+> **How Credential Viewing Currently Works in AIR Kit:**
+> 
+> Right now, the **only** way users see their credentials is during **verification flows**. When a verifier calls the verify credential function, AIR Kit opens a **built-in UI widget** that shows the user's credentials and lets them select which one to present. The user sees their wallet, chooses the credential, and shares it with the verifier.
+> 
+> But there's no standalone 'view my wallet' feature - no API to just list credentials outside of verification. This makes sense from a privacy perspective - you only see credentials when you need to present them.
+> 
+> **How Credential Viewing Should Work:**
+> 
+> Ideally, to see a user's **full credential wallet** proactively - including credentials from ALL issuers across the ecosystem - you'd use **MOCA's official APIs**. Something like an AIR Kit method that retrieves encrypted credentials from MCSP that only the user has permission to decrypt. That would be the privacy-preserving approach for building wallet interfaces.
+> 
+> But currently, AIR Kit doesn't expose that API. There's no get credentials method. So as the **issuer**, we track what **we** issued. This is legitimate - issuers need to know what they've issued for management purposes like checking expiry dates or handling revocations.
+> 
+> **Privacy compliance**: We can only see credentials from **Credo Protocol** - our own issuances. We can't see credentials from other issuers like employment credentials from another company or bank balance credentials from a different financial institution. That would require the user's permission and would need to go through MOCA's verification flows. The UI clearly says **'Credentials Issued by Credo Protocol'**, not 'All Your Credentials'."
+> 
+> **[Point to MCSP badge on credential card]**
+> 
+> "The actual credential data - the encrypted verifiable credential - is still on MCSP. If our backend database disappeared, users wouldn't lose their credentials. They'd just need to re-verify via AIR Kit's verify credential flow.
+> 
+> As the issuer, we can also view all issued credentials in the [AIR Kit Dashboard](https://developers.sandbox.air3.com/) under **Issuer → Records** - that's MOCA's official issuer management interface."
+> 
 > **[Click to proceed to blockchain submission]**
 > 
 > "Now we submit the credential hash to our smart contract on-chain for credit scoring."
@@ -232,25 +273,25 @@ By the end of this demo, judges should understand:
 > 
 > **[Lending page loads showing Position Card at top]**
 > 
-> "The page shows my current position overview. With my **[YOUR_SCORE]** credit score, the smart contract queries the oracle via `getUserCollateralFactor()` and gets my tier's collateral requirement."
+> "The page shows my current position overview. With my **[YOUR_SCORE]** credit score, the smart contract queries the oracle to get my tier's collateral requirement."
 > 
 > **[Point to collateral factor in position card]**
 > 
-> "My tier has a **collateral factor of [COLLATERAL]%** stored on-chain. The LendingPool contract calculates: `borrowLimit = (suppliedCollateral × 100) / collateralFactor`."
+> "My tier has a **collateral factor of [COLLATERAL]%** stored on-chain. The LendingPool contract calculates your borrow limit by taking your supplied collateral times one hundred, divided by your collateral factor."
 > 
 > "So I can borrow **$[AMOUNT]** for every $100 I supply. That's **[calculate ratio]x better** than standard DeFi's 0.67x!"
 > 
 > **[Point to existing borrow position if you have one]**
 > 
-> "I have an active borrow position here. The contract tracks this with **per-user borrow indices** - similar to Compound's interest model. Every time anyone interacts with the contract, it calls `accrueInterest()` which updates the **global borrow index** based on: `newIndex = oldIndex × (1 + (APR × timeElapsed / SECONDS_PER_YEAR))`."
+> "I have an active borrow position here. The contract tracks this with **per-user borrow indices** - similar to Compound's interest model. Every time anyone interacts with the contract, it accrues interest by updating the **global borrow index** - the calculation takes the old index and multiplies it by one plus the APR times elapsed time divided by seconds per year."
 > 
 > **[Point to interest accruing in real-time]**
 > 
-> "My interest accrues continuously. The frontend polls every 5 seconds calling `getBorrowBalanceWithInterest()` - a view function that calculates: `totalOwed = principal × (globalIndex / userIndex)`. No gas costs for this calculation - it's a read-only call."
+> "My interest accrues continuously. The frontend polls every 5 seconds calling a view function that calculates total owed by taking the principal amount and multiplying it by the ratio of the global index to the user's index. No gas costs for this calculation - it's a read-only call."
 > 
 > **[Point to APR display]**
 > 
-> "My borrowing rate is **[YOUR_APR]%** - tier-based rates are stored in the contract's `tierInterestRates` mapping. Exceptional credit (900+) gets **5% APR**, Very Poor gets **18% APR**. This is retrieved with `getUserAPR(address)` which queries the oracle for your score, then returns the corresponding rate."
+> "My borrowing rate is **[YOUR_APR]%** - tier-based rates are stored in the contract's tier interest rates mapping. Exceptional credit scores over 900 get **5% APR**, while Very Poor scores get **18% APR**. The contract retrieves this by calling a function that queries the oracle for your score, then returns the corresponding rate."
 
 **Time Check**: 3:30
 
@@ -260,17 +301,17 @@ By the end of this demo, judges should understand:
 
 ### Part A: Leaderboard (15 seconds)
 
-**[Navigate back to Score Builder page (/score) - can click from dashboard or navbar]**
+**[Navigate back to Score Builder page - can click from dashboard or navbar]**
 
 **[Scroll down to Leaderboard section below the Score Builder Wizard]**
 
 ### Talking Points:
 
-> "Here's our **live leaderboard** - this queries the blockchain for `ScoreComputed` events from the last 10,000 blocks. We're limited to 10k blocks by MOCA's RPC - that's about 8-10 hours of history."
+> "Here's our **live leaderboard** - this queries the blockchain for score computation events from the last 10,000 blocks. We're limited to 10 thousand blocks by MOCA's RPC infrastructure - that's about 8 to 10 hours of history."
 > 
 > **[Point to top users in the leaderboard]**
 > 
-> "The frontend uses `ethers.js` to call `oracle.queryFilter('ScoreComputed')` - these are indexed events emitted every time someone submits a credential. Each event contains: user address, base score, component breakdown, diversity bonus, and final score. We aggregate by user, keep the latest score, and sort descending."
+> "The frontend queries the blockchain for indexed events emitted every time someone submits a credential. Each event contains the user address, base score, component breakdown, diversity bonus, and final score. We aggregate by user, keep the latest score, and sort in descending order."
 > 
 > **[Point to trophy icons for top 3]**
 > 
@@ -284,7 +325,7 @@ By the end of this demo, judges should understand:
 
 **[Open new tab to API endpoint]**
 
-**[Navigate to: `https://credo-protocol.vercel.app/api/score/[YOUR_DEMO_ADDRESS]`]**
+**[Navigate to the API endpoint with your demo address]**
 
 ### Talking Points:
 
@@ -292,27 +333,27 @@ By the end of this demo, judges should understand:
 > 
 > **[Show JSON response]**
 > 
-> "This is a Next.js API route at `/api/score/[address].js`. When you hit this endpoint, the backend:
-> 1. Creates an **ethers.js JSON-RPC provider** to Moca Chain
-> 2. Instantiates our CreditScoreOracle contract with the ABI
-> 3. Calls `oracle.getCreditScore(address)` - a view function, no gas
-> 4. Calls `oracle.getTierForScore(score)` to get collateral factors
+> "This is a Next.js API route. When you hit this endpoint, the backend:
+> 1. Creates a JSON-RPC provider connection to Moca Chain
+> 2. Instantiates our CreditScoreOracle contract
+> 3. Calls the get credit score function - a view function that costs no gas
+> 4. Calls the get tier for score function to retrieve collateral factors
 > 5. Caches the result for 60 seconds in memory
 > 
-> CORS headers are set to `Access-Control-Allow-Origin: *` - any origin can call this."
+> The CORS headers are set to allow any origin - so any website or app can call this API."
 > 
 > **[Scroll through response]**
 > 
-> "The response includes score, tier, borrowing power calculations, and **integration code**. Other dApps can:
+> "The response includes the score, tier level, borrowing power calculations, and **integration examples**. Other dApps can:
 > - **GameFi**: Call our API to gate content by score
-> - **DAOs**: Weight votes by calling `oracle.getCreditScore()` on-chain
+> - **DAOs**: Weight votes by calling our oracle directly on-chain
 > - **DeFi protocols**: Read our oracle for dynamic collateral ratios
 > 
-> We've also included a **Solidity interface** - `ICreditScoreOracle` with function signatures. Any contract can import this and query our oracle directly without trusting our API."
+> We've also included a **Solidity interface** with all the function signatures. Any smart contract can import this interface and query our oracle directly without trusting our API centralized endpoint."
 > 
 > **[Point to Solidity example]**
 > 
-> "See? `oracle.getCreditScore(user)` returns `uint256`. One line of Solidity gives you a user's creditworthiness. That's true composability."
+> "See? One line of Solidity gives you a user's creditworthiness as an unsigned integer. That's true composability."
 
 **Time Check**: 4:15
 
@@ -322,7 +363,7 @@ By the end of this demo, judges should understand:
 
 **[Open Moca Devnet Explorer in new tab]**
 
-**[Navigate to your Oracle contract: devnet-scan.mocachain.org/address/0x12ad1aBfBde99Ce4D37fB18A5e622A619d59f705]**
+**[Navigate to your Oracle contract on the block explorer]**
 
 ### Talking Points:
 
@@ -330,11 +371,11 @@ By the end of this demo, judges should understand:
 > 
 > **[Show contract address]**
 > 
-> "Here's our CreditScoreOracle at `0x12ad...9f705`. The explorer shows:
+> "Here's our CreditScoreOracle contract address. The explorer shows:
 > - **Contract bytecode** - the compiled EVM opcodes
-> - **Source code** - because we ran `hardhat verify`, the Solidity is published
+> - **Source code** - because we verified it with Hardhat, the Solidity is published
 > - **ABI** - the JSON interface other contracts can use
-> - **Read/Write functions** - you can query `getCreditScore()` right from the explorer
+> - **Read and Write functions** - you can query the get credit score function right from the explorer
 > 
 > **[Click on 'Contract' tab if visible]**
 > 
@@ -358,10 +399,10 @@ By the end of this demo, judges should understand:
 > - **Transparent scoring** - all logic is in smart contracts with event emissions
 > 
 > **For Developers**:
-> - **REST API** with 60s caching and CORS headers - instant integration
-> - **Solidity interfaces** - `ICreditScoreOracle` anyone can import
-> - **On-chain oracle** - `getCreditScore(address)` view function, zero gas
-> - **Standardized events** - `ScoreComputed` with full breakdown for indexing
+> - **REST API** with 60 second caching and CORS headers - instant integration
+> - **Solidity interfaces** - a credit score oracle interface anyone can import
+> - **On-chain oracle** - view functions that cost zero gas to query
+> - **Standardized events** - score computed events with full breakdown for indexing
 > 
 > **For MOCA Ecosystem**:
 > - **Official AIR Kit integration** - Partner JWT authentication with RS256 + JWKS
@@ -372,10 +413,10 @@ By the end of this demo, judges should understand:
 > 
 > This is just the beginning. The technical roadmap includes:
 > - **Plaid API integration** - real bank balance OAuth instead of simulated data
-> - **Zero-knowledge range proofs** via AIR Kit's ZK services - prove income > $X without revealing amount
-> - **MOCA Identity Oracle** for cross-chain verification - port your score to Ethereum/Polygon
+> - **Zero-knowledge range proofs** via AIR Kit's ZK services - prove income exceeds a threshold without revealing the exact amount
+> - **MOCA Identity Oracle** for cross-chain verification - port your score to Ethereum or Polygon
 > - **Liquidation keepers** with Chainlink price feeds - production-grade risk management
-> - **EIP-4626 tokenized vaults** - composable yield on supplied collateral
+> - **Tokenized vault standards** - composable yield on supplied collateral
 > 
 > Credo Protocol brings **TradFi credit concepts to Web3** with **cryptographic guarantees** and **on-chain transparency**. We're making DeFi accessible to **everyone**, not just crypto-wealthy users."
 > 
@@ -426,7 +467,7 @@ Before the demo, take high-quality screenshots of:
 - ✅ "**On-chain registries** for issuers, credential types, and tiers"
 - ✅ "**Compound-style interest accrual** with global + per-user borrow indices"
 - ✅ "**Event-driven transparency** - every score calculation emits full breakdown"
-- ✅ "**View functions** for zero-gas queries: `getCreditScore()`, `getTierForScore()`"
+- ✅ "**View functions** for zero-gas queries - get credit score and get tier for score"
 - ✅ "**EIP-4337 Account Abstraction** wallets via AIR Kit (MPC key management)"
 
 ### Technical Differentiation:
@@ -438,7 +479,7 @@ Before the demo, take high-quality screenshots of:
 
 ### Technical Impact:
 - ✅ "**2-3x capital efficiency** - LTV from 67% to 200% based on credit"
-- ✅ "**On-chain oracle** - `ICreditScoreOracle` interface for Solidity integration"
+- ✅ "**On-chain oracle** - credit score oracle interface for Solidity integration"
 - ✅ "**Decentralized identity** bridge - off-chain reputation → on-chain proofs"
 - ✅ "**Infrastructure primitive** - credit scoring as a composable building block"
 
@@ -490,7 +531,7 @@ Before the demo, take high-quality screenshots of:
 > - **Payroll**: Employers verify identity for tax purposes (W-2, SSN)
 > 
 > **Layer 2: Credential Uniqueness**
-> - Smart contract uses `keccak256(credentialData)` as a unique identifier
+> - Smart contract uses cryptographic hashing of credential data as a unique identifier
 > - Same credential submitted twice = rejected on-chain
 > - Each credential type has a **cooldown period** (e.g., can't submit new income proof every day)
 > 
@@ -514,7 +555,7 @@ Before the demo, take high-quality screenshots of:
 > 
 > **Liquidation Mechanism (Phase 2):**
 > 1. **Price Oracles**: Integrate Chainlink price feeds for USDC/collateral valuation
-> 2. **Health Factor Monitoring**: `healthFactor = (collateralValue × liquidationThreshold) / totalDebt`
+> 2. **Health Factor Monitoring**: health factor equals collateral value times liquidation threshold divided by total debt
 > 3. **Liquidator Incentives**: When healthFactor < 1.0, anyone can liquidate for 5-10% bonus
 > 4. **Partial Liquidations**: Only liquidate enough to restore health, not entire position
 > 
@@ -532,7 +573,7 @@ Before the demo, take high-quality screenshots of:
 > This buildathon focused on **proving the credential infrastructure works** - getting 10 W3C credentials from AIR Kit into our smart contract. Liquidation logic is standard DeFi - we can add it once the identity layer is validated."
 
 **Q: "Can users game the system by requesting the same credential multiple times?"**
-> A: "No - the smart contract uses `credentialHash` as a unique identifier. Same credential twice = rejected. Also, credentials **decay over time** (70-100% weight based on age), so old credentials become less valuable. Users are incentivized to update with fresh credentials."
+> A: "No - the smart contract uses the credential hash as a unique identifier. Same credential submitted twice gets rejected. Also, credentials **decay over time** with weight ranging from 70 to 100 percent based on age, so old credentials become less valuable. Users are incentivized to update with fresh credentials."
 
 **Q: "Why Moca Chain? Why not Ethereum?"**
 > A: "MOCA provides **vertical integration** for decentralized identity that would take months to build on Ethereum. Here's the technical comparison:
@@ -547,7 +588,7 @@ Before the demo, take high-quality screenshots of:
 > 
 > **On MOCA, we get:**
 > 1. **AIR Kit Dashboard** - register Issuer DIDs in UI, instant
-> 2. **Partner JWT + JWKS** - proven auth pattern with `airService.issueCredential()`
+> 2. **Partner JWT plus JWKS** - proven auth pattern with AIR Kit credential issuance
 > 3. **MCSP built-in** - decentralized storage handled automatically
 > 4. **AIR Kit wallets** - EIP-4337 AA wallets with MPC key management
 > 5. **Paymaster infrastructure** - just add policy ID, no custom contracts
@@ -563,13 +604,49 @@ Before the demo, take high-quality screenshots of:
 > 
 > They're **credit-invisible** to TradFi banks but **credit-visible** to our on-chain scoring. Perfect initial market."
 
+**Q: "How do users view their credentials? Aren't they supposed to be private?"**
+> A: "Excellent question about the architecture! Here's the nuanced answer:
+> 
+> **Current Implementation:**
+> - Our UI shows **'Credentials Issued by Credo Protocol'** - not all credentials
+> - We track only **what we issued** as the issuer - that's our legitimate role
+> - Stored data: credential ID, bucket type, dates - NOT the encrypted credential itself
+> - The actual credential with the W3C standard cryptographic proof lives on MCSP
+> 
+> **Why This Approach:**
+> - Currently, credentials are **only shown during verification flows** through AIR Kit's built-in UI widget
+> - AIR Kit doesn't expose an API method to retrieve a user's full credential wallet from MCSP for display purposes
+> - To build a standalone wallet view showing ALL credentials (from all issuers), you'd need MOCA to provide an official API that queries MCSP with user permission
+> - As the **issuer**, we legitimately track what we've issued for management purposes like revocation and expiry monitoring
+> 
+> **Privacy Compliance:**
+> - We can only see **our own issuances** - credentials from Credo Protocol
+> - We can't see credentials from OTHER issuers - that's the proper self-sovereign model
+> - To see credentials from other issuers would require the user's explicit consent through AIR Kit's verification flows
+> - Users control who sees their credentials via MOCA's built-in verification mechanisms
+> 
+> **The Ideal Future State:**
+> - MOCA adds an official API like get user credentials with authentication
+> - Only the authenticated user or apps with user consent can call it
+> - Returns encrypted credential data from MCSP that only the user can decrypt
+> - This would enable building custom wallet UIs showing credentials from all issuers
+> - Currently you can only see credentials during verification - this would allow proactive viewing
+> - This would enable true cross-issuer credential portability while preserving privacy
+> 
+> **Issuer Dashboard:**
+> - We can also view issued credentials at the AIR Kit Developer Dashboard
+> - That's MOCA's official issuer management interface under Issuer Records
+> - Shows Holder ID, Credential ID, Claimed Time, and revocation controls
+> 
+> So we're **not violating privacy** - we're fulfilling our role as an issuer by tracking our own issuances. The encrypted credential data itself remains on decentralized MCSP storage."
+
 **Q: "How do you handle privacy? Can everyone see my salary?"**
 > A: "Multi-layer privacy architecture:
 > 
 > **Current Implementation (Range Buckets):**
 > 1. **Backend issuer** sees your exact amount (needed for bucketing decision)
-> 2. **Credential stores** only the bucket: `INCOME_HIGH` ($8k+/month)
-> 3. **On-chain storage**: Just bytes32 hash `keccak256('INCOME_HIGH')` = `0x1a2b...`
+> 2. **Credential stores** only the bucket: Income High which is eight thousand dollars plus per month
+> 3. **On-chain storage**: Just the cryptographic hash of the bucket name, not the human-readable text
 > 4. **Smart contract** only knows: "This user has INCOME_HIGH credential (180 points)"
 > 5. **Public blockchain**: Shows credential hash, not even the bucket name
 > 
@@ -577,14 +654,14 @@ Before the demo, take high-quality screenshots of:
 > 
 > **Future: Zero-Knowledge Proofs (Phase 4):**
 > Using AIR Kit's ZK credential services, we can prove:
-> - `income > $5000` (boolean) without revealing amount
-> - Implemented with **zk-SNARKs**: Generate proof that `salary ≥ threshold`
+> - income greater than five thousand dollars as a yes or no boolean without revealing the exact amount
+> - Implemented with **zk-SNARKs**: Generate a cryptographic proof that salary is greater than or equal to the threshold
 > - Smart contract verifies proof cryptographically
 > - Backend never sees your exact amount (done client-side with ZK circuit)
 > 
 > **Technical Flow (ZK Future):**
-> 1. User inputs salary in frontend: `$7,234`
-> 2. Frontend generates ZK proof: `PROOF[salary ≥ $5000] = true`
+> 1. User inputs their salary in the frontend, say seven thousand two hundred thirty-four dollars
+> 2. Frontend generates a ZK proof that the salary is greater than or equal to five thousand dollars, which evaluates to true
 > 3. Submit proof to contract, not the salary
 > 4. Contract verifies proof using **PLONK/Groth16 verifier**
 > 5. Awards points if proof valid
@@ -694,9 +771,9 @@ This demo script now includes deep technical explanations for:
 
 ### **Smart Contract Architecture:**
 - EIP-4337 Account Abstraction with MPC key management
-- Compound-style interest accrual formulas (`globalIndex × (1 + APR × time)`)
+- Compound-style interest accrual formulas with global index calculations
 - On-chain registries (issuers, credential types, tiers)
-- Event-driven transparency (`ScoreComputed` event structure)
+- Event-driven transparency with score computed event structures
 - View functions for zero-gas queries
 
 ### **MOCA Integration:**
@@ -712,11 +789,13 @@ This demo script now includes deep technical explanations for:
 - Zero-knowledge proof roadmap (zk-SNARKs, PLONK/Groth16)
 - Multi-layer Sybil resistance (KYC, uniqueness, governance, economics)
 - Issuer trust score and deactivation mechanism
+- Credential viewing architecture (issuer tracking vs user wallet privacy)
+- MCSP decentralized storage separation from issuer database
 
 ### **Composability:**
 - Next.js API route architecture (ethers.js provider, caching, CORS)
-- Solidity interface (`ICreditScoreOracle`) for contract integration
-- Event indexing with `queryFilter()` for leaderboard
+- Solidity interface for credit score oracle contract integration
+- Event indexing with query filtering for the leaderboard
 - Public schema registry for ecosystem discovery
 
 ### **Production Readiness:**
@@ -725,7 +804,8 @@ This demo script now includes deep technical explanations for:
 - Credit-specific features (grace periods, score penalties)
 - Comparison: Ethereum DIY vs MOCA vertical integration
 
-**Total Technical Terms Explained**: 50+  
-**Code Examples**: 15+  
+**Total Technical Terms Explained**: 55+  
+**Code Examples**: 17+  
 **Architecture Diagrams**: 3 (conceptual)
+**New Topics Added**: Credential viewing architecture, issuer tracking patterns, production database design
 
