@@ -1,7 +1,7 @@
 /**
  * Credential API Routes - MOCA Official Integration
  * 
- * NEW APPROACH (Phase 5.2):
+ * NEW APPROACH:
  * - Backend prepares credential metadata
  * - Frontend uses AIR Kit to issue credentials
  * - No more manual signature generation

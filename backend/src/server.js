@@ -1,5 +1,5 @@
 /**
- * Credo Protocol Backend Server - Phase 5.2
+ * Credo Protocol Backend Server (wave 3)
  * 
  * MOCA Official Integration: Partner JWT Authentication
  * 
