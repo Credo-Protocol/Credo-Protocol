@@ -314,9 +314,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
 
         {/* Liquidity Warning */}
         {liquidityLimited && maxBorrow > 0 && (
-          <Alert>
-            <AlertDescription className="flex items-center gap-2 text-sm">
-              <Info className="h-4 w-4 flex-shrink-0" />
+          <Alert className="border-red-500 bg-red-50">
+            <AlertDescription className="flex items-center gap-2 text-sm text-red-700">
+              <Info className="h-4 w-4 flex-shrink-0 text-red-600" />
               <span>
                 <strong>Note:</strong> Pool liquidity is currently limiting you to <strong>{maxBorrow.toFixed(2)} USDC</strong>. More will become available as others supply collateral.
               </span>
