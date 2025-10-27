@@ -280,7 +280,6 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
                       USDC
                     </div>
                   </div>
-                  <p className="text-xs text-black/60">Tip: "Pay Total" includes accrued interest. The contract caps to the exact amount owed.</p>
                   <div className="flex gap-2">
                     <button
                       className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
@@ -307,17 +306,31 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
                       className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
                       // Add a small buffer to cover interest accrued between fetch and repay
                       onClick={() => {
-                        const buffer = 0.10; // 10 cents buffer; contract will clamp to total owed
+                        const buffer = 0.10; // Small buffer for interest that accrues during transaction
                         const target = Math.min(balance, totalOwed + buffer);
                         setRepayAmount(target.toFixed(2));
                       }}
                       disabled={balance === 0}
+                      title="Includes $0.10 buffer for interest accruing during transaction. Contract auto-caps to exact amount owed - you won't overpay!"
                     >
                       Pay Total
                     </button>
                   </div>
                 </div>
               </div>
+              
+              {/* Info about Pay Total buffer */}
+              {repayAmount && parseFloat(repayAmount) > totalOwed && (
+                <div className="p-4 rounded-xl border border-black/10 bg-neutral-50">
+                  <div className="flex items-start gap-3">
+                    <Info className="h-5 w-5 text-black/60 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-black/70">
+                      <p className="font-semibold mb-1 text-black">Why is the amount higher than what I owe?</p>
+                      <p>The extra $0.10 buffer covers interest that accrues during the transaction (a few seconds). The smart contract automatically caps the payment to your exact debt, so <strong className="text-black">you won't be charged extra</strong>.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {totalOwed === 0 && (
                 <div className="p-4 rounded-xl border border-black/10 bg-neutral-50">
