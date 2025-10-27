@@ -275,11 +275,11 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
 
           {/* Step 2: Loading - AIR Kit Issuance (Phase 5.3) */}
           {(step === 'preparing' || step === 'issuing') && (
-            <div className="py-12 text-center space-y-6">
+            <div className="py-6 text-center space-y-4">
               <div className="flex justify-center">
                 <Loader2 className="h-12 w-12 animate-spin text-black" />
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center justify-center gap-2">
                   {step === 'preparing' && <Lock className="h-4 w-4 text-black" />}
                   {step === 'issuing' && <FileText className="h-4 w-4 text-black" />}
@@ -291,18 +291,21 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
                   <div className={`h-2 w-2 rounded-full ${step === 'preparing' ? 'bg-black' : 'bg-black/20'}`} />
                   <div className={`h-2 w-2 rounded-full ${step === 'issuing' ? 'bg-black' : 'bg-black/20'}`} />
                 </div>
-                {step === 'issuing' && (
-                  <div className="mt-4 space-y-2">
-                    {process.env.NEXT_PUBLIC_PAYMASTER_POLICY_ID && (
+                {/* Reserve space for additional info to keep modal same size */}
+                <div className="mt-2 space-y-1 h-[32px]">
+                  {step === 'issuing' && (
+                    <>
+                      {process.env.NEXT_PUBLIC_PAYMASTER_POLICY_ID && (
+                        <p className="text-xs text-black/60">
+                          Gas-sponsored - No MOCA tokens needed
+                        </p>
+                      )}
                       <p className="text-xs text-black/60">
-                        Gas-sponsored - No MOCA tokens needed
+                        Storing on MCSP (decentralized storage)
                       </p>
-                    )}
-                    <p className="text-xs text-black/60">
-                      Storing on MCSP (decentralized storage)
-                    </p>
-                  </div>
-                )}
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           )}
