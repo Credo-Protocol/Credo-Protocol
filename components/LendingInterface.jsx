@@ -71,7 +71,7 @@ export default function LendingInterface({ userAddress, creditScore, provider })
                     <ul className="text-sm text-muted-foreground space-y-2">
                       <li className="flex items-start">
                         <span className="mr-2">1.</span>
-                        <span>Get test USDC from the faucet (10,000 max)</span>
+                        <span>Get test USDC from the faucet (10,000 USDC)</span>
                       </li>
                       <li className="flex items-start">
                         <span className="mr-2">2.</span>
