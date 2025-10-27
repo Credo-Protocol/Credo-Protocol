@@ -49,7 +49,7 @@ export function AppNav({ onConnectionChange }) {
                 <Link key={item.href} href={item.href}>
                   <Button
                     variant={isActive ? 'default' : 'ghost'}
-                    className={`h-[44px] px-4 flex items-center gap-2 ${
+                    className={`h-[44px] w-[140px] flex items-center justify-center gap-2 ${
                       isActive 
                         ? 'bg-black text-white hover:bg-black/90' 
                         : 'text-black/70 hover:text-black hover:bg-black/5'
