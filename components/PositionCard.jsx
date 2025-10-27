@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { ethers } from 'ethers';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -276,8 +277,10 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
               <TrendingUp className="h-4 w-4 text-green-500" />
               <p className="text-sm text-muted-foreground">Supplied</p>
             </div>
-            <p className="text-2xl font-bold">{position.suppliedAmount.toFixed(2)}</p>
-            <p className="text-xs text-muted-foreground">USDC</p>
+            <p className="text-2xl font-bold">${position.suppliedAmount.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={12} height={12} className="inline" /> USDC
+            </p>
           </div>
 
           {/* Borrowed Amount */}
@@ -286,8 +289,10 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
               <TrendingDown className="h-4 w-4 text-red-500" />
               <p className="text-sm text-muted-foreground">Borrowed</p>
             </div>
-            <p className="text-2xl font-bold">{position.borrowedAmount.toFixed(2)}</p>
-            <p className="text-xs text-muted-foreground">USDC</p>
+            <p className="text-2xl font-bold">${position.borrowedAmount.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={12} height={12} className="inline" /> USDC
+            </p>
           </div>
         </div>
 

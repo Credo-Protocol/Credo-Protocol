@@ -10,6 +10,7 @@
  */
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -58,8 +59,8 @@ export default function LendingInterface({ userAddress, creditScore, provider })
           <Card>
             <CardHeader>
               <CardTitle>Supply Collateral</CardTitle>
-              <CardDescription>
-                Deposit USDC to use as collateral for borrowing
+              <CardDescription className="flex items-center gap-1.5">
+                Deposit <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC to use as collateral for borrowing
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -71,7 +72,7 @@ export default function LendingInterface({ userAddress, creditScore, provider })
                     <ul className="text-sm text-muted-foreground space-y-2">
                       <li className="flex items-start">
                         <span className="mr-2">1.</span>
-                        <span>Get test USDC from the faucet (10,000 USDC)</span>
+                        <span className="flex items-center gap-1.5 flex-wrap">Get test <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC from the faucet (10,000 <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC)</span>
                       </li>
                       <li className="flex items-start">
                         <span className="mr-2">2.</span>
@@ -79,7 +80,7 @@ export default function LendingInterface({ userAddress, creditScore, provider })
                       </li>
                       <li className="flex items-start">
                         <span className="mr-2">3.</span>
-                        <span>Supply USDC as collateral to start borrowing</span>
+                        <span className="flex items-center gap-1.5">Supply <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC as collateral to start borrowing</span>
                       </li>
                       <li className="flex items-start">
                         <span className="mr-2">4.</span>
@@ -95,7 +96,7 @@ export default function LendingInterface({ userAddress, creditScore, provider })
                 onClick={() => setSupplyModalOpen(true)}
               >
                 <TrendingUp className="h-5 w-5" />
-                Supply USDC
+                <span className="flex items-center gap-1.5">Supply <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC</span>
               </button>
             </CardContent>
           </Card>
@@ -115,8 +116,8 @@ export default function LendingInterface({ userAddress, creditScore, provider })
           <Card>
             <CardHeader>
               <CardTitle>Repay Debt</CardTitle>
-              <CardDescription>
-                Pay back your borrowed USDC to reduce debt and improve health factor
+              <CardDescription className="flex items-center gap-1.5 flex-wrap">
+                Pay back your borrowed <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC to reduce debt and improve health factor
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -125,7 +126,7 @@ export default function LendingInterface({ userAddress, creditScore, provider })
                 onClick={() => setRepayModalOpen(true)}
               >
                 <TrendingUp className="h-5 w-5" />
-                Repay USDC
+                <span className="flex items-center gap-1.5">Repay <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC</span>
               </button>
             </CardContent>
           </Card>

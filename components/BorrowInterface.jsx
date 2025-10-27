@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { ethers } from 'ethers';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -320,7 +321,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Credit Limit</span>
-            <span className="text-lg font-semibold">{creditLimit.toFixed(2)} USDC</span>
+            <span className="text-lg font-semibold flex items-center gap-1.5">
+              {creditLimit.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
+            </span>
           </div>
         </div>
 
@@ -329,8 +332,8 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
           <Alert className="border-red-500 bg-red-50">
             <AlertDescription className="flex items-center gap-2 text-sm text-red-700">
               <Info className="h-4 w-4 flex-shrink-0 text-red-600" />
-              <span>
-                <strong>Note:</strong> Pool liquidity is currently limiting you to <strong>{maxBorrow.toFixed(2)} USDC</strong>. More will become available as others supply collateral.
+              <span className="flex items-center gap-1 flex-wrap">
+                <strong>Note:</strong> Pool liquidity is currently limiting you to <strong className="flex items-center gap-1">{maxBorrow.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC</strong>. More will become available as others supply collateral.
               </span>
             </AlertDescription>
           </Alert>
@@ -365,8 +368,8 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
                   className="w-full px-4 py-3 pr-20 text-right text-2xl font-bold text-black border border-black/20 rounded-md focus:outline-none focus:ring-2 focus:ring-black/20 bg-white cursor-text"
                   inputMode="numeric"
                 />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-black/60 font-medium">
-                  USDC
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-black/60 font-medium flex items-center gap-1.5">
+                  <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
                 </div>
               </div>
               
@@ -382,7 +385,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
               
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>0</span>
-                <span>{maxBorrow.toFixed(2)} USDC</span>
+                <span className="flex items-center gap-1">
+                  {maxBorrow.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={12} height={12} className="inline" /> USDC
+                </span>
               </div>
             </div>
 
@@ -393,7 +398,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
                   <Info className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div className="flex-1 space-y-1">
                     <p className="text-sm font-medium">Required Collateral</p>
-                    <p className="text-xl font-bold">{requiredCollateral.toFixed(2)} USDC</p>
+                    <p className="text-xl font-bold flex items-center gap-1.5">
+                      {requiredCollateral.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       Based on your {collateralFactor}% collateral factor
                     </p>
@@ -424,7 +431,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
               ) : (
                 <>
                   <TrendingDown className="mr-2 h-4 w-4" />
-                  Borrow {borrowAmount.toFixed(2)} USDC
+                  <span className="flex items-center gap-1.5">
+                    Borrow {borrowAmount.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
+                  </span>
                 </>
               )}
             </Button>
@@ -433,7 +442,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
           <Alert>
             <AlertDescription className="flex items-center gap-2">
               <Info className="h-4 w-4 flex-shrink-0" />
-              <span>You need to supply collateral before you can borrow. Go to the Supply tab to deposit USDC.</span>
+              <span className="flex items-center gap-1 flex-wrap">
+                You need to supply collateral before you can borrow. Go to the Supply tab to deposit <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC.
+              </span>
             </AlertDescription>
           </Alert>
         )}
@@ -457,7 +468,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
           {/* Borrowed Amount */}
           <div className="flex items-center justify-between p-6 rounded-xl border border-black/10 bg-white">
             <span className="text-sm text-black/60">Amount Borrowed</span>
-            <span className="text-lg font-bold text-black">{successDetails.amount.toFixed(2)} USDC</span>
+            <span className="text-lg font-bold text-black flex items-center gap-1.5">
+              {successDetails.amount.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
+            </span>
           </div>
           
           {/* Transaction Hash */}
