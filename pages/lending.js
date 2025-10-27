@@ -2,7 +2,7 @@
  * Lending Page
  * 
  * Dedicated page for DeFi lending operations:
- * - Supply USDC to earn interest
+ * - Supply USDC as collateral
  * - Borrow based on credit score
  * - Manage positions
  */
@@ -150,7 +150,7 @@ export default function LendingPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-black mb-2">Lending Pool</h1>
           <p className="text-black/60">
-            Supply USDC to earn interest or borrow based on your credit score
+            Supply USDC as collateral or borrow based on your credit score
           </p>
         </div>
 

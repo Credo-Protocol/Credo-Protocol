@@ -281,14 +281,14 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Credit Score Info */}
-        <div className="p-4 bg-muted rounded-lg space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Your Credit Score</span>
-            <span className={`text-lg font-bold ${scoreColor}`}>{creditScore}</span>
+        <div className="p-6 bg-muted rounded-lg space-y-4">
+          <div className="text-center space-y-2">
+            <span className="text-base font-medium block text-muted-foreground">Your Credit Score</span>
+            <span className={`text-5xl font-bold block ${scoreColor}`}>{creditScore}</span>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Collateral Factor</span>
-            <span className="text-sm font-semibold">{collateralFactor}%</span>
+          <div className="text-center space-y-2">
+            <span className="text-base font-medium block text-muted-foreground">Collateral Factor</span>
+            <span className="text-4xl font-bold block">{collateralFactor}%</span>
           </div>
         </div>
 
