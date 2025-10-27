@@ -2,7 +2,7 @@
 
 This guide will help you redeploy all contracts and test the complete MOCA integration.
 
-**Last Updated**: Phase 5.3 Complete (October 26, 2025)
+**Last Updated**: October 27, 2025 (Verified & Tested)
 
 ---
 
@@ -24,7 +24,7 @@ Before starting, ensure you have:
 
 ```bash
 # Navigate to project root
-cd /Users/marcus/Projects/Credo-Protocol
+cd Credo-Protocol
 
 # Optional: Clear any existing deployed addresses
 # (We'll generate new ones)
@@ -43,14 +43,14 @@ cd contracts
 # Check your wallet has MOCA tokens
 echo "Check balance at: https://devnet-scan.mocachain.org/faucet"
 
-# Deploy contracts
-npm run deploy
+# Deploy contracts (use the correct script name)
+npm run deploy:devnet
 
 # This will:
-# ✅ Deploy CreditScoreOracle
-# ✅ Deploy LendingPool
+# ✅ Deploy CreditScoreOracle v2
+# ✅ Deploy LendingPool (with interest accrual)
 # ✅ Deploy MockUSDC
-# ✅ Register credential types
+# ✅ Register 11 credential types (all 10 types + on-chain activity)
 # ✅ Enable USDC in lending pool
 # ✅ Save addresses to deployed-addresses.json
 ```
@@ -59,10 +59,12 @@ npm run deploy
 ```
 🎉 DEPLOYMENT COMPLETE!
 📋 Contract Addresses:
-   CreditScoreOracle: 0x...
-   LendingPool:       0x...
-   MockUSDC:          0x...
+   CreditScoreOracle: 0xE8F32cD64626044c64CE7b9e58bfB98A9f026cc3 (example - yours will differ)
+   LendingPool:       0xF72a2eC49655F67147DC6e0d397991C9c3a12685 (example)
+   MockUSDC:          0xDC44715B0208022a04fC00fF70f7C12d7D8F8dAc (example)
 ```
+
+**IMPORTANT:** Copy these addresses - you'll need them for Step 3!
 
 ### 2.1 ⚠️ CRITICAL: Register Issuers
 
@@ -77,25 +79,28 @@ npx hardhat run --network moca-devnet scripts/register-deployer-issuer.ts
 - Without registered issuers, credential submissions fail with "missing revert data" error
 - This registers your deployer address + all mock issuers on the Oracle contract
 - Must be done EVERY time you deploy new contracts
+- The script automatically reads the new Oracle address from `deployed-addresses.json`
 
 **Expected Output:**
 ```
 🔐 Registering Deployer as Issuer
 ============================================================
-📍 Oracle Address: 0xFA1F2920F107FE2199CC5f389349e3F2292387BD
+📍 Oracle Address: 0x<YOUR_NEW_ORACLE_ADDRESS>
 👤 Deployer Address: 0x32F91E4E2c60A9C16cAE736D3b42152B331c147F
 
 ⚙️  Registering deployer as issuer...
 ✅ Deployer registered successfully!
 
 ⚙️  Registering mock issuers on correct contract...
-   ✅ Mock Exchange registered
-   ✅ Mock Employer registered  
-   ✅ Mock Bank registered
+   ⚠️  Mock Exchange already registered (or ✅ registered if first time)
+   ⚠️  Mock Employer already registered
+   ⚠️  Mock Bank already registered
 
 ============================================================
 ✅ All issuers registered on correct contract!
 ```
+
+**Note:** If you see "already registered", that's fine - it means the deploy script registered them.
 
 ---
 
@@ -103,38 +108,49 @@ npx hardhat run --network moca-devnet scripts/register-deployer-issuer.ts
 
 ### 3.1 Update Frontend `.env.local`
 
-```bash
-cd /Users/marcus/Projects/Credo-Protocol
+**Get addresses from:** `contracts/deployed-addresses.json`
 
-# Open .env.local and update these lines:
+```bash
+cd Credo-Protocol
+# View the deployed addresses
+cat contracts/deployed-addresses.json
 ```
 
-Update with your **new contract addresses** from Step 2:
+Now open `.env.local` and update **6 address variables** (3 primary + 3 legacy):
 
 ```bash
-# Smart Contract Addresses (UPDATE THESE!)
-NEXT_PUBLIC_CREDIT_SCORE_ORACLE=0xYOUR_NEW_ORACLE_ADDRESS
-NEXT_PUBLIC_LENDING_POOL=0xYOUR_NEW_POOL_ADDRESS
-NEXT_PUBLIC_USDC=0xYOUR_NEW_USDC_ADDRESS
+# Primary contract addresses (UPDATE THESE!)
+NEXT_PUBLIC_CREDIT_ORACLE_ADDRESS=0x<YOUR_NEW_ORACLE_ADDRESS>
+NEXT_PUBLIC_LENDING_POOL_ADDRESS=0x<YOUR_NEW_POOL_ADDRESS>
+NEXT_PUBLIC_MOCK_USDC_ADDRESS=0x<YOUR_NEW_USDC_ADDRESS>
 
-# Keep these from Phase 5.1-5.3
+# Legacy names for backward compatibility (UPDATE THESE TOO!)
+NEXT_PUBLIC_CREDIT_SCORE_ORACLE=0x<YOUR_NEW_ORACLE_ADDRESS>
+NEXT_PUBLIC_LENDING_POOL=0x<YOUR_NEW_POOL_ADDRESS>
+NEXT_PUBLIC_USDC=0x<YOUR_NEW_USDC_ADDRESS>
+
+# Keep these from Phase 5.1-5.3 (DON'T CHANGE)
 NEXT_PUBLIC_PARTNER_ID=954fe820-050d-49fb-b22e-884922aa6cef
 NEXT_PUBLIC_ISSUER_DID=did:air:id:test:4P3gyKQFs7SYu1XBDirLU7WhJqRgDHHuKbfVuGTwun
 NEXT_PUBLIC_VERIFIER_DID=did:key:81eGFbL7uQGFjvbTMAyQv4XtzTv7w7JLpevwLDRtenKt6i4z8sgsuAPwGJaXrBBZUgRbfFC13mXE2QVMDffs1KScqF
 NEXT_PUBLIC_PAYMASTER_POLICY_ID=
 NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_MOCA_RPC=https://rpc.testnet.mocachain.org
+NEXT_PUBLIC_MOCA_RPC=https://devnet-rpc.mocachain.org
 ```
 
-### 3.2 Update `lib/contracts.js` (if needed)
+### 3.2 Update `lib/contracts.js` (fallback addresses)
 
-Check if contract addresses are hardcoded anywhere:
+Open `lib/contracts.js` and update the fallback addresses in the CONTRACTS object:
 
-```bash
-grep -r "0x82Adc" lib/ components/ pages/ hooks/
+```javascript
+export const CONTRACTS = {
+  CREDIT_ORACLE: process.env.NEXT_PUBLIC_CREDIT_ORACLE_ADDRESS || '0x<YOUR_NEW_ORACLE_ADDRESS>',
+  LENDING_POOL: process.env.NEXT_PUBLIC_LENDING_POOL_ADDRESS || '0x<YOUR_NEW_POOL_ADDRESS>',
+  MOCK_USDC: process.env.NEXT_PUBLIC_MOCK_USDC_ADDRESS || '0x<YOUR_NEW_USDC_ADDRESS>',
+};
 ```
 
-If found, update to use env variables instead.
+**Why update fallbacks?** If `.env.local` is missing, the app will still work with these addresses.
 
 ---
 
@@ -173,7 +189,7 @@ curl http://localhost:3001/health
 ### 4.2 Restart Frontend
 
 ```bash
-cd /Users/marcus/Projects/Credo-Protocol
+cd Credo-Protocol
 
 # Kill existing Next.js process
 lsof -ti:3000 | xargs kill -9 2>/dev/null || true
@@ -534,4 +550,42 @@ Once all tests pass:
 ---
 
 Good luck testing! 🚀
+
+---
+
+## 📝 Quick Reference Commands
+
+**Redeploy Everything:**
+```bash
+# 1. Deploy contracts
+cd contracts && npm run deploy:devnet
+
+# 2. Register issuers
+npx hardhat run --network moca-devnet scripts/register-deployer-issuer.ts
+
+# 3. Copy addresses from deployed-addresses.json
+cat deployed-addresses.json
+
+# 4. Update .env.local (6 variables) and lib/contracts.js (3 fallbacks)
+
+# 5. Restart backend
+cd Credo-Protocol/backend
+lsof -ti:3001 | xargs kill -9 2>/dev/null || true
+npm run dev
+
+# 6. Restart frontend (new terminal)
+cd Credo-Protocol
+lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+npm run dev
+```
+
+**Files to Update After Redeployment:**
+1. `Credo-Protocol/.env.local` (6 variables)
+2. `Credo-Protocol/lib/contracts.js` (3 fallback addresses)
+3. `Credo-Protocol/contracts/scripts/register-deployer-issuer.ts` (only if it has hardcoded address)
+
+**Important Addresses to Update:**
+- `NEXT_PUBLIC_CREDIT_ORACLE_ADDRESS` / `NEXT_PUBLIC_CREDIT_SCORE_ORACLE`
+- `NEXT_PUBLIC_LENDING_POOL_ADDRESS` / `NEXT_PUBLIC_LENDING_POOL`
+- `NEXT_PUBLIC_MOCK_USDC_ADDRESS` / `NEXT_PUBLIC_USDC`
 
