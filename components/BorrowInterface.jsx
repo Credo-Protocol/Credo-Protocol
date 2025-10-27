@@ -8,7 +8,7 @@
  * - Calls borrow() which internally queries CreditScoreOracle
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ethers } from 'ethers';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +22,7 @@ import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 
 export default function BorrowInterface({ userAddress, creditScore, onSuccess, provider }) {
   const [borrowAmount, setBorrowAmount] = useState(0);
+  const [inputValue, setInputValue] = useState('0.00'); // Display value for payment-style input
   const [maxBorrow, setMaxBorrow] = useState(0);
   const [borrowing, setBorrowing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -30,6 +31,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
   const [creditLimit, setCreditLimit] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successDetails, setSuccessDetails] = useState({ amount: 0, txHash: '' });
+  const inputRef = useRef(null);
 
   // Calculate collateral factor from credit score
   const collateralFactor = calculateCollateralFactor(creditScore);
@@ -118,7 +120,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
       setLiquidityLimited(isLiquidityLimited);
       
       // Set initial borrow amount to 50% of actual borrowable
-      setBorrowAmount(Math.max(0, actualBorrowableAmount * 0.5));
+      const initialAmount = Math.max(0, actualBorrowableAmount * 0.5);
+      setBorrowAmount(initialAmount);
+      setInputValue(initialAmount.toFixed(2));
     } catch (error) {
       console.error('Error fetching max borrow:', error);
       if (String(error?.message || '').toLowerCase().includes('disconnect')) {
@@ -184,6 +188,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
       
       // Reset borrow amount
       setBorrowAmount(0);
+      setInputValue('0.00');
       
       // Show success modal
       setShowSuccessModal(true);
@@ -198,6 +203,44 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
     } finally {
       setBorrowing(false);
     }
+  };
+
+  // Payment-style input handler
+  const handlePaymentInput = (e) => {
+    const key = e.key;
+    
+    // Handle backspace
+    if (key === 'Backspace') {
+      e.preventDefault();
+      const currentCents = Math.round(borrowAmount * 100);
+      const newCents = Math.floor(currentCents / 10);
+      const newAmount = newCents / 100;
+      const cappedAmount = Math.min(newAmount, maxBorrow);
+      setBorrowAmount(cappedAmount);
+      setInputValue(cappedAmount.toFixed(2));
+      return;
+    }
+    
+    // Handle number keys
+    if (/^[0-9]$/.test(key)) {
+      e.preventDefault();
+      const digit = parseInt(key);
+      const currentCents = Math.round(borrowAmount * 100);
+      const newCents = currentCents * 10 + digit;
+      const newAmount = newCents / 100;
+      
+      // Cap to max borrow
+      if (newAmount <= maxBorrow) {
+        setBorrowAmount(newAmount);
+        setInputValue(newAmount.toFixed(2));
+      }
+    }
+  };
+  
+  // Sync slider changes to input
+  const handleSliderChange = (value) => {
+    setBorrowAmount(value);
+    setInputValue(value.toFixed(2));
   };
 
   // Calculate required collateral based on borrow amount and collateral factor
@@ -261,19 +304,44 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
 
         {maxBorrow > 0 ? (
           <>
-            {/* Borrow Amount Slider */}
+            {/* Borrow Amount Input and Slider */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Borrow Amount</label>
-                <span className="text-2xl font-bold">{borrowAmount.toFixed(2)} USDC</span>
+              <label className="text-sm font-medium">Borrow Amount</label>
+              
+              {/* Direct Input Field - Payment Style */}
+              <div className="relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputValue}
+                  onKeyDown={handlePaymentInput}
+                  onChange={() => {}} // Prevent default onChange
+                  onFocus={(e) => {
+                    // Move cursor to the end when focused
+                    const length = e.target.value.length;
+                    e.target.setSelectionRange(length, length);
+                  }}
+                  onClick={(e) => {
+                    // Always position cursor at the end on click
+                    const length = e.target.value.length;
+                    e.target.setSelectionRange(length, length);
+                  }}
+                  placeholder="0.00"
+                  className="w-full px-4 py-3 pr-20 text-right text-2xl font-bold text-black border border-black/20 rounded-md focus:outline-none focus:ring-2 focus:ring-black/20 bg-white cursor-text"
+                  inputMode="numeric"
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-black/60 font-medium">
+                  USDC
+                </div>
               </div>
               
+              {/* Slider */}
               <Slider
                 min={0}
                 max={maxBorrow}
                 step={0.01}
                 value={[borrowAmount]}
-                onValueChange={(value) => setBorrowAmount(value[0])}
+                onValueChange={(value) => handleSliderChange(value[0])}
                 className="py-4"
               />
               
