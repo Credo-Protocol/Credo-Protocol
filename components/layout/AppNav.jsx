@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { Button } from '@/components/ui/button';
 import ConnectButton from '@/components/auth/ConnectButton';
 import CredentialNotifications from '@/components/CredentialNotifications';
-import { Home, Wallet, TrendingUp, BarChart3, Droplets } from 'lucide-react';
+import { Home, Wallet, TrendingUp, BarChart3, Droplets, Coins } from 'lucide-react';
 
 export function AppNav({ onConnectionChange }) {
   const router = useRouter();
@@ -18,8 +18,7 @@ export function AppNav({ onConnectionChange }) {
   const navItems = [
     { href: '/dashboard', label: 'Overview', icon: Home },
     { href: '/credentials', label: 'Credentials', icon: Wallet },
-    { href: '/lending', label: 'Lending', icon: TrendingUp },
-    { href: '/score', label: 'Score Builder', icon: BarChart3 },
+    { href: '/lending', label: 'Lending', icon: Coins },
   ];
   
   return (
@@ -29,7 +28,7 @@ export function AppNav({ onConnectionChange }) {
       
       <header className="border-b border-black/10 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between relative">
           {/* Logo and Brand */}
           <Link href="/" className="flex items-center gap-1 group">
             <img 
@@ -40,8 +39,8 @@ export function AppNav({ onConnectionChange }) {
             <span className="text-xl font-bold text-black">Credo Protocol</span>
           </Link>
           
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Navigation Links - Centered */}
+          <nav className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = router.pathname === item.href;
@@ -66,51 +65,79 @@ export function AppNav({ onConnectionChange }) {
           
           {/* Right Side Actions */}
           <div className="flex items-center gap-3">
-            <Link href="/">
-              <Button 
-                variant="ghost" 
-                className="h-[44px] px-3 flex items-center gap-2 text-black/70 hover:text-black hover:bg-black/5"
-              >
-                <Home className="h-4 w-4" />
-                <span className="text-sm hidden lg:inline">Home</span>
-              </Button>
-            </Link>
-            <Link href="/faucet">
-              <Button 
-                variant="outline" 
-                className="h-[44px] px-4 flex items-center gap-2 border-black/20 hover:bg-black/5 hover:border-black/30 text-black bg-white"
-              >
-                <Droplets className="h-4 w-4" />
-                <span className="text-sm hidden lg:inline">Faucet</span>
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href="/score">
+                <Button 
+                  variant="outline" 
+                  className={`h-[44px] w-[44px] p-0 flex items-center justify-center border-black/20 hover:bg-black/5 hover:border-black/30 text-black bg-white ${
+                    router.pathname === '/score' ? 'bg-black/5 border-black/30' : ''
+                  }`}
+                >
+                  <BarChart3 className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/faucet">
+                <Button 
+                  variant="outline" 
+                  className="h-[44px] w-[44px] p-0 flex items-center justify-center border-black/20 hover:bg-black/5 hover:border-black/30 text-black bg-white"
+                >
+                  <Droplets className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
             <ConnectButton onConnectionChange={onConnectionChange} />
           </div>
         </div>
         
         {/* Mobile Navigation */}
-        <nav className="md:hidden flex items-center gap-1 mt-3 overflow-x-auto pb-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = router.pathname === item.href;
-            
-            return (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant={isActive ? 'default' : 'ghost'}
-                  size="sm"
-                  className={`flex items-center gap-2 whitespace-nowrap ${
-                    isActive 
-                      ? 'bg-black text-white' 
-                      : 'text-black/70 hover:text-black'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span className="text-xs">{item.label}</span>
-                </Button>
-              </Link>
-            );
-          })}
+        <nav className="md:hidden flex items-center justify-between gap-1 mt-3 overflow-x-auto pb-1">
+          <div className="flex items-center gap-1">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = router.pathname === item.href;
+              
+              return (
+                <Link key={item.href} href={item.href}>
+                  <Button
+                    variant={isActive ? 'default' : 'ghost'}
+                    size="sm"
+                    className={`flex items-center gap-2 whitespace-nowrap ${
+                      isActive 
+                        ? 'bg-black text-white' 
+                        : 'text-black/70 hover:text-black'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="text-xs">{item.label}</span>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+          <div className="flex items-center gap-1">
+            <Link href="/score">
+              <Button
+                variant={router.pathname === '/score' ? 'default' : 'ghost'}
+                size="sm"
+                className={`w-[36px] h-[36px] p-0 flex items-center justify-center ${
+                  router.pathname === '/score'
+                    ? 'bg-black text-white'
+                    : 'text-black/70 hover:text-black'
+                }`}
+              >
+                <BarChart3 className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/faucet">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-[36px] h-[36px] p-0 flex items-center justify-center text-black/70 hover:text-black"
+              >
+                <Droplets className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
         </nav>
       </div>
     </header>
