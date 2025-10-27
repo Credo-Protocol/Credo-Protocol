@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Wallet, RefreshCw, CheckCircle, XCircle, Database, AlertTriangle, Clock, Ban } from 'lucide-react';
+import { Wallet, RefreshCw, CheckCircle, XCircle, Database, AlertTriangle, Clock, Ban, Lock, Coins, Briefcase, TrendingUp, Building2, FileText } from 'lucide-react';
 
 export function CredentialWallet() {
   const { userAddress, isConnected } = useAirKit();
@@ -27,6 +27,15 @@ export function CredentialWallet() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+
+  // Icon mapping for credential types
+  const iconComponents = {
+    Coins,
+    Briefcase,
+    TrendingUp,
+    Building2,
+    FileText
+  };
 
   // Load credentials on mount and when user connects
   useEffect(() => {
@@ -124,7 +133,7 @@ export function CredentialWallet() {
             size="sm" 
             onClick={handleRefresh}
             disabled={refreshing}
-            className="gap-2"
+            className="gap-2 border-black/20 hover:bg-black/5 hover:border-black/30 text-black bg-white"
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
@@ -134,8 +143,9 @@ export function CredentialWallet() {
       <CardContent>
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200">
-            <p className="text-sm text-red-600">
-              ⚠️ {error}
+            <p className="text-sm text-red-600 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              {error}
             </p>
           </div>
         )}
@@ -156,6 +166,7 @@ export function CredentialWallet() {
           <div className="space-y-3">
             {credentials.map((credential, index) => {
               const display = getCredentialDisplayInfo(credential);
+              const IconComponent = iconComponents[display.icon] || FileText;
               
               return (
                 <div
@@ -171,7 +182,9 @@ export function CredentialWallet() {
                   {/* Header: Icon and Details */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <span className="text-3xl">{display.icon}</span>
+                      <div className="w-12 h-12 rounded-lg bg-black flex items-center justify-center text-white flex-shrink-0">
+                        <IconComponent className="h-6 w-6" />
+                      </div>
                       <div>
                         <p className="font-medium capitalize">{display.name}</p>
                         <p className="text-xs text-muted-foreground">
@@ -242,9 +255,12 @@ export function CredentialWallet() {
         {/* Info footer */}
         {credentials.length > 0 && (
           <div className="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
-            <p className="text-xs text-blue-700">
-              <strong>🔒 Decentralized Storage:</strong> Your credentials are stored on MOCA Chain Storage Providers (MCSP), 
-              ensuring privacy and availability across the MOCA ecosystem.
+            <p className="text-xs text-blue-700 flex items-start gap-2">
+              <Lock className="h-4 w-4 flex-shrink-0 mt-0.5" />
+              <span>
+                <strong>Decentralized Storage:</strong> Your credentials are stored on MOCA Chain Storage Providers (MCSP), 
+                ensuring privacy and availability across the MOCA ecosystem.
+              </span>
             </p>
           </div>
         )}
