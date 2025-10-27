@@ -115,7 +115,7 @@ By the end of this demo, judges should understand:
 > 
 > **[Modal opens]**
 > 
-> "Notice: **'No MOCA tokens needed - Gas Sponsored'** - we're using MOCA's Paymaster infrastructure."
+> "Notice the **infrastructure is ready for gas sponsorship** - we've built in Paymaster support that can be enabled with a policy ID. For this demo, users pay minimal MOCA gas fees."
 > 
 > **[Credential processes]**
 > 
@@ -247,7 +247,7 @@ By the end of this demo, judges should understand:
 > - Real-world identity brought to DeFi
 > 
 > **For MOCA Ecosystem**:
-> - Official AIR Kit integration (Issuer DIDs, MCSP storage, gas sponsorship ready)
+> - Official AIR Kit integration (Issuer DIDs, MCSP storage, paymaster infrastructure ready)
 > - W3C Verifiable Credentials compliance
 > - True interoperability - our credentials work across all MOCA dApps
 > 
@@ -290,7 +290,7 @@ Before the demo, take high-quality screenshots of:
 ### MOCA Integration Points:
 - ✅ "Official AIR Kit Issuer DIDs - not custom signatures"
 - ✅ "Credentials stored on MCSP (decentralized storage)"
-- ✅ "Gas sponsorship ready with Paymaster infrastructure"
+- ✅ "Paymaster infrastructure built-in (can be enabled with policy ID)"
 - ✅ "W3C Verifiable Credentials standard compliance"
 - ✅ "Interoperable across MOCA ecosystem"
 

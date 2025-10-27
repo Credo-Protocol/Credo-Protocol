@@ -141,7 +141,7 @@ app.get('/.well-known/jwks.json', (req, res) => {
 #### Accomplishments:
 ✅ **AIR Kit SDK Integration**
 - Updated `lib/airkit.js` with paymaster configuration
-- Gas sponsorship enabled (users don't need MOCA tokens)
+- Gas sponsorship infrastructure ready (can be enabled with policy ID)
 - Graceful degradation if paymaster unavailable
 
 ✅ **Credential Services Created**
@@ -180,7 +180,7 @@ app.get('/.well-known/jwks.json', (req, res) => {
 #### User Experience Improvements:
 - **Before**: 4-step issuance with multiple approvals
 - **After**: 2-step issuance, fully automated
-- **Gas costs**: From user-paid → Fully sponsored (optional)
+- **Gas costs**: User pays minimal MOCA fees (sponsorship infrastructure ready for future)
 - **Storage**: From local → Decentralized (MCSP)
 - **Interoperability**: From isolated → MOCA ecosystem
 
@@ -198,7 +198,7 @@ await airService.issueCredential({
 // ✅ Credential signed by AIR Kit
 // ✅ Stored on MCSP (decentralized)
 // ✅ Added to user's AIR wallet
-// ✅ Gas sponsored (if enabled)
+// ✅ Gas sponsorship infrastructure ready (can be enabled with policy ID)
 // ✅ Visible in AIR Kit Dashboard
 ```
 
@@ -245,11 +245,11 @@ await airService.issueCredential({
 - **User privacy** maintained (data not exposed to MOCA servers)
 - **Permanent storage** (credentials persist)
 
-### 3. Gas Sponsorship
-- **Paymaster integration** for gasless transactions
-- **Users don't need MOCA tokens** for credential issuance
-- **Optional feature** (can be disabled)
-- **Production-ready** UX (no crypto friction)
+### 3. Gas Sponsorship Infrastructure
+- **Paymaster integration built-in** and ready to enable
+- **Can be activated** with paymaster policy ID configuration
+- **Infrastructure complete** (optional feature flag)
+- **Future-ready** for gasless UX (requires policy setup)
 
 ### 4. AIR Kit Dashboard Integration
 - **Credentials visible** in official dashboard
@@ -326,12 +326,12 @@ JWKS Endpoint ←→ AIR Kit (JWT Validation)
 9. AIR Kit adds to user's wallet
 10. Frontend receives confirmation
 11. Frontend submits to smart contract (optional)
-12. **Total**: ~5-8 seconds, **gas sponsored** (optional)
+12. **Total**: ~5-8 seconds, **user pays minimal MOCA gas** (sponsorship ready to enable)
 
 **Key Improvements**:
 - ✅ W3C compliant credentials
 - ✅ Decentralized storage
-- ✅ Gas-sponsored UX
+- ✅ Gas sponsorship infrastructure ready (can be enabled)
 - ✅ Ecosystem interoperability
 - ✅ No private key management
 - ✅ Official MOCA integration
@@ -360,7 +360,7 @@ JWKS Endpoint ←→ AIR Kit (JWT Validation)
 - JWT validation via JWKS endpoint ✓
 - Credentials appear in AIR Kit Dashboard ✓
 - MCSP storage confirmation ✓
-- Gas sponsorship working (when enabled) ✓
+- Gas sponsorship infrastructure ready (can be enabled with policy ID) ✓
 - Official Issuer DID used ✓
 - Program IDs correctly mapped ✓
 
@@ -478,7 +478,7 @@ backend/src/utils/credentialSigner.js
 ✅ **Complete migration from mock issuers to AIR Kit**
 ✅ **All 10 credential types working**
 ✅ **Credentials stored on MCSP**
-✅ **Gas sponsorship enabled (optional)**
+✅ **Gas sponsorship infrastructure ready (can be enabled with policy ID)**
 ✅ **AIR Kit Dashboard integration**
 ✅ **JWKS validation working**
 ✅ **Smart contract integration maintained**
@@ -542,10 +542,10 @@ backend/src/utils/credentialSigner.js
 - **Phase 5 (MOCA)**: ~5-7 seconds
 - **Increase**: +2-4 seconds (acceptable for security + features gained)
 
-### Gas Costs (with Sponsorship):
-- **User pays**: 0 MOCA (100% sponsored)
-- **Partner pays**: ~0.01 MOCA per credential
-- **ROI**: Infinite (user friction eliminated)
+### Gas Costs:
+- **User pays**: Minimal MOCA for transactions (~0.01 MOCA per credential)
+- **Sponsorship ready**: Infrastructure can enable gasless UX with policy ID
+- **Current status**: Users need MOCA tokens for gas (minimal amounts)
 
 ### Backend Response Time:
 - `/api/credentials/prepare`: ~50ms
@@ -625,7 +625,7 @@ Phase 5 transformed Credo Protocol into a **production-ready, MOCA ecosystem-int
 ### Technical Achievements:
 ✅ **Official MOCA Integration** - Full AIR Kit SDK adoption  
 ✅ **Decentralized Storage** - MCSP integration complete  
-✅ **Gas Sponsorship** - Gasless UX for users  
+✅ **Gas Sponsorship Infrastructure** - Ready to enable with policy ID  
 ✅ **Security Hardening** - RS256 JWT, JWKS validation  
 ✅ **Ecosystem Interoperability** - Public schema registry  
 ✅ **Clean Architecture** - Removed 450 lines of mock code  
@@ -634,7 +634,7 @@ Phase 5 transformed Credo Protocol into a **production-ready, MOCA ecosystem-int
 ✅ **Production-Ready** - Can be deployed to mainnet  
 ✅ **Compliant** - W3C Verifiable Credentials standard  
 ✅ **Scalable** - AIR Kit handles credential infrastructure  
-✅ **User-Friendly** - No crypto friction (gas sponsorship)  
+✅ **User-Friendly** - Minimal gas costs (sponsorship infrastructure ready)  
 ✅ **Interoperable** - Part of MOCA ecosystem  
 ✅ **Maintainable** - Clear architecture, well-documented  
 
