@@ -398,6 +398,9 @@ Fix: Add responsive Tailwind classes, test on phone
 
 Issue: Demo wallet score lower than expected
 Fix: Submit all 4 credentials, check diversity bonus
+
+Issue: Wallet confirm shows "Unknown" function for submit
+Fix: This is expected with AIR Wallet for complex selectors. Transaction is safe to confirm. Ensure contracts are verified on the explorer, keep our pre-confirm UI text clear, and optionally register selector 0x54514fa9 → submitCredential(bytes,bytes,address,bytes32,uint256) on 4byte. Reference: MOCA "Wallet Functions" (EIP-1193 provider) docs: https://docs.moca.network/airkit/usage/account/provider-functions
 ```
 
 ---
