@@ -16,7 +16,7 @@ import { Slider } from '@/components/ui/slider';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, TrendingDown, Info, CheckCircle2 } from 'lucide-react';
-import { CONTRACTS, LENDING_POOL_ABI, calculateCollateralFactor, getScoreColor } from '@/lib/contracts';
+import { CONTRACTS, LENDING_POOL_ABI, calculateCollateralFactor, calculateInterestRate, getScoreColor } from '@/lib/contracts';
 import { handleTransactionError } from '@/lib/errorHandler';
 import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 import { AuroraText } from '@/components/ui/aurora-text';
@@ -36,6 +36,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
 
   // Calculate collateral factor from credit score
   const collateralFactor = calculateCollateralFactor(creditScore);
+  
+  // Calculate interest rate from credit score
+  const interestRate = calculateInterestRate(creditScore);
   
   // Get dynamic color for credit score display
   const scoreColor = getScoreColor(creditScore);
@@ -287,6 +290,8 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
             <span className="text-base font-medium block text-black">Your Credit Score</span>
             <span className={`text-8xl font-bold block ${scoreColor}`}>{creditScore}</span>
           </div>
+          
+          {/* Collateral Factor */}
           <div className="text-center space-y-3">
             <span className="text-base font-medium block text-black">Collateral Factor</span>
             <AuroraText 
@@ -301,6 +306,13 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
             >
               {collateralFactor}%
             </AuroraText>
+          </div>
+          
+          {/* Interest Rate Pill */}
+          <div className="flex justify-center">
+            <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-black border border-black">
+              Current Interest Rate: {interestRate}% APR
+            </div>
           </div>
         </div>
 

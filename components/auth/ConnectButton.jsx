@@ -42,6 +42,7 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
   const [loggingIn, setLoggingIn] = useState(false);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [airIdCopied, setAirIdCopied] = useState(false);
   
   // Balance states
   const [mocaBalance, setMocaBalance] = useState(null);
@@ -203,6 +204,17 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
       navigator.clipboard.writeText(userInfo.user.abstractAccountAddress);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  /**
+   * Copy AIR ID to clipboard
+   */
+  function copyAirId() {
+    if (userInfo?.user?.id) {
+      navigator.clipboard.writeText(userInfo.user.id);
+      setAirIdCopied(true);
+      setTimeout(() => setAirIdCopied(false), 2000);
     }
   }
 
@@ -434,9 +446,23 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
                 <User className="h-4 w-4 mt-0.5 text-muted-foreground" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground mb-1">AIR ID</p>
-                  <p className="text-xs font-mono text-muted-foreground truncate">
-                    {userInfo.user.id}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-mono text-muted-foreground truncate flex-1">
+                      {userInfo.user.id}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
+                      onClick={copyAirId}
+                    >
+                      {airIdCopied ? (
+                        <Check className="h-3 w-3 text-green-500" />
+                      ) : (
+                        <Copy className="h-3 w-3" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
