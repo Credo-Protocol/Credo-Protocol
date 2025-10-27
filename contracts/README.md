@@ -107,7 +107,19 @@ npm run coverage
    npm run deploy:devnet
    ```
 
-3. **Verify contracts** (optional):
+3. **⚠️ IMPORTANT: Register Issuers**:
+   After deploying contracts, you MUST register issuers on the Oracle:
+   ```bash
+   npx hardhat run --network moca-devnet scripts/register-deployer-issuer.ts
+   ```
+   
+   This registers:
+   - The deployer address as an issuer (for testing)
+   - All mock issuers (Exchange, Employer, Bank)
+   
+   **Why this is needed**: Without registered issuers, credential submissions will fail with "missing revert data" error.
+
+4. **Verify contracts** (optional):
    ```bash
    npm run verify <CONTRACT_ADDRESS>
    ```

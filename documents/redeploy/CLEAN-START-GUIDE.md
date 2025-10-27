@@ -64,6 +64,39 @@ npm run deploy
    MockUSDC:          0x...
 ```
 
+### 2.1 ⚠️ CRITICAL: Register Issuers
+
+**This step is REQUIRED after every deployment!**
+
+```bash
+# Still in contracts directory
+npx hardhat run --network moca-devnet scripts/register-deployer-issuer.ts
+```
+
+**Why this is needed**: 
+- Without registered issuers, credential submissions fail with "missing revert data" error
+- This registers your deployer address + all mock issuers on the Oracle contract
+- Must be done EVERY time you deploy new contracts
+
+**Expected Output:**
+```
+🔐 Registering Deployer as Issuer
+============================================================
+📍 Oracle Address: 0xFA1F2920F107FE2199CC5f389349e3F2292387BD
+👤 Deployer Address: 0x32F91E4E2c60A9C16cAE736D3b42152B331c147F
+
+⚙️  Registering deployer as issuer...
+✅ Deployer registered successfully!
+
+⚙️  Registering mock issuers on correct contract...
+   ✅ Mock Exchange registered
+   ✅ Mock Employer registered  
+   ✅ Mock Bank registered
+
+============================================================
+✅ All issuers registered on correct contract!
+```
+
 ---
 
 ## Step 3: Update All Environment Variables

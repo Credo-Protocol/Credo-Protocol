@@ -289,11 +289,26 @@ main()
 cd contracts
 npx hardhat run scripts/deploy-wave3.ts --network mocaTestnet
 
+# ⚠️ CRITICAL: Register Issuers (REQUIRED STEP!)
+# Without this, credential submissions will fail with "missing revert data" error
+npx hardhat run --network mocaTestnet scripts/register-deployer-issuer.ts
+
 # Verify contracts (after deployment)
 npx hardhat verify --network mocaTestnet <ORACLE_ADDRESS>
 npx hardhat verify --network mocaTestnet <LENDING_POOL_ADDRESS> <USDC_ADDRESS> <ORACLE_ADDRESS>
 npx hardhat verify --network mocaTestnet <USDC_ADDRESS>
 ```
+
+**⚠️ Important Note on Issuer Registration:**
+
+The issuer registration step is **MANDATORY** after every contract deployment. Without it:
+- Credential submissions will fail
+- You'll see "missing revert data" errors
+- The Oracle won't accept any credentials
+
+This step registers:
+- Your deployer address as a trusted issuer (for testing)
+- All mock issuer addresses (Exchange, Employer, Bank)
 
 ---
 
