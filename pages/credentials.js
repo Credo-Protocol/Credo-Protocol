@@ -4,7 +4,7 @@
  * Dedicated page for credential management:
  * - View credential wallet
  * - Request new credentials from marketplace
- * - See expiry and revocation status
+ * - See expiry status
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAirKit } from '@/hooks/useAirKit';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
-import { Lock, Database, Clock, Ban } from 'lucide-react';
+import { Lock, Database, Clock } from 'lucide-react';
 
 export default function CredentialsPage() {
   const router = useRouter();
@@ -155,17 +155,7 @@ export default function CredentialsPage() {
                   </div>
                 </div>
                 
-                <div className="flex items-start gap-3">
-                  <div className="mt-0.5">
-                    <Ban className="h-5 w-5 text-black/60" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm">
-                      <strong className="text-black font-medium">Revocation:</strong>{' '}
-                      <span className="text-black/70">Issuers can revoke credentials if needed. You'll be notified if this happens.</span>
-                    </p>
-                  </div>
-                </div>
+                
               </div>
             </div>
           </TabsContent>

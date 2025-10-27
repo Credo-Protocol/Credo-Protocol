@@ -2,7 +2,6 @@
  * Credential Notifications Component
  * 
  * Shows alerts for:
- * - Revoked credentials
  * - Expiring credentials (within 30 days)
  * - Expired credentials
  * 
@@ -12,7 +11,7 @@
 import { useState, useEffect } from 'react';
 import { useAirKit } from '@/hooks/useAirKit';
 import { getUserCredentials } from '@/lib/credentialServices';
-import { AlertTriangle, XCircle, Ban, X } from 'lucide-react';
+import { AlertTriangle, XCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -36,22 +35,8 @@ export function CredentialNotifications() {
       const alerts = [];
 
       credentials.forEach(cred => {
-        // Revoked credentials
-        if (cred.status === 'revoked') {
-          alerts.push({
-            id: `revoked-${cred.id}`,
-            type: 'error',
-            icon: <Ban className="w-5 h-5" />,
-            title: 'Credential Revoked',
-            message: `Your "${cred.bucket?.replace(/_/g, ' ')}" credential has been revoked. ${cred.revocationReason || 'Contact issuer for details.'}`,
-            action: {
-              label: 'Get New Credential',
-              href: '/credentials?tab=marketplace'
-            }
-          });
-        }
         // Expired credentials
-        else if (cred.status === 'expired') {
+        if (cred.status === 'expired') {
           alerts.push({
             id: `expired-${cred.id}`,
             type: 'warning',

@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Wallet, RefreshCw, CheckCircle, XCircle, Database, AlertTriangle, Clock, Ban, Lock, Coins, Briefcase, TrendingUp, Building2, FileText } from 'lucide-react';
+import { Wallet, RefreshCw, CheckCircle, XCircle, Database, AlertTriangle, Clock, Lock, Coins, Briefcase, TrendingUp, Building2, FileText } from 'lucide-react';
 
 export function CredentialWallet() {
   const { userAddress, isConnected } = useAirKit();
@@ -172,9 +172,7 @@ export function CredentialWallet() {
                 <div
                   key={credential.id || index}
                   className={`p-4 border rounded-lg transition-all ${
-                    display.isRevoked 
-                      ? 'bg-red-50 border-red-200 opacity-75' 
-                      : display.isExpired 
+                    display.isExpired 
                       ? 'bg-yellow-50 border-yellow-200 opacity-90' 
                       : 'hover:bg-accent/50 border-black/10'
                   }`}
@@ -201,12 +199,7 @@ export function CredentialWallet() {
                     
                     {/* Status Badge */}
                     <div className="flex flex-col items-end gap-1">
-                      {display.isRevoked ? (
-                        <Badge variant="destructive" className="text-xs gap-1">
-                          <Ban className="h-3 w-3" />
-                          Revoked
-                        </Badge>
-                      ) : display.isExpired ? (
+                      {display.isExpired ? (
                         <Badge variant="outline" className="text-xs gap-1 bg-yellow-100 border-yellow-300 text-yellow-800">
                           <XCircle className="h-3 w-3" />
                           Expired
@@ -225,12 +218,7 @@ export function CredentialWallet() {
                     </div>
                   </div>
                   
-                  {/* Revocation Notice */}
-                  {display.isRevoked && display.revocationReason && (
-                    <div className="mt-2 p-2 bg-red-100 border border-red-200 rounded text-xs text-red-700">
-                      <strong>Revocation Reason:</strong> {display.revocationReason}
-                    </div>
-                  )}
+                  
                   
                   {/* Expiry Warning */}
                   {!display.isRevoked && display.isExpired && (
