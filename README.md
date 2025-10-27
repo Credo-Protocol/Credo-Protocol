@@ -3,7 +3,7 @@
 > **Moca Network Proof of Build - Wave 3 Submission**  
 > **Identity-Backed DeFi Lending with Official MOCA Integration**
 
-Credo Protocol is an undercollateralized lending platform on Moca Chain Testnet, built for the Moca Network Proof of Build. It leverages official AIR Kit credential services to generate privacy-preserving, on-chain credit scores from verifiable credentials, unlocking fair access to capital in DeFi.
+Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, built for the Moca Network Proof of Build. It leverages official AIR Kit credential services to generate privacy-preserving, on-chain credit scores from verifiable credentials, unlocking fair access to capital in DeFi.
 
 [![Moca Chain](https://img.shields.io/badge/Moca_Chain-Devnet-blue)](https://devnet-scan.mocachain.org)
 [![Buildathon](https://img.shields.io/badge/Buildathon-Wave_3-purple)]()
@@ -27,7 +27,7 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Testnet,
 #### 🏗️ Official MOCA Integration
 - **AIR Kit Issuer DIDs**: Official registered issuer with reputation tracking
 - **Decentralized Storage**: Credentials stored on MOCA Chain Storage Providers (MCSP)
-- **Gas Sponsorship**: Zero-friction credential issuance (no MOCA tokens required!)
+- **Gas Sponsorship Support**: Infrastructure ready (requires paymaster policy configuration)
 - **Ecosystem Interoperability**: Credentials discoverable by any MOCA dApp
 - **Public Schema Registry**: Official schemas published for third-party use
 
@@ -63,11 +63,11 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Testnet,
 
 ### What's Different from Wave 2
 
-**Wave 2 (Devnet)** → **Wave 3 (Testnet)**
+**Wave 2 (Devnet)** → **Wave 3 (Devnet)**
 - 3 basic credentials → 10 bucketed credentials (privacy-first)
 - Custom mock issuers → Official AIR Kit Issuer DIDs
 - Local credential storage → MOCA Chain Storage Providers (MCSP)
-- Users pay gas → Gas-sponsored credential issuance
+- Users pay gas → Paymaster infrastructure ready (configurable)
 - Isolated credentials → Interoperable MOCA ecosystem credentials
 - Static scoring → Transparent on-chain registries
 - No interest → Time-based interest accrual (5-18% APR)
@@ -107,7 +107,7 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Testnet,
 - 🎯 **True Integration**: Official MOCA infrastructure (not just SSO)
 - 🧱 **Infrastructure Primitive**: Foundational layer for DeFi identity
 - 💡 **Innovation**: Brings TradFi credit concepts to Web3
-- ⚡ **Gas Sponsorship**: Demonstrates seamless UX with paymaster
+- ⚡ **Paymaster Ready**: Infrastructure for gas-sponsored transactions (not currently active)
 
 ---
 
@@ -124,7 +124,6 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Testnet,
 - Great for hackathons and proof-of-concept
 
 ⚠️ **What This Project is NOT (Yet):**
-- Mainnet production-ready (contracts not audited)
 - Using real financial data (still simulated credentials)
 - Economically secure (no liquidation mechanism, price oracles needed)
 - Battle-tested with real liquidity
@@ -451,7 +450,7 @@ npm run dev
 #### 4. Deployment & Infrastructure
 - ✅ Frontend deployed to Vercel
 - ✅ Backend deployed to Render
-- ✅ Environment configuration for testnet
+- ✅ Environment configuration for devnet
 - ✅ CORS and security headers configured
 - ✅ Public GitHub repository with documentation
 
@@ -512,7 +511,7 @@ npm run dev
 - ✅ **10 issuance programs** configured for programmatic issuance
 - ✅ **W3C Verifiable Credentials** compliance via AIR Kit signing
 - ✅ **Partner JWT authentication** (RS256 with JWKS validation)
-- ✅ **Gas sponsorship via Paymaster** (users don't need MOCA tokens!)
+- ✅ **Paymaster infrastructure ready** (gas sponsorship can be enabled with policy ID)
 - ✅ **MCSP decentralized storage** (credentials stored on-chain)
 - ✅ **Ecosystem interoperability** (credentials discoverable by any MOCA dApp)
 
@@ -525,7 +524,7 @@ npm run dev
 
 **Frontend Integration**
 - ✅ **`lib/credentialServices.js`**: Official AIR Kit issuance flow
-- ✅ **Gas sponsorship enabled**: Optional paymaster configuration
+- ✅ **Gas sponsorship infrastructure**: Paymaster support built-in (not currently enabled)
 - ✅ **Credential wallet display**: View issued credentials in app
 - ✅ **MCSP confirmation badges**: Visual feedback for decentralized storage
 - ✅ **Simplified 2-step flow**: Prepare → Issue (vs old 4-step)
@@ -586,7 +585,7 @@ npm run dev
 - ✅ Backend: Deployed with Partner JWT authentication
 - ✅ Smart contracts: Deployed and verified on Moca Devnet Explorer
 - ✅ Environment variables: Comprehensive `.env.example` files
-- ✅ Gas sponsorship: Optional paymaster configuration available
+- ✅ Paymaster infrastructure: Code ready for gas sponsorship (requires policy ID)
 
 **Comprehensive Documentation**
 - ✅ **Phase summaries**: 5 detailed implementation docs (Phase 1-5)
@@ -599,7 +598,7 @@ npm run dev
 
 **Testing Coverage**
 - ✅ **104+ unit tests**: All contracts fully tested
-- ✅ **End-to-end flows**: Verified on testnet
+- ✅ **End-to-end flows**: Verified on devnet
 - ✅ **10 credential types**: All tested and working
 - ✅ **Interest system**: Time-based accrual validated
 - ✅ **API endpoints**: All responses verified
