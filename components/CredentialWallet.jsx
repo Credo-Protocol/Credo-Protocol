@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Wallet, RefreshCw, CheckCircle, XCircle, Database } from 'lucide-react';
+import { Wallet, RefreshCw, CheckCircle, XCircle, Database, AlertTriangle, Clock, Ban } from 'lucide-react';
 
 export function CredentialWallet() {
   const { userAddress, isConnected } = useAirKit();
@@ -160,35 +160,77 @@ export function CredentialWallet() {
               return (
                 <div
                   key={credential.id || index}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                  className={`p-4 border rounded-lg transition-all ${
+                    display.isRevoked 
+                      ? 'bg-red-50 border-red-200 opacity-75' 
+                      : display.isExpired 
+                      ? 'bg-yellow-50 border-yellow-200 opacity-90' 
+                      : 'hover:bg-accent/50 border-black/10'
+                  }`}
                 >
-                  {/* Left: Icon and Details */}
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{display.icon}</span>
-                    <div>
-                      <p className="font-medium capitalize">{display.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Issued: {display.issuedDate}
-                      </p>
+                  {/* Header: Icon and Details */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{display.icon}</span>
+                      <div>
+                        <p className="font-medium capitalize">{display.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Issued: {display.issuedDate}
+                        </p>
+                        {display.expiryDate && (
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                            <Clock className="h-3 w-3" />
+                            {display.expiryText}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Status Badge */}
+                    <div className="flex flex-col items-end gap-1">
+                      {display.isRevoked ? (
+                        <Badge variant="destructive" className="text-xs gap-1">
+                          <Ban className="h-3 w-3" />
+                          Revoked
+                        </Badge>
+                      ) : display.isExpired ? (
+                        <Badge variant="outline" className="text-xs gap-1 bg-yellow-100 border-yellow-300 text-yellow-800">
+                          <XCircle className="h-3 w-3" />
+                          Expired
+                        </Badge>
+                      ) : display.daysUntilExpiry !== null && display.daysUntilExpiry <= 30 ? (
+                        <Badge variant="outline" className="text-xs gap-1 bg-orange-50 border-orange-200 text-orange-700">
+                          <AlertTriangle className="h-3 w-3" />
+                          Expiring Soon
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-xs gap-1 bg-green-50 border-green-200 text-green-700">
+                          <CheckCircle className="h-3 w-3" />
+                          Active
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   
-                  {/* Right: Status Badges */}
-                  <div className="flex flex-col items-end gap-1">
-                    {display.isValid ? (
-                      <Badge variant="outline" className="text-xs gap-1 bg-green-50 border-green-200 text-green-700">
-                        <CheckCircle className="h-3 w-3" />
-                        Active
-                      </Badge>
-                    ) : (
-                      <Badge variant="destructive" className="text-xs gap-1">
-                        <XCircle className="h-3 w-3" />
-                        Expired
-                      </Badge>
-                    )}
+                  {/* Revocation Notice */}
+                  {display.isRevoked && display.revocationReason && (
+                    <div className="mt-2 p-2 bg-red-100 border border-red-200 rounded text-xs text-red-700">
+                      <strong>Revocation Reason:</strong> {display.revocationReason}
+                    </div>
+                  )}
+                  
+                  {/* Expiry Warning */}
+                  {!display.isRevoked && display.isExpired && (
+                    <div className="mt-2 p-2 bg-yellow-100 border border-yellow-200 rounded text-xs text-yellow-800">
+                      This credential has expired. Request a new one to maintain your credit score.
+                    </div>
+                  )}
+                  
+                  {/* Bottom: Storage Badge */}
+                  <div className="mt-3 pt-3 border-t border-black/5">
                     <Badge variant="secondary" className="text-xs gap-1">
                       <Database className="h-3 w-3" />
-                      MCSP Storage
+                      MCSP Decentralized Storage
                     </Badge>
                   </div>
                 </div>
