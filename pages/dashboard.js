@@ -468,6 +468,11 @@ export default function Dashboard() {
               submittedCredentials={credentials}
               onRequestCredential={handleRequestCredential}
             />
+            
+            {/* Leaderboard - shown only in Score Builder tab */}
+            <div className="mt-12">
+              <Leaderboard />
+            </div>
           </TabsContent>
 
           {/* Credentials Tab */}
@@ -488,11 +493,6 @@ export default function Dashboard() {
             />
           </TabsContent>
         </Tabs>
-
-        {/* Phase 4: Leaderboard Section (NEW!) */}
-        <div className="mt-12">
-          <Leaderboard />
-        </div>
       </main>
     </div>
   );
