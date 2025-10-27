@@ -156,14 +156,6 @@ export default function ScoreBuilderWizard({
     
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div className="mb-8">
-                <h2 className="text-3xl md:text-4xl font-bold mb-2 text-black">Score Simulator</h2>
-                <p className="text-black/60 text-lg">
-                    See how different credentials will impact your credit score and borrowing power
-                </p>
-            </div>
-            
             {/* Current vs Simulated Score */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Current Score */}

@@ -32,14 +32,6 @@ export default function LendingInterface({ userAddress, creditScore, provider })
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="mb-8">
-        <h2 className="text-3xl md:text-4xl font-bold mb-2 text-black">Lending Pool</h2>
-        <p className="text-black/60 text-lg">
-          Supply collateral and borrow based on your credit score
-        </p>
-      </div>
-
       {/* Position Overview */}
       <PositionCard 
         userAddress={userAddress} 
