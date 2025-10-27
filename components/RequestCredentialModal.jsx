@@ -335,9 +335,9 @@ export default function RequestCredentialModal({ credential, userAddress, isOpen
                 </div>
                 {/* Phase 2: Show bucket info if available */}
                 {credentialData.credential.metadata?.display && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-black/60">Bucket:</span>
-                    <span className="text-sm font-medium text-black">
+                  <div className="flex justify-between items-start gap-4">
+                    <span className="text-sm text-black/60 flex-shrink-0">Bucket:</span>
+                    <span className="text-sm font-medium text-black text-right">
                       {credentialData.credential.metadata.display}
                     </span>
                   </div>
