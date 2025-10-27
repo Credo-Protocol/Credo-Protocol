@@ -322,7 +322,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Credit Limit</span>
             <span className="text-lg font-semibold flex items-center gap-1.5">
-              {creditLimit.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
+              ${creditLimit.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
             </span>
           </div>
         </div>
@@ -333,7 +333,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
             <AlertDescription className="flex items-center gap-2 text-sm text-red-700">
               <Info className="h-4 w-4 flex-shrink-0 text-red-600" />
               <span className="flex items-center gap-1 flex-wrap">
-                <strong>Note:</strong> Pool liquidity is currently limiting you to <strong className="flex items-center gap-1">{maxBorrow.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC</strong>. More will become available as others supply collateral.
+                <strong>Note:</strong> Pool liquidity is currently limiting you to <strong className="flex items-center gap-1">${maxBorrow.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC</strong>. More will become available as others supply collateral.
               </span>
             </AlertDescription>
           </Alert>
@@ -347,6 +347,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
               
               {/* Direct Input Field - Payment Style */}
               <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-black/40">
+                  $
+                </div>
                 <input
                   ref={inputRef}
                   type="text"
@@ -365,7 +368,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
                     e.target.setSelectionRange(length, length);
                   }}
                   placeholder="0.00"
-                  className="w-full px-4 py-3 pr-20 text-right text-2xl font-bold text-black border border-black/20 rounded-md focus:outline-none focus:ring-2 focus:ring-black/20 bg-white cursor-text"
+                  className="w-full px-10 py-3 pr-24 text-right text-2xl font-bold text-black border border-black/20 rounded-md focus:outline-none focus:ring-2 focus:ring-black/20 bg-white cursor-text"
                   inputMode="numeric"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-black/60 font-medium flex items-center gap-1.5">
@@ -384,9 +387,9 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
               />
               
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>0</span>
+                <span>$0</span>
                 <span className="flex items-center gap-1">
-                  {maxBorrow.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={12} height={12} className="inline" /> USDC
+                  ${maxBorrow.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={12} height={12} className="inline" /> USDC
                 </span>
               </div>
             </div>
@@ -399,7 +402,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
                   <div className="flex-1 space-y-1">
                     <p className="text-sm font-medium">Required Collateral</p>
                     <p className="text-xl font-bold flex items-center gap-1.5">
-                      {requiredCollateral.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
+                      ${requiredCollateral.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Based on your {collateralFactor}% collateral factor
@@ -432,7 +435,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
                 <>
                   <TrendingDown className="mr-2 h-4 w-4" />
                   <span className="flex items-center gap-1.5">
-                    Borrow {borrowAmount.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
+                    Borrow ${borrowAmount.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
                   </span>
                 </>
               )}
@@ -469,7 +472,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
           <div className="flex items-center justify-between p-6 rounded-xl border border-black/10 bg-white">
             <span className="text-sm text-black/60">Amount Borrowed</span>
             <span className="text-lg font-bold text-black flex items-center gap-1.5">
-              {successDetails.amount.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
+              ${successDetails.amount.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
             </span>
           </div>
           

@@ -239,11 +239,11 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <p className="text-sm text-black/60">Your Balance</p>
-                    <p className="text-lg font-bold text-black">{balance.toFixed(2)} USDC</p>
+                    <p className="text-lg font-bold text-black">${balance.toFixed(2)} USDC</p>
                   </div>
                   <div>
                     <p className="text-sm text-black/60">Total Owed</p>
-                    <p className="text-lg font-bold text-red-500">{totalOwed.toFixed(2)} USDC</p>
+                    <p className="text-lg font-bold text-red-500">${totalOwed.toFixed(2)} USDC</p>
                   </div>
                 </div>
 
@@ -254,11 +254,11 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <p className="text-sm text-black/60">Principal</p>
-                    <p className="text-lg font-semibold text-black">{borrowed.toFixed(2)} USDC</p>
+                    <p className="text-lg font-semibold text-black">${borrowed.toFixed(2)} USDC</p>
                   </div>
                   <div>
                     <p className="text-sm text-black/60">Accrued Interest</p>
-                    <p className={`text-lg font-semibold ${interestOwed > 0 ? 'text-orange-600' : 'text-black'}`}>+{interestOwed.toFixed(2)} USDC</p>
+                    <p className={`text-lg font-semibold ${interestOwed > 0 ? 'text-orange-600' : 'text-black'}`}>+${interestOwed.toFixed(2)} USDC</p>
                   </div>
                 </div>
 
@@ -266,12 +266,15 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-black">Amount to Repay</label>
                   <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-black/40">
+                      $
+                    </div>
                     <input
                       type="number"
                       value={repayAmount}
                       onChange={(e) => setRepayAmount(e.target.value)}
                       placeholder="0.00"
-                      className="w-full px-4 py-3 pr-16 text-lg border border-black/20 rounded-md focus:outline-none focus:ring-2 focus:ring-black/20 bg-white text-black"
+                      className="w-full pl-8 pr-16 py-3 text-lg border border-black/20 rounded-md focus:outline-none focus:ring-2 focus:ring-black/20 bg-white text-black"
                       step="0.01"
                       min="0"
                       max={Math.min(balance, totalOwed)}
@@ -428,12 +431,12 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
               <div className="p-6 rounded-xl border border-black/10 bg-white space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-black/60">Amount to Repay</span>
-                  <span className="text-lg font-bold text-black">{repayAmount} USDC</span>
+                  <span className="text-lg font-bold text-black">${repayAmount} USDC</span>
                 </div>
                 <div className="flex items-center justify-between pt-4 border-t border-black/10">
                   <span className="text-sm text-black/60">New Debt</span>
                   <span className="text-lg font-semibold text-green-600">
-                    {Math.max(0, totalOwed - parseFloat(repayAmount || '0')).toFixed(2)} USDC
+                    ${Math.max(0, totalOwed - parseFloat(repayAmount || '0')).toFixed(2)} USDC
                   </span>
                 </div>
               </div>
