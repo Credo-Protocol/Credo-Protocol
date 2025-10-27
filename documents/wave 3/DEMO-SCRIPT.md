@@ -6,6 +6,25 @@
 
 ---
 
+## 🗺️ App Structure Overview
+
+Credo Protocol has a **clean, page-based navigation** (not tabs):
+
+- **Landing Page** (`/`) - Hero, problem statement, features, CTA
+- **Dashboard** (`/dashboard`) - Overview with 3 stats cards + 4 quick link cards
+  - Credit Score Card (shows current score + tier)
+  - Collateral Factor Card (shows percentage based on tier)
+  - Login Method Card (Email/Google or Moca ID)
+  - Quick Links: Credentials, Lending Pool, Score Builder, Faucet
+- **Score Builder** (`/score`) - Interactive wizard + leaderboard
+- **Credentials** (`/credentials`) - Wallet tab + Marketplace tab
+- **Lending Pool** (`/lending`) - Supply/Borrow tabs + position overview
+- **Faucet** (`/faucet`) - Get test USDC tokens
+
+**Demo Navigation Flow**: Landing → Dashboard → Score Builder → Credentials → Lending
+
+---
+
 ## 🎯 Demo Objectives
 
 By the end of this demo, judges should understand:
@@ -21,11 +40,14 @@ By the end of this demo, judges should understand:
 | Time | Act | Key Message |
 |------|-----|-------------|
 | 0:00-0:30 | **Act 1: The Problem** | "DeFi is capital inefficient" |
-| 0:30-3:20 | **Act 2: The Journey** | "Build score → Get better terms" (includes 40s MCSP wait) |
-| 3:20-4:20 | **Act 3: Ecosystem** | "Composable credit for all dApps" |
-| 4:20-4:50 | **Act 4: Vision** | "Identity-backed DeFi is the future" |
+| 0:30-3:30 | **Act 2: The Journey** | "Build score → Get better terms" (includes 40s MCSP wait) |
+| 3:30-4:30 | **Act 3: Ecosystem** | "Composable credit for all dApps" |
+| 4:30-5:00 | **Act 4: Vision** | "Identity-backed DeFi is the future" |
 
 **Note**: Act 2 Part C includes ~40 seconds for MCSP credential storage - use this time to explain the technical architecture in detail.
+
+**Navigation Flow**:
+- Landing (/) → Dashboard (/dashboard) → Score Builder (/score) → Credentials (/credentials) → Lending (/lending)
 
 ---
 
@@ -53,11 +75,11 @@ By the end of this demo, judges should understand:
 
 ---
 
-## 🎬 Act 2: The Journey (2 minutes)
+## 🎬 Act 2: The Journey (2 minutes 50 seconds)
 
-### Part A: Login & Dashboard (20 seconds)
+### Part A: Login & Dashboard Overview (30 seconds)
 
-**[Click "Get Started"]**
+**[Click "Get Started" - navigates to /dashboard]**
 
 ### Talking Points:
 
@@ -67,55 +89,79 @@ By the end of this demo, judges should understand:
 > 
 > "Under the hood, AIR Kit creates a **smart contract wallet** for me - it's an EIP-4337 Account Abstraction wallet. This means I can login with Google, email, or any Web2 method, but I get a non-custodial Ethereum wallet. The private key is managed via **Multi-Party Computation (MPC)** - no single point of failure."
 > 
-> **[Dashboard loads]**
+> **[Dashboard loads - overview page with stats cards]**
 > 
 > "Now I'm authenticated on-chain. My wallet address is deterministically derived from my Moca ID. The frontend uses AIR Kit's **EIP-1193 provider** to interact with smart contracts - same interface as MetaMask, but smoother UX."
 > 
-> **[Point to credit score]**
+> **[Point to Credit Score Card - top left]**
 > 
 > "Current credit score: **[YOUR_SCORE]** - that's **[YOUR_TIER]** tier. This is fetched from our **CreditScoreOracle smart contract** via a `getCreditScore(address)` view call. The contract computes this on-chain based on my submitted credentials."
+> 
+> **[Point to Collateral Factor Card - center]**
+> 
+> "My collateral factor is **[YOUR_FACTOR]%** - this is calculated client-side based on the tier returned from `getTierForScore()`. The large animated number shows exactly how much collateral I need to borrow."
+> 
+> **[Point to Login Method Card - right]**
+> 
+> "You can see I logged in with **[Email/Google or Moca ID]** - AIR Kit supports multiple authentication methods, all backed by the same smart contract wallet."
+> 
+> **[Scroll down to Quick Links]**
+> 
+> "The dashboard has quick navigation to all major features - Credentials, Lending Pool, Score Builder, and Faucet. This is our mission control."
 
-**Time Check**: 0:50
+**Time Check**: 1:00
 
 ---
 
 ### Part B: Score Builder Wizard (40 seconds)
 
-**[Navigate to "Score Builder" tab]**
+**[Click "Score Builder" quick link card from dashboard - navigates to /score page]**
 
 ### Talking Points:
 
-> "This is our **Score Builder Wizard** - it runs the exact same scoring algorithm as our smart contract, but client-side in React."
+> "Let me show you our **Score Builder Wizard** - this is a dedicated tool that helps users optimize their credit score before submitting credentials."
 > 
-> **[Select Income Range credential]**
+> **[Page loads showing Current Score vs Simulated Score cards]**
 > 
-> "Watch the real-time simulation. When I select Income Range..."
+> "This runs the exact same scoring algorithm as our smart contract, but client-side in React. Left side shows my current on-chain score. Right side shows what I could achieve."
 > 
-> **[Score updates in real-time]**
+> **[Scroll down to credential selector]**
 > 
-> "The algorithm calculates: **Base weight (180 points for high income) × Issuer trust score (100%) × Recency factor (100% for new credentials) = 180 points**. Then it adds a **diversity bonus** - 5% per unique credential type I have. My simulated score jumps from **[CURRENT]** to **[SIMULATED]**!"
+> "Here's the interactive part. When I select Income Range credential..."
 > 
-> **[Point to progress bar]**
+> **[Click Income Range credential card]**
 > 
-> "The progress bar calculates distance to the next tier threshold. Our smart contract has **8 tiers stored on-chain** - from Exceptional (900-1000) down to Very Poor (0-299). Each tier unlocks different collateral ratios."
+> **[Simulated score updates in real-time]**
+> 
+> "Watch the right side update! The algorithm calculates: **Base weight (180 points for high income) × Issuer trust score (100%) × Recency factor (100% for new credentials) = 180 points**. Then it adds a **diversity bonus** - 5% per unique credential type I have. My simulated score jumps from **[CURRENT]** to **[SIMULATED]**!"
+> 
+> **[Point to progress bar in middle section]**
+> 
+> "The progress bar shows distance to the next tier threshold. Our smart contract has **8 tiers stored on-chain** - from Exceptional (900-1000) down to Very Poor (0-299). Each tier unlocks different collateral ratios and APR rates."
 > 
 > **[Select Bank Balance credential]**
 > 
-> "Add Bank Balance... now **[NEW_SCORE]**. These are **bucketed credentials** - notice the privacy badges. The smart contract only stores `INCOME_HIGH` or `BANK_BALANCE_MEDIUM` as bytes32 hashes, never exact amounts. Privacy-first by design - we use **range proofs** conceptually."
+> "Add Bank Balance... now **[NEW_SCORE]**. Notice the **'Privacy-First'** and **'Highest Weight'** badges. These are **bucketed credentials** - the smart contract only stores `INCOME_HIGH` or `BANK_BALANCE_MEDIUM` as bytes32 hashes, never exact amounts. Privacy-first by design - we use **range proofs** conceptually."
 
-**Time Check**: 1:30
+**Time Check**: 1:40
 
 ---
 
 ### Part C: Request Credential (MOCA Integration) (1 minute 20 seconds)
 
-**[Click "Go to Build Credit →" button]**
+**[Click "Go to Build Credit →" button at bottom of selected credentials section]**
+
+**[Page navigates to /credentials - Marketplace tab]**
 
 ### Talking Points:
 
-> "Let me request one of these credentials to show the **deep MOCA integration**."
+> "Now let me request one of these credentials to show the **deep MOCA integration**."
 > 
-> **[Click "Request Credential" on Income Range]**
+> **[Credentials page loads - Marketplace tab showing all available credential types]**
+> 
+> "This is our credential marketplace - you can see all 11 credential types organized by category: Income Range, Bank Balance, Employment, and CEX History. Each shows the point range, privacy level, and tier impact."
+> 
+> **[Click "Request Credential" on Income Range - High credential]**
 > 
 > "Here's where Credo becomes a **true MOCA ecosystem participant** - not just using MOCA for login, but fully integrated with AIR Kit's credential infrastructure."
 > 
@@ -172,37 +218,41 @@ By the end of this demo, judges should understand:
 > 
 > "Now we submit the credential hash to our smart contract on-chain for credit scoring."
 
-**Time Check**: 2:50
+**Time Check**: 3:00
 
 ---
 
 ### Part D: Lending Power (30 seconds)
 
-**[Navigate to "Lending Pool" tab]**
+**[Navigate back to Dashboard, then click "Lending Pool" quick link card - goes to /lending page]**
 
 ### Talking Points:
 
 > "Now let's see how credit scores unlock better lending terms through **smart contract logic**."
 > 
-> **[Point to credit score section]**
+> **[Lending page loads showing Position Card at top]**
 > 
-> "With my **[YOUR_SCORE]** credit score, the smart contract queries the oracle and gets my tier. My tier has a **collateral factor of [COLLATERAL]%** stored on-chain. The LendingPool contract calculates: `borrowLimit = (suppliedCollateral × 100) / collateralFactor`."
+> "The page shows my current position overview. With my **[YOUR_SCORE]** credit score, the smart contract queries the oracle via `getUserCollateralFactor()` and gets my tier's collateral requirement."
+> 
+> **[Point to collateral factor in position card]**
+> 
+> "My tier has a **collateral factor of [COLLATERAL]%** stored on-chain. The LendingPool contract calculates: `borrowLimit = (suppliedCollateral × 100) / collateralFactor`."
 > 
 > "So I can borrow **$[AMOUNT]** for every $100 I supply. That's **[calculate ratio]x better** than standard DeFi's 0.67x!"
 > 
-> **[Point to existing position if you have one]**
+> **[Point to existing borrow position if you have one]**
 > 
-> "I have an active borrow position. The contract tracks this with **per-user borrow indices** - similar to Compound's interest model. Every time anyone interacts with the contract, it calls `accrueInterest()` which updates the **global borrow index** based on: `newIndex = oldIndex × (1 + (APR × timeElapsed / SECONDS_PER_YEAR))`."
+> "I have an active borrow position here. The contract tracks this with **per-user borrow indices** - similar to Compound's interest model. Every time anyone interacts with the contract, it calls `accrueInterest()` which updates the **global borrow index** based on: `newIndex = oldIndex × (1 + (APR × timeElapsed / SECONDS_PER_YEAR))`."
 > 
-> **[Point to interest display]**
+> **[Point to interest accruing in real-time]**
 > 
-> "My interest accrues continuously. The frontend polls every 5 seconds calling `getBorrowBalanceWithInterest()` - a view function that calculates: `totalOwed = principal × (globalIndex / userIndex)`. No gas costs for this calculation."
+> "My interest accrues continuously. The frontend polls every 5 seconds calling `getBorrowBalanceWithInterest()` - a view function that calculates: `totalOwed = principal × (globalIndex / userIndex)`. No gas costs for this calculation - it's a read-only call."
 > 
-> **[Point to APR badge]**
+> **[Point to APR display]**
 > 
 > "My borrowing rate is **[YOUR_APR]%** - tier-based rates are stored in the contract's `tierInterestRates` mapping. Exceptional credit (900+) gets **5% APR**, Very Poor gets **18% APR**. This is retrieved with `getUserAPR(address)` which queries the oracle for your score, then returns the corresponding rate."
 
-**Time Check**: 3:20
+**Time Check**: 3:30
 
 ---
 
@@ -210,19 +260,23 @@ By the end of this demo, judges should understand:
 
 ### Part A: Leaderboard (15 seconds)
 
-**[Scroll down to Leaderboard section]**
+**[Navigate back to Score Builder page (/score) - can click from dashboard or navbar]**
+
+**[Scroll down to Leaderboard section below the Score Builder Wizard]**
 
 ### Talking Points:
 
 > "Here's our **live leaderboard** - this queries the blockchain for `ScoreComputed` events from the last 10,000 blocks. We're limited to 10k blocks by MOCA's RPC - that's about 8-10 hours of history."
 > 
-> **[Point to top users]**
+> **[Point to top users in the leaderboard]**
 > 
 > "The frontend uses `ethers.js` to call `oracle.queryFilter('ScoreComputed')` - these are indexed events emitted every time someone submits a credential. Each event contains: user address, base score, component breakdown, diversity bonus, and final score. We aggregate by user, keep the latest score, and sort descending."
 > 
-> "This demonstrates **network effects** - users compete for rank. But more importantly, it shows **on-chain transparency** - all scoring is auditable via events."
+> **[Point to trophy icons for top 3]**
+> 
+> "This demonstrates **network effects** - users compete for rank with trophy rewards for top 3. But more importantly, it shows **on-chain transparency** - all scoring is auditable via events."
 
-**Time Check**: 3:35
+**Time Check**: 3:45
 
 ---
 
@@ -260,7 +314,7 @@ By the end of this demo, judges should understand:
 > 
 > "See? `oracle.getCreditScore(user)` returns `uint256`. One line of Solidity gives you a user's creditworthiness. That's true composability."
 
-**Time Check**: 4:05
+**Time Check**: 4:15
 
 ---
 
@@ -286,7 +340,7 @@ By the end of this demo, judges should understand:
 > 
 > "This transparency is critical. Anyone can audit our scoring algorithm, verify the tier configurations, check issuer trust scores. **No black boxes** - everything is on-chain and immutable unless we deploy a new version."
 
-**Time Check**: 4:20
+**Time Check**: 4:30
 
 ---
 
@@ -329,7 +383,7 @@ By the end of this demo, judges should understand:
 > 
 > "Questions?"
 
-**Time Check**: 4:50
+**Time Check**: 5:00
 
 ---
 
@@ -337,17 +391,25 @@ By the end of this demo, judges should understand:
 
 Before the demo, take high-quality screenshots of:
 
-1. **Landing Page Hero** - Shows the problem statement
-2. **Dashboard with Score** - Your credit score + tier display
-3. **Score Builder Wizard** - Simulation with credentials selected
-4. **Credential Request Modal** - Showing MCSP storage badge
-5. **Lending Pool Interface** - Borrowing power based on score
-6. **Position Card with Interest** - Real-time interest display
-7. **Leaderboard** - Top users with scores
-8. **API JSON Response** - Pretty-printed with syntax highlighting
-9. **Explorer Contract View** - Verified contract on devnet
+1. **Landing Page Hero** - Shows the problem statement with "Borrow Based on WHO YOU ARE"
+2. **Dashboard Overview** - Shows 3 stats cards (Credit Score, Collateral Factor, Login Method) + Quick Links
+3. **Score Builder Wizard** (/score page) - Current vs Simulated scores with credential selector
+4. **Credentials Marketplace** (/credentials page) - All 11 credential types displayed
+5. **Credential Request Modal** - Showing MCSP storage badge and step-by-step progress
+6. **Lending Pool Interface** (/lending page) - Position card showing borrowing power
+7. **Position Card with Interest** - Real-time interest accruing
+8. **Leaderboard** (bottom of /score page) - Top users with trophy icons
+9. **API JSON Response** - Pretty-printed with syntax highlighting
+10. **Explorer Contract View** - Verified CreditScoreOracle contract on devnet
 
 **Save all screenshots to**: `/public/demo/` folder
+
+**Page Navigation for Screenshots**:
+- `/` - Landing page
+- `/dashboard` - Dashboard overview
+- `/score` - Score Builder + Leaderboard
+- `/credentials` - Credentials wallet & marketplace
+- `/lending` - Lending pool interface
 
 ---
 
@@ -535,12 +597,13 @@ Before the demo, take high-quality screenshots of:
 
 **Technical Setup:**
 - [ ] Demo wallet funded with MOCA (for gas)
-- [ ] Demo wallet has 10,000+ test USDC
+- [ ] Demo wallet has 10,000+ test USDC (get from /faucet)
 - [ ] Demo wallet has high credit score (850+)
 - [ ] Active borrow position (for interest display)
 - [ ] Interest accruing for at least 1 hour
-- [ ] All tabs tested in target browser
+- [ ] All pages tested in target browser (/, /dashboard, /score, /credentials, /lending, /faucet)
 - [ ] Second backup wallet ready (if primary fails)
+- [ ] Test navigation flow: Landing → Dashboard → Score Builder → Credentials → Lending
 
 **Browser Setup:**
 - [ ] Clear cache and cookies
