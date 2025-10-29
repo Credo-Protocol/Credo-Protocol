@@ -12,9 +12,10 @@ import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
 import Image from 'next/image';
 import Link from 'next/link';
+import AppNav from '@/components/layout/AppNav';
 import ConnectButton from '@/components/auth/ConnectButton';
 import { Button } from '@/components/ui/button';
-import { Loader2, Droplets, CheckCircle2, Info, Home, ArrowRight } from 'lucide-react';
+import { Loader2, Droplets, CheckCircle2, Info, ArrowRight } from 'lucide-react';
 import { CONTRACTS, ERC20_ABI, MOCA_CHAIN } from '@/lib/contracts';
 import { useAirKit } from '@/hooks/useAirKit';
 import { handleTransactionError } from '@/lib/errorHandler';
@@ -211,44 +212,7 @@ export default function Faucet() {
 
   return (
     <div className="min-h-screen bg-white text-black">
-      {/* Header */}
-      <header className="border-b border-black/10 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo and Brand */}
-            <Link href="/" className="flex items-center gap-1 group">
-              <img 
-                src="/credo.jpg" 
-                alt="Credo Protocol" 
-                className="w-8 h-8 rounded-lg object-cover transition-transform group-hover:scale-105" 
-              />
-              <span className="text-xl font-bold text-black">Credo Protocol</span>
-            </Link>
-            
-            <div className="flex items-center gap-3">
-              <Link href="/">
-                <Button 
-                  variant="ghost" 
-                  className="h-[44px] px-3 flex items-center gap-2 text-black/70 hover:text-black hover:bg-black/5"
-                >
-                  <Home className="h-4 w-4" />
-                  <span className="text-sm">Home</span>
-                </Button>
-              </Link>
-              <Link href="/dashboard">
-                <Button 
-                  variant="outline" 
-                  className="h-[44px] px-4 flex items-center gap-2 border-black/20 hover:bg-black/5 hover:border-black/30 text-black bg-white"
-                >
-                  <ArrowRight className="h-4 w-4" />
-                  <span className="text-sm">Go to Dashboard</span>
-                </Button>
-              </Link>
-              <ConnectButton onConnectionChange={handleConnectionChange} />
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppNav onConnectionChange={handleConnectionChange} />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
