@@ -53,7 +53,7 @@ export default function RewardBanner() {
   if (claimed === false) {
     return (
       <div className="inline-flex items-center gap-3 px-4 py-3 bg-white border-2 border-black/5 rounded-lg">
-        <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
           <Gift className="h-4 w-4 text-white" />
         </div>
         <div className="flex flex-col gap-2 items-center">
@@ -63,7 +63,7 @@ export default function RewardBanner() {
           <Button
             onClick={() => router.push('/rewards')}
             size="sm"
-            className="bg-black hover:bg-black/80 hover:scale-105 text-white h-8 px-8 text-xs transition-all duration-200 hover:shadow-lg"
+            className="bg-green-600 hover:bg-green-700 hover:scale-105 text-white h-8 px-8 text-xs transition-all duration-200 hover:shadow-lg"
           >
             Claim Now
           </Button>

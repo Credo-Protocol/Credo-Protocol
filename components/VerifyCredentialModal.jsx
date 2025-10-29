@@ -103,28 +103,28 @@ export default function VerifyCredentialModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-white">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Gift className="h-5 w-5 text-blue-500" />
+          <DialogTitle className="flex items-center gap-2 text-black">
+            <Gift className="h-5 w-5 text-green-600" />
             Claim $50 USDC
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-black/60">
             Verify employment credential to claim ${REWARD_AMOUNT} {REWARD_TOKEN}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Reward Highlight */}
-          <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-lg">
+          <div className="p-6 bg-white border-2 border-green-200 rounded-lg">
             <div className="text-center">
-              <p className="text-sm text-blue-700 mb-1">Free Reward</p>
+              <p className="text-base font-bold text-green-700 mb-2">Free Reward</p>
               <div className="flex items-center justify-center gap-2">
-                <DollarSign className="h-8 w-8 text-blue-600" />
-                <span className="text-4xl font-bold text-blue-600">{REWARD_AMOUNT}</span>
-                <span className="text-2xl font-semibold text-blue-600">{REWARD_TOKEN}</span>
+                <DollarSign className="h-10 w-10 text-green-600" />
+                <span className="text-5xl font-bold text-green-600">{REWARD_AMOUNT}</span>
+                <span className="text-3xl font-bold text-green-600">{REWARD_TOKEN}</span>
               </div>
-              <p className="text-xs text-blue-600 mt-1">
+              <p className="text-sm font-medium text-green-700 mt-2">
                 One-time reward for verified users!
               </p>
             </div>
@@ -132,21 +132,21 @@ export default function VerifyCredentialModal({
 
           {/* Required Credentials */}
           <div>
-            <h4 className="text-sm font-medium mb-2">Requirements:</h4>
+            <h4 className="text-base font-bold mb-3 text-black">Requirements:</h4>
             <div className="space-y-2">
               {requiredCredentials.map((cred, idx) => (
                 <div 
                   key={idx}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded"
+                  className="flex items-center justify-between p-4 bg-white border-2 border-black/10 rounded"
                 >
-                  <span className="text-sm flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-gray-400" />
+                  <span className="text-base font-medium flex items-center gap-2 text-black">
+                    <Shield className="h-5 w-5 text-green-600" />
                     {cred.replace(/_/g, ' ')}
                   </span>
                   {results.length > 0 && (
                     <div>
                       {results.find(r => r.credentialType === cred)?.verified ? (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-green-600" />
                       ) : results.find(r => r.credentialType === cred)?.simulated ? (
                         <Badge variant="outline" className="text-xs">
                           Simulated
@@ -164,34 +164,36 @@ export default function VerifyCredentialModal({
           {/* Verification Results */}
           {results.length > 0 && (
             <div className="border-t pt-4">
-              <h4 className="text-sm font-medium mb-2">Results:</h4>
+              <h4 className="text-base font-bold mb-3 text-black">Results:</h4>
               <div className="space-y-2">
                 {results.map((result, idx) => (
-                  <div key={idx} className="p-3 bg-gray-50 rounded">
+                  <div key={idx} className="p-4 bg-white border-2 border-black/10 rounded">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium">
+                      <span className="text-base font-medium text-black">
                         {result.credentialType.replace(/_/g, ' ')}
                       </span>
-                      <Badge variant={result.verified ? 'success' : 'destructive'}>
+                      <Badge 
+                        className={result.verified ? 'bg-green-600' : 'bg-red-600'}
+                      >
                         {result.simulated ? 'Simulated' :
                          result.verified ? 'Verified' : 'Failed'}
                       </Badge>
                     </div>
                     {result.error && (
-                      <p className="text-xs text-red-600">{result.error}</p>
+                      <p className="text-sm font-medium text-red-600 mt-1">{result.error}</p>
                     )}
                     {result.simulated && (
-                      <p className="text-xs text-blue-600">
+                      <p className="text-sm font-medium text-green-700 mt-1">
                         Demo mode - using simulation for testing
                       </p>
                     )}
                     {result.reward && (
-                      <div className="mt-2 p-2 bg-green-50 rounded">
-                        <p className="text-xs text-green-700 font-medium">
+                      <div className="mt-2 p-3 bg-green-50 border-2 border-green-200 rounded">
+                        <p className="text-sm text-green-700 font-bold">
                           💰 {result.reward.amount} {result.reward.token} sent!
                         </p>
                         {result.reward.txHash && (
-                          <p className="text-xs text-green-600 font-mono truncate">
+                          <p className="text-xs text-green-700 font-mono truncate mt-1">
                             TX: {result.reward.txHash}
                           </p>
                         )}
@@ -202,10 +204,10 @@ export default function VerifyCredentialModal({
               </div>
 
               {/* Overall Score */}
-              <div className="mt-4 p-3 bg-blue-50 rounded">
+              <div className="mt-4 p-4 bg-white border-2 border-green-200 rounded">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Verification Score:</span>
-                  <span className="text-lg font-bold text-blue-600">
+                  <span className="text-base font-bold text-black">Verification Score:</span>
+                  <span className="text-2xl font-bold text-green-600">
                     {Math.round(
                       (results.filter(r => r.verified).length / results.length) * 100
                     )}%
@@ -217,10 +219,10 @@ export default function VerifyCredentialModal({
 
           {/* Error Message */}
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded">
+            <div className="p-4 bg-red-50 border-2 border-red-200 rounded">
               <div className="flex items-start gap-2">
                 <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-base font-medium text-red-700">{error}</p>
               </div>
             </div>
           )}
@@ -231,7 +233,7 @@ export default function VerifyCredentialModal({
               <Button
                 onClick={handleVerify}
                 disabled={verifying}
-                className="flex-1"
+                className="flex-1 bg-green-600 hover:bg-green-700"
               >
                 {verifying ? (
                   <>
@@ -255,30 +257,11 @@ export default function VerifyCredentialModal({
                 >
                   Verify Again
                 </Button>
-                <Button onClick={onClose} className="flex-1">
+                <Button onClick={onClose} className="flex-1 bg-green-600 hover:bg-green-700">
                   Done
                 </Button>
               </>
             )}
-          </div>
-
-          {/* Privacy Info Note */}
-          <div className="text-xs text-gray-500 bg-blue-50 p-3 rounded">
-            <div className="flex items-start gap-2">
-              <Lock className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="font-medium text-blue-900 mb-1">
-                  🔐 Privacy-Preserving Verification
-                </p>
-                <p className="text-blue-700">
-                  Zero-knowledge proof = your private data stays private. We only verify
-                  you meet the requirements, without seeing your actual details.
-                </p>
-                <p className="text-blue-700 mt-2">
-                  <strong>Example:</strong> Proves &quot;has employment&quot; without revealing employer name.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </DialogContent>
