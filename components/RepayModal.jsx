@@ -166,13 +166,74 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
         LENDING_POOL_ABI,
         signer
       );
+      
+      // CRITICAL: Re-fetch the latest total owed right before repaying
+      // Interest accrues every second, so the amount owed may have increased
+      // since the approval. We need to ensure our allowance covers it.
+      const reliableProvider = await getBestProvider(provider);
+      const poolContract = new ethers.Contract(
+        CONTRACTS.LENDING_POOL,
+        LENDING_POOL_ABI,
+        reliableProvider
+      );
+      
+      const latestOwed = await poolContract.getBorrowBalanceWithInterest(userAddress, CONTRACTS.MOCK_USDC);
+      const latestOwedFormatted = Number(ethers.formatUnits(latestOwed, 6));
+      
+      console.log('Latest total owed (just before repay):', latestOwedFormatted.toFixed(6), 'USDC');
+      console.log('Current allowance:', allowance.toFixed(6), 'USDC');
+      
+      // Pre-flight checks
+      const repayAmountNum = parseFloat(repayAmount);
+      
+      // Check if user has enough balance
+      if (repayAmountNum > balance) {
+        setError(`💰 Insufficient USDC balance. You have ${balance.toFixed(2)} USDC but are trying to repay ${repayAmountNum.toFixed(2)} USDC.`);
+        setRepaying(false);
+        return;
+      }
+      
+      // Use the smaller of user's input and the latest owed for the actual transfer
+      // Passing the exact amount to the contract avoids some provider/bundler
+      // simulation quirks when the input is much larger than what will be used.
+      const actualRepayAmount = Math.min(repayAmountNum, latestOwedFormatted);
+      
+      if (actualRepayAmount > allowance) {
+        setError(`⚠️ Insufficient allowance. Interest has accrued since approval. You need to re-approve. (Owed: ${latestOwedFormatted.toFixed(2)} USDC, Allowance: ${allowance.toFixed(2)} USDC)`);
+        // Go back to approval step
+        setStep(2);
+        setRepaying(false);
+        return;
+      }
+      
+      // Check if amount is valid
+      if (repayAmountNum <= 0) {
+        setError('Please enter a valid repayment amount greater than 0.');
+        setRepaying(false);
+        return;
+      }
 
-      // Repay debt to pool
-      const amount = ethers.parseUnits(repayAmount, 6);
+      // Repay debt to pool — send EXACT amount we expect the contract to pull
+      const amount = ethers.parseUnits(actualRepayAmount.toFixed(6), 6);
       
-      console.log('Repaying', repayAmount, 'USDC to LendingPool');
+      console.log('Repaying', actualRepayAmount.toFixed(6), 'USDC to LendingPool');
+      console.log('User balance:', balance.toFixed(2), 'USDC');
+      console.log('Latest owed used for repay:', latestOwedFormatted.toFixed(6), 'USDC');
       
-      const tx = await lendingPool.repay(CONTRACTS.MOCK_USDC, amount);
+      // Try to estimate gas; if estimation fails due to provider quirks, use a safe fallback
+      let gasLimit;
+      try {
+        // ethers v6: estimate via contract.estimateGas.function
+        const estimated = await lendingPool.estimateGas.repay(CONTRACTS.MOCK_USDC, amount);
+        // Add a 25% buffer to prevent underestimation
+        gasLimit = (estimated * 125n) / 100n;
+        console.log('Repay gas estimate:', estimated.toString(), '→ using', gasLimit.toString());
+      } catch (estErr) {
+        console.log('Gas estimation failed, using fallback gas limit for repay.', estErr);
+        gasLimit = 400000n; // Safe fallback for repay on devnet
+      }
+      
+      const tx = await lendingPool.repay(CONTRACTS.MOCK_USDC, amount, { gasLimit });
       
       console.log('Repay transaction submitted:', tx.hash);
       
@@ -327,14 +388,15 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
                     </button>
                     <button
                       className="flex-1 px-3 py-2 text-sm border border-black/20 rounded-md hover:bg-black/5 transition-colors text-black disabled:opacity-50 disabled:cursor-not-allowed"
-                      // Add a small buffer to cover interest accrued between fetch and repay
+                      // Add generous buffer to ensure contract's dust-clearing logic triggers
+                      // Contract auto-clears debt < $0.00001 (10 units at 6 decimals)
                       onClick={() => {
-                        const buffer = 0.10; // Small buffer for interest that accrues during transaction
+                        const buffer = 1.00; // Generous buffer ensures contract clears all debt including dust
                         const target = Math.min(balance, totalOwed + buffer);
                         setRepayAmount(target.toFixed(2));
                       }}
                       disabled={balance === 0}
-                      title="Includes $0.10 buffer for interest accruing during transaction. Contract auto-caps to exact amount owed - you won't overpay!"
+                      title="Includes $1.00 buffer to ensure complete debt clearance. Contract auto-caps at exact owed amount and clears dust (< $0.00001)."
                     >
                       Pay Total
                     </button>

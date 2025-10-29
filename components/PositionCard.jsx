@@ -44,8 +44,9 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
   }, [userAddress, refresh, provider, creditScore]);
   
   // Phase 3: Auto-refresh interest every 5 seconds
+  // Only run when there's meaningful debt (>= $0.01), not dust amounts
   useEffect(() => {
-    if (!userAddress || !provider || position.borrowedAmount === 0) {
+    if (!userAddress || !provider || position.borrowedAmount < 0.0001) {
       return;
     }
     
@@ -194,7 +195,8 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
   };
 
   // Check if health factor is infinite (no debt)
-  const isHealthFactorInfinite = position.healthFactor > 1e10;
+  // Health factor > 1 million indicates no meaningful debt (effectively infinite)
+  const isHealthFactorInfinite = position.healthFactor > 1000000;
   
   // Calculate health factor percentage for progress bar
   // Health factor > 1 means safe, < 1 means at risk of liquidation
@@ -214,8 +216,11 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
     return 'text-red-500';
   };
 
-  // Check if user has any position
-  const hasPosition = position.suppliedAmount > 0 || position.borrowedAmount > 0;
+  // Show position card if user has supplied collateral OR has meaningful borrows
+  // Use dust tolerance for borrows to handle rounding (< $0.01 = effectively zero)
+  const hasSuppliedCollateral = position.suppliedAmount > 0;
+  const hasMeaningfulDebt = position.borrowedAmount >= 0.01;
+  const hasPosition = hasSuppliedCollateral || hasMeaningfulDebt;
 
   if (loading) {
     return (
@@ -297,7 +302,8 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
         </div>
 
         {/* Phase 3: Real-Time Interest Display (NEW!) */}
-        {position.borrowedAmount > 0 && (
+        {/* Only show when there's meaningful debt (>= $0.01), not dust amounts */}
+        {hasMeaningfulDebt && (
           <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700">Interest Accruing</span>

@@ -125,6 +125,23 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
       setSupplying(true);
       setError('');
 
+      // Pre-flight checks to prevent "missing revert data" errors
+      const supplyAmountNum = parseFloat(supplyAmount);
+      
+      // Check if user has enough balance
+      if (supplyAmountNum > balance) {
+        setError(`💰 Insufficient USDC balance. You have ${balance.toFixed(2)} USDC but are trying to supply ${supplyAmountNum.toFixed(2)} USDC.`);
+        setSupplying(false);
+        return;
+      }
+      
+      // Check if amount is valid
+      if (supplyAmountNum <= 0) {
+        setError('Please enter a valid supply amount greater than 0.');
+        setSupplying(false);
+        return;
+      }
+
       const signer = await provider.getSigner();
       
       const lendingPool = new ethers.Contract(
@@ -137,6 +154,7 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
       const amount = ethers.parseUnits(supplyAmount, 6);
       
       console.log('Supplying', supplyAmount, 'USDC to LendingPool');
+      console.log('User balance:', balance.toFixed(2), 'USDC');
       
       const tx = await lendingPool.supply(CONTRACTS.MOCK_USDC, amount);
       
