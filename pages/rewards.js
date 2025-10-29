@@ -17,7 +17,6 @@ import {
   Gift, 
   CheckCircle, 
   Shield, 
-  Sparkles,
   ExternalLink,
   DollarSign,
   Lock,
@@ -120,11 +119,6 @@ export default function RewardsPage() {
       <main className="container mx-auto px-4 py-12">
         {/* Header Section */}
         <div className="max-w-4xl mx-auto text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 bg-blue-50 mb-6">
-            <Sparkles className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-medium text-blue-900">Rewards Center</span>
-          </div>
-          
           <h1 className="text-5xl md:text-6xl font-bold mb-4">
             Verify & Earn Rewards
           </h1>
@@ -352,7 +346,7 @@ export default function RewardsPage() {
         {/* Coming Soon Section */}
         <div className="max-w-4xl mx-auto mt-12 text-center">
           <div className="p-8 border-2 border-dashed border-black/10 rounded-2xl">
-            <Sparkles className="w-12 h-12 mx-auto mb-4 text-black/40" />
+            <Gift className="w-12 h-12 mx-auto mb-4 text-black/40" />
             <h3 className="text-2xl font-bold mb-2">More Rewards Coming Soon</h3>
             <p className="text-black/60">
               Stay tuned for additional reward opportunities and challenges
