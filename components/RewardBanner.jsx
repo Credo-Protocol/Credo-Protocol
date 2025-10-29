@@ -56,16 +56,16 @@ export default function RewardBanner() {
         <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
           <Gift className="h-4 w-4 text-white" />
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 items-center">
           <h4 className="font-bold text-black text-sm whitespace-nowrap">
-            Claim Your Free ${REWARD_AMOUNT} {REWARD_TOKEN}!
+            First time free ${REWARD_AMOUNT} {REWARD_TOKEN}!
           </h4>
           <Button
             onClick={() => router.push('/rewards')}
             size="sm"
-            className="bg-black hover:bg-black/80 hover:scale-105 text-white h-8 px-3 text-xs w-fit transition-all duration-200 hover:shadow-lg"
+            className="bg-black hover:bg-black/80 hover:scale-105 text-white h-8 px-8 text-xs transition-all duration-200 hover:shadow-lg"
           >
-            Verify & Claim ${REWARD_AMOUNT}
+            Claim Now
           </Button>
         </div>
       </div>
