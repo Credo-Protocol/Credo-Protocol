@@ -60,12 +60,23 @@ Add Wave 3 section at the top:
 - **Privacy-First Design**: Only range disclosed (e.g., "$5k-$10k"), exact amounts never revealed
 - **10 Credential Types**: 4 income buckets + 4 balance buckets + 2 legacy types
 
-#### 🏗️ Official MOCA Integration
-- **AIR Kit Issuer DIDs**: 3 registered issuers with reputation tracking
+#### 🏗️ Complete AIR Kit Integration (All 3 Services)
+- **✅ AIR Account Services**: One-click login with Moca ID (Google/Email/Wallet SSO)
+- **✅ AIR Credential Issuance**: Official Issuer DID with 10 credential schemas
+- **✅ AIR Credential Verification**: Verification programs with ZK proof validation
 - **Decentralized Storage**: Credentials stored on MOCA Chain Storage Providers (MCSP)
-- **Gas Sponsorship**: Zero-friction credential issuance (no MOCA tokens required!)
+- **Gas Sponsorship Infrastructure**: Paymaster support built-in (configuration ready)
+- **Partner JWT Authentication**: Secure backend-to-AIR Kit communication (RS256 + JWKS)
 - **Ecosystem Interoperability**: Credentials discoverable by any MOCA dApp
-- **Public Schema Registry**: Official schemas published for third-party use
+
+#### 💰 $50 USDC Verification Gift (AIR Verification Services)
+- **Verification Program**: Employment credential check via AIR Kit Dashboard
+- **Employment Verification Reward**: Instant $50 USDC for ZK proof validation
+- **Zero-Knowledge Proofs**: Privacy-preserving verification (no data revealed)
+- **On-Chain Validation**: AIR Kit smart contracts verify proofs on Moca Chain
+- **Dashboard Integration**: Banner prompts unclaimed rewards
+- **Dedicated Rewards Page**: Full verification flow with inline credential checking
+- **One-Time Claim**: Anti-fraud protection with claim tracking
 
 #### 🎯 Crystal-Clear User Journey
 - **Score Builder Wizard**: See exactly what unlocks your next tier
@@ -220,8 +231,8 @@ Internal Links:
 # Generate new wallet or use existing
 # Address: 0x... (save for demo)
 
-# 2. Fund with testnet tokens
-# Visit: https://testnet-scan.mocachain.org/faucet
+# 2. Fund with devnet tokens
+# Visit: https://devnet-scan.mocachain.org/faucet
 # Get MOCA for gas
 
 # 3. Get test USDC
@@ -271,13 +282,14 @@ Act 1: Problem (30 sec)
 
 Act 2: Journey (2 min)
 - [ ] Login (already connected, just show dashboard)
+- [ ] **Optional: Show $50 USDC reward banner (if unclaimed)**
 - [ ] Open Score Builder
 - [ ] Show current score + tier
 - [ ] Select 2 credentials
 - [ ] Show simulation jumping to next tier
-- [ ] **Request credential (highlight: no MOCA tokens needed - gas sponsored!)**
+- [ ] **Request credential via AIR Kit (official integration)**
 - [ ] **Show AIR Kit issuance flow (official integration)**
-- [ ] **Open AIR Wallet - show credential stored on MCSP**
+- [ ] **Show credential in wallet (stored on MCSP)**
 - [ ] Navigate to Lending Pool
 - [ ] Show borrowing power comparison
 - [ ] Borrow action (pre-prepared)
@@ -465,20 +477,20 @@ Clean Up:
 - [ ] Demo wallet has high credit score (850+)
 - [ ] Demo wallet has active borrow position (for interest demo)
 - [ ] **Demo wallet has credentials in AIR Kit wallet (viewable)**
-- [ ] **Gas sponsorship working (can issue without MOCA)**
+- [ ] **Optional: Demo $50 USDC reward claim (if unclaimed)**
 - [ ] Backup wallet ready (in case of issues)
 - [ ] Demo flow rehearsed and under 4 minutes
-- [ ] **Demo includes showing AIR Kit Dashboard issuers**
+- [ ] **Demo includes showing AIR Kit credential issuance**
 - [ ] Screenshots taken of all key screens
 - [ ] Video recorded (optional but recommended)
 - [ ] Backup plan if internet fails
 
 ### Testing
-- [ ] Full end-to-end flow works on testnet
-- [ ] **Credential issuance uses official AIR Kit (not mock backend)**
-- [ ] **Gas sponsorship confirmed working**
-- [ ] **Credentials appear in AIR Kit Dashboard**
-- [ ] **Credentials stored on MCSP (check dashboard)**
+- [ ] Full end-to-end flow works on devnet
+- [ ] **Credential issuance uses official AIR Kit (Partner JWT authentication)**
+- [ ] **Credentials appear in AIR Kit wallet component**
+- [ ] **Credentials stored on MCSP (decentralized storage)**
+- [ ] **$50 USDC reward claim tested and working**
 - [ ] All features work on mobile
 - [ ] API tested from external domain
 - [ ] Leaderboard shows at least 3 users
@@ -502,16 +514,20 @@ Clean Up:
 
 **Prerequisites Check** (Before starting Phase 6):
 - [ ] ✅ Phase 5.1 (Dashboard Setup) complete
-  - [ ] All 3 Issuer DIDs registered and active
+  - [ ] Official Issuer DID registered and active
   - [ ] All 10 credential schemas created
-  - [ ] Gas sponsorship enabled
+  - [ ] Paymaster infrastructure configured
 - [ ] ✅ Phase 5.2 (Backend Refactor) complete
   - [ ] Backend using Partner JWT authentication
   - [ ] All API endpoints tested
 - [ ] ✅ Phase 5.3 (Frontend Integration) complete
   - [ ] Credentials issuing via AIR Kit (not mock backend)
   - [ ] Credentials stored on MCSP
-  - [ ] Gas sponsorship tested and working
+  - [ ] Verification service tested
+- [ ] ✅ Phase 5.5 (Verification Faucet) complete
+  - [ ] $50 USDC reward system functional
+  - [ ] RewardBanner integrated on dashboard
+  - [ ] Rewards page with inline verification
 
 **Part A: Documentation**
 - [ ] Step 1: Update README (1 hour)
@@ -703,11 +719,21 @@ If any of these fail, **go back** to the relevant sub-phase and fix it before pr
 ### Demo Day Talking Points
 
 **Highlight these** during demo:
-1. "No MOCA tokens needed - gas sponsored by protocol"
-2. "Credentials stored on decentralized MOCA Chain Storage"
-3. "Official AIR Kit Issuer DIDs with reputation tracking"
-4. "Credentials interoperable with entire MOCA ecosystem"
-5. "Any dApp can discover and verify our credentials"
 
-This separates you from projects that only use MOCA for login!
+**Complete AIR Kit Integration (All 3 Services):**
+1. "✅ AIR Account Services - One-click Moca ID login (SSO)"
+2. "✅ AIR Credential Issuance - Official Issuer DID with 10 schemas"
+3. "✅ AIR Credential Verification - ZK proof validation on-chain"
+4. "This is a FULL AIR Kit integration, not just authentication!"
+
+**Technical Highlights:**
+5. "Partner JWT authentication (RS256 + JWKS endpoint)"
+6. "Credentials stored on decentralized MOCA Chain Storage (MCSP)"
+7. "Verification programs via AIR Kit Dashboard"
+8. "$50 USDC instant reward for employment ZK proof verification"
+9. "Privacy-preserving bucketed credentials (ranges, not exact amounts)"
+10. "Real-time interest accrual on loans (5-18% APR based on score)"
+11. "Public API for credit scores - any dApp can integrate"
+
+**This separates you from projects that only use MOCA for login!**
 

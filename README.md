@@ -38,12 +38,23 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 - **Privacy-First Design**: Only range disclosed (e.g., "$5k-$10k"), exact amounts never revealed
 - **10 Credential Types**: 4 income buckets + 4 balance buckets + 2 legacy types
 
-#### 🏗️ Official MOCA Integration
-- **AIR Kit Issuer DIDs**: Official registered issuer with reputation tracking
+#### 🏗️ Official MOCA Integration (Full AIR Kit Suite)
+- **✅ AIR Account Services**: One-click login with Moca ID (Google/Email/Wallet SSO)
+- **✅ AIR Credential Issuance**: Official Issuer DID with 10 credential schemas published
+- **✅ AIR Credential Verification**: Verification programs with zero-knowledge proof validation
 - **Decentralized Storage**: Credentials stored on MOCA Chain Storage Providers (MCSP)
-- **Gas Sponsorship Support**: Infrastructure ready (requires paymaster policy configuration)
+- **Paymaster Infrastructure**: Built-in support for gas-sponsored transactions (configuration ready)
+- **Partner JWT Authentication**: Secure backend-to-AIR Kit communication (RS256 with JWKS)
 - **Ecosystem Interoperability**: Credentials discoverable by any MOCA dApp
-- **Public Schema Registry**: Official schemas published for third-party use
+
+#### 💰 User Incentives & Onboarding (AIR Verification Services)
+- **$50 USDC Verification Faucet**: Instant reward for employment credential verification
+- **Verification Programs**: Custom verification logic via AIR Kit Dashboard (employment check)
+- **Zero-Knowledge Proofs**: Privacy-preserving verification (employment confirmed without revealing details)
+- **On-Chain Proof Validation**: AIR Kit smart contracts validate ZK proofs on Moca Chain
+- **One-Time Rewards**: Anti-fraud claim tracking prevents double-claiming
+- **Seamless Flow**: Dashboard banner + dedicated rewards page with inline verification
+- **User Acquisition**: Incentivized onboarding drives adoption and engagement
 
 #### 🎯 Crystal-Clear User Journey
 - **Score Builder Wizard**: See exactly what unlocks your next tier
@@ -56,7 +67,7 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 - **Interest Accrual**: Time-based interest (5-18% APR based on credit tier)
 - **Live Interest Display**: Watch interest accrue every 5 seconds in real-time
 - **Dynamic APR**: Lower rates for higher scores (5% vs 18%)
-- **Testnet Deployment**: Live on Moca devnet for testing and demonstration
+- **Devnet Deployment**: Live on Moca Devnet for testing and demonstration
 
 #### 🌐 Ecosystem Integration
 - **Composable Credit API**: Public `/api/score/:address` endpoint
@@ -89,6 +100,7 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 - No UX guidance → Score Builder Wizard with simulation
 - Isolated protocol → Composable API for ecosystem
 - No leaderboard → Top 10 leaderboard with live updates
+- No incentives → $50 USDC verification faucet for user acquisition
 
 ### Try It Now
 
@@ -103,6 +115,7 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 ## 📊 Wave 3 Highlights
 
 ### For Users
+- 💰 **$50 USDC Welcome Bonus**: Instant reward for verifying employment credentials
 - 🎯 **2x Better Terms**: Income credentials unlock up to 50% collateral (vs 150% standard)
 - 🔒 **Privacy Protected**: Prove creditworthiness without revealing sensitive data
 - 📈 **Clear Path**: Know exactly which credentials unlock better rates
@@ -118,20 +131,22 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 
 ### For the Ecosystem
 - 🚀 **Moca ID Adoption**: Requires Moca login, drives identity usage
-- 🛠️ **AIR Kit Showcase**: Deep integration with Account + Credential Services
+- 🛠️ **Complete AIR Kit Integration**: All 3 services - Account, Issuance & Verification
 - 🎯 **True Integration**: Official MOCA infrastructure (not just SSO)
+- 🔐 **Zero-Knowledge Verification**: Demonstrates privacy-preserving credential verification
 - 🧱 **Infrastructure Primitive**: Foundational layer for DeFi identity
 - 💡 **Innovation**: Brings TradFi credit concepts to Web3
-- ⚡ **Paymaster Ready**: Infrastructure for gas-sponsored transactions (not currently active)
+- 🎁 **User Acquisition**: $50 USDC reward system drives onboarding and engagement
+- ⚡ **Paymaster Ready**: Infrastructure for gas-sponsored transactions (configuration ready)
 
 ---
 
 ## 📊 Project Status & Maturity
 
-**Current Status: Testnet Demo (Wave 3)**
+**Current Status: Devnet Demo (Wave 3)**
 
 ✅ **What This Project IS:**
-- Feature-complete testnet demonstration
+- Feature-complete devnet demonstration
 - Official MOCA ecosystem integration
 - Comprehensive smart contract testing (104+ tests passing)
 - Professional UI/UX for showcasing
@@ -186,10 +201,13 @@ Credo Protocol bridges this gap by creating an **identity-backed lending model**
 
 ### Core Functionality
 - **🔐 Seamless Login** - One-click Web3 SSO via Moca AIR Kit (Google/Email/Wallet)
-- **🎫 Verifiable Credentials** - Submit proof of CEX history, employment, and stable balances
+- **🎫 Verifiable Credentials** - Privacy-preserving bucketed credentials via official AIR Kit
 - **📊 On-Chain Credit Scoring** - Transparent 0-1000 scale with diversity bonuses
 - **⚡ Dynamic Collateral** - 50-150% requirements based on your score
-- **💰 Complete Lending Flow** - Supply, borrow, and repay USDC seamlessly
+- **💰 Complete Lending Flow** - Supply, borrow, and repay USDC with real-time interest
+- **🎁 Rewards System** - $50 USDC instant reward for employment verification
+- **📈 Score Builder** - Interactive wizard with real-time simulation
+- **🏆 Leaderboard** - Top credit scores across the network
 
 ### Why Credo Protocol?
 
@@ -290,6 +308,10 @@ Credo-Protocol/
 ├── pages/                      # Next.js pages
 │   ├── index.js               # Landing page
 │   ├── dashboard.js           # Main app dashboard
+│   ├── credentials.js         # Credential wallet & marketplace
+│   ├── score.js               # Score builder & leaderboard
+│   ├── lending.js             # Lending pool interface
+│   ├── rewards.js             # $50 USDC verification faucet
 │   └── faucet.js              # Get test USDC
 ├── components/                 # React components
 │   ├── auth/
@@ -299,6 +321,8 @@ Credo-Protocol/
 │   ├── LendingInterface.jsx   # Supply/Borrow/Repay
 │   ├── SupplyModal.jsx        # Deposit collateral modal
 │   ├── RepayModal.jsx         # Repay debt modal
+│   ├── RewardBanner.jsx       # $50 USDC reward banner
+│   ├── Leaderboard.jsx        # Top credit scores
 │   └── ui/                    # shadcn/ui components
 ├── contracts/                  # Solidity smart contracts
 │   ├── contracts/
@@ -311,17 +335,21 @@ Credo-Protocol/
 │   └── test/                  # Contract tests
 ├── backend/                    # Express API server
 │   └── src/
-│       ├── issuers/           # Mock credential issuers
-│       │   ├── MockBankIssuer.js
-│       │   ├── MockEmployerIssuer.js
-│       │   └── MockExchangeIssuer.js
+│       ├── auth/              # JWT/JWKS infrastructure
+│       │   ├── jwt.js         # Partner JWT generation
+│       │   └── jwks.js        # JWKS endpoint for AIR Kit
+│       ├── services/
+│       │   └── verificationService.js  # $50 USDC reward logic
 │       └── routes/
-│           └── credentials.js  # Credential API endpoints
+│           ├── credentials.js  # Credential preparation
+│           └── verification.js # Verification & rewards
 ├── hooks/
 │   └── useAirKit.js           # AIR Kit React hook
 ├── lib/
 │   ├── contracts.js           # Contract ABIs & addresses
 │   ├── airkit.js              # AIR Kit initialization
+│   ├── credentialServices.js  # AIR Kit credential issuance
+│   ├── verificationService.js # Frontend verification flow
 │   └── utils.js               # Helper functions
 └── docs/                       # Comprehensive documentation
     ├── OVERVIEW.md            # Technical architecture (670+ lines)
@@ -425,11 +453,13 @@ npm run dev
 ### 5. Try It Out!
 
 1. **Login** - Click "Login with Moca ID" and choose Google/Email/Wallet
-2. **Request Credentials** - Visit "Build Credit Score" tab, request all 3 credentials
-3. **Check Score** - Your credit score updates automatically (base 500 + credentials)
-4. **Supply USDC** - Go to "Lending Pool" tab, supply collateral
-5. **Borrow** - Borrow up to your limit based on credit score
-6. **Repay** - Pay back anytime to improve health factor
+2. **Claim Reward** - Visit "Rewards" page to claim $50 USDC (verify employment)
+3. **Request Credentials** - Visit "Credentials" tab, request credentials from marketplace
+4. **Build Score** - Use "Score Builder" to simulate and optimize your score
+5. **Check Score** - Your credit score updates automatically on-chain
+6. **Supply USDC** - Go to "Lending Pool" tab, supply collateral
+7. **Borrow** - Borrow up to your limit based on credit score
+8. **Repay** - Pay back anytime to improve health factor
 
 ## 📊 Buildathon Progress
 
@@ -475,7 +505,7 @@ npm run dev
 
 ### ✅ Wave 3 Deliverables (COMPLETED - Oct 27, 2025)
 
-**What's New This Wave:** Complete transformation from basic MVP to feature-rich testnet protocol with official MOCA ecosystem integration, privacy-preserving credentials, interest-bearing loans, and composable credit infrastructure.
+**What's New This Wave:** Complete transformation from basic MVP to feature-rich devnet protocol with official MOCA ecosystem integration, privacy-preserving credentials, interest-bearing loans, and composable credit infrastructure.
 
 #### 1. Smart Contracts v2 (Redeployed on Moca Devnet)
 
@@ -595,7 +625,32 @@ npm run dev
 - NFT platforms: Whitelist eligibility
 - DeFi protocols: Reduced collateral requirements
 
-#### 6. Deployment & Documentation
+#### 6. AIR Credential Verification Services & Rewards (Phase 5.5)
+
+**MOCA Verification Integration** - Complete AIR Kit verification implementation
+- ✅ **Verification Program**: Created via AIR Kit Dashboard (employment credential check)
+- ✅ **Verifier DID**: Official verifier identity registered on Moca Chain
+- ✅ **Zero-Knowledge Proof Validation**: On-chain proof verification via AIR Kit smart contracts
+- ✅ **Partner JWT with `scope=verify`**: Secure verification authentication
+- ✅ **`airService.verifyCredential()`**: Frontend integration with AIR Kit SDK
+
+**$50 USDC Verification Rewards** - User acquisition engine
+- ✅ **Employment verification reward**: Instant $50 USDC for verifying employment credentials
+- ✅ **Backend service**: `verificationService.js` with verification flow
+- ✅ **API endpoints**: `/api/verification/prepare`, `/result`, `/claim-status`
+- ✅ **Frontend integration**: Dedicated rewards page + dashboard banner
+- ✅ **Anti-fraud**: One-time claim tracking prevents double-claiming
+- ✅ **Inline verification**: Seamless UX with expandable reward cards
+- ✅ **BorderBeam animations**: Polished UI for claimed rewards
+
+**Files**:
+- Backend: `backend/src/services/verificationService.js` (351 lines)
+- Backend: `backend/src/routes/verification.js` (223 lines)
+- Frontend: `lib/verificationService.js` (327 lines)
+- UI: `pages/rewards.js` (509 lines)
+- UI: `components/RewardBanner.jsx` (78 lines)
+
+#### 7. Deployment & Documentation
 
 **Live Deployment**
 - ✅ Frontend: Deployed on Vercel (https://credo-protocol.vercel.app)
@@ -632,6 +687,8 @@ npm run dev
 - 🔜 **Zero-Knowledge Proofs** - Full ZK implementation via AIR Credential Services
   - Prove "income > $X" without revealing exact salary
   - Prove "balance stable for Y months" without exposing amounts
+- 🔜 **Gas Sponsorship Activation** - Enable paymaster for gasless credential issuance
+- 🔜 **Additional Reward Tiers** - Multiple verification rewards (Credit Score Champion, Whale Supplier)
 - 🔜 **Liquidation Mechanism** - Automated liquidations with keeper incentives
 - 🔜 **Issuer SDK v1.0** - Open framework for third-party credential providers
 - 🔜 **Advanced Analytics** - Historical credit score tracking & trend analysis
@@ -639,7 +696,7 @@ npm run dev
 - 🔜 **Governance Token** - Community-driven protocol governance
 - 🔜 **Additional Credential Types** - Education, healthcare, on-chain activity
 
-**Note:** Wave 3 transformed Credo from a basic MVP into a feature-complete testnet demo with official MOCA integration, privacy-preserving credentials, and ecosystem composability. While not yet mainnet-ready, it demonstrates all core concepts and is fully functional for testing.
+**Note:** Wave 3 transformed Credo from a basic MVP into a feature-complete devnet demo with official MOCA integration, privacy-preserving credentials, and ecosystem composability. While not yet mainnet-ready, it demonstrates all core concepts and is fully functional for testing.
 
 ---
 
