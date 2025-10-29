@@ -163,10 +163,32 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
         signer
       );
 
+      // Pre-flight check: Verify pool has enough liquidity
+      // This prevents the "missing revert data" error for better UX
+      const reliableProvider = await getBestProvider(provider);
+      const poolContract = new ethers.Contract(
+        CONTRACTS.LENDING_POOL,
+        LENDING_POOL_ABI,
+        reliableProvider
+      );
+      
+      const assetData = await poolContract.assets(CONTRACTS.MOCK_USDC);
+      const poolTotalSupply = Number(ethers.formatUnits(assetData[0], 6));
+      const poolTotalBorrowed = Number(ethers.formatUnits(assetData[1], 6));
+      const poolAvailableLiquidity = poolTotalSupply - poolTotalBorrowed;
+      
+      // Check if pool has enough liquidity (with small buffer for safety)
+      if (borrowAmount > poolAvailableLiquidity * 0.999) {
+        setError(`💧 Insufficient pool liquidity. Pool only has ${poolAvailableLiquidity.toFixed(2)} USDC available. Please borrow less or wait for more liquidity.`);
+        setBorrowing(false);
+        return;
+      }
+
       // Convert borrow amount to 6 decimals (MockUSDC)
       const borrowAmountWei = ethers.parseUnits(borrowAmount.toFixed(6), 6);
 
       console.log('Borrowing:', borrowAmount, 'USDC');
+      console.log('Pool available:', poolAvailableLiquidity.toFixed(2), 'USDC');
       
       // Call borrow function
       // This will internally query CreditScoreOracle for user's score
@@ -205,6 +227,18 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
     } catch (error) {
       const errorMessage = handleTransactionError('Borrow', error);
       setError(errorMessage);
+      
+      // Auto-dismiss user rejection messages after 4 seconds (not a real error)
+      if (error.code === 'ACTION_REJECTED' || 
+          error.code === 4001 || 
+          error.message?.includes('user rejected') ||
+          error.message?.includes('User rejected') ||
+          error.message?.includes('rejected the request') ||
+          error.message?.includes('User denied')) {
+        setTimeout(() => {
+          setError('');
+        }, 4000);
+      }
     } finally {
       setBorrowing(false);
     }

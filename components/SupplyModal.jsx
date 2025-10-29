@@ -105,6 +105,16 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
     } catch (error) {
       const errorMessage = handleTransactionError('Approve USDC', error);
       setError(errorMessage);
+      
+      // Auto-dismiss user rejection messages after 4 seconds
+      if (error.code === 'ACTION_REJECTED' || 
+          error.code === 4001 || 
+          error.message?.includes('user rejected') ||
+          error.message?.includes('User rejected') ||
+          error.message?.includes('rejected the request') ||
+          error.message?.includes('User denied')) {
+        setTimeout(() => setError(''), 4000);
+      }
     } finally {
       setApproving(false);
     }
@@ -150,6 +160,16 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
     } catch (error) {
       const errorMessage = handleTransactionError('Supply', error);
       setError(errorMessage);
+      
+      // Auto-dismiss user rejection messages after 4 seconds
+      if (error.code === 'ACTION_REJECTED' || 
+          error.code === 4001 || 
+          error.message?.includes('user rejected') ||
+          error.message?.includes('User rejected') ||
+          error.message?.includes('rejected the request') ||
+          error.message?.includes('User denied')) {
+        setTimeout(() => setError(''), 4000);
+      }
     } finally {
       setSupplying(false);
     }

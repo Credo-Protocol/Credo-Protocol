@@ -139,6 +139,16 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
     } catch (error) {
       const errorMessage = handleTransactionError('Approve USDC', error);
       setError(errorMessage);
+      
+      // Auto-dismiss user rejection messages after 4 seconds
+      if (error.code === 'ACTION_REJECTED' || 
+          error.code === 4001 || 
+          error.message?.includes('user rejected') ||
+          error.message?.includes('User rejected') ||
+          error.message?.includes('rejected the request') ||
+          error.message?.includes('User denied')) {
+        setTimeout(() => setError(''), 4000);
+      }
     } finally {
       setApproving(false);
     }
@@ -184,6 +194,16 @@ export default function RepayModal({ isOpen, onClose, userAddress, onSuccess, pr
     } catch (error) {
       const errorMessage = handleTransactionError('Repay', error);
       setError(errorMessage);
+      
+      // Auto-dismiss user rejection messages after 4 seconds
+      if (error.code === 'ACTION_REJECTED' || 
+          error.code === 4001 || 
+          error.message?.includes('user rejected') ||
+          error.message?.includes('User rejected') ||
+          error.message?.includes('rejected the request') ||
+          error.message?.includes('User denied')) {
+        setTimeout(() => setError(''), 4000);
+      }
     } finally {
       setRepaying(false);
     }

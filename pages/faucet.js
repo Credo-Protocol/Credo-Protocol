@@ -121,6 +121,16 @@ export default function Faucet() {
       // Use centralized error handler for user-friendly messages
       const errorMessage = handleTransactionError('Faucet Request', error);
       setError(errorMessage);
+      
+      // Auto-dismiss user rejection messages after 4 seconds
+      if (error.code === 'ACTION_REJECTED' || 
+          error.code === 4001 || 
+          error.message?.includes('user rejected') ||
+          error.message?.includes('User rejected') ||
+          error.message?.includes('rejected the request') ||
+          error.message?.includes('User denied')) {
+        setTimeout(() => setError(''), 4000);
+      }
     } finally {
       setRequesting(false);
     }
