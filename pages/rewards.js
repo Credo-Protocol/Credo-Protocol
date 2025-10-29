@@ -184,8 +184,8 @@ export default function RewardsPage() {
             <Card className="relative overflow-hidden border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50">
               <BorderBeam size={250} duration={12} borderWidth={2} />
               
-              <CardContent className="p-12">
-                <div className="text-center mb-8">
+              <CardContent className="p-10">
+                <div className="text-center">
                   <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 mb-6 shadow-lg">
                     <Gift className="w-12 h-12 text-white" />
                   </div>
@@ -233,57 +233,10 @@ export default function RewardsPage() {
                     Verify & Claim ${REWARD_AMOUNT}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
-
-                  <p className="text-sm text-blue-600 mt-4">
-                    🔐 Your job details remain private with zero-knowledge proofs
-                  </p>
                 </div>
               </CardContent>
             </Card>
           )}
-        </div>
-
-        {/* How It Works Section */}
-        <div className="max-w-4xl mx-auto mb-12">
-          <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="border-2 border-black/5 hover:border-black/10 hover:shadow-lg transition-all">
-              <CardContent className="p-8 text-center">
-                <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                  1
-                </div>
-                <h3 className="text-xl font-bold mb-3">Connect Credential</h3>
-                <p className="text-black/60">
-                  Verify you have an employment credential in your AIR Kit wallet
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-black/5 hover:border-black/10 hover:shadow-lg transition-all">
-              <CardContent className="p-8 text-center">
-                <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                  2
-                </div>
-                <h3 className="text-xl font-bold mb-3">Generate Proof</h3>
-                <p className="text-black/60">
-                  AIR Kit creates a zero-knowledge proof without revealing details
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-black/5 hover:border-black/10 hover:shadow-lg transition-all">
-              <CardContent className="p-8 text-center">
-                <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                  3
-                </div>
-                <h3 className="text-xl font-bold mb-3">Receive Reward</h3>
-                <p className="text-black/60">
-                  Get ${REWARD_AMOUNT} {REWARD_TOKEN} instantly sent to your wallet
-                </p>
-              </CardContent>
-            </Card>
-          </div>
         </div>
 
         {/* Requirements Section */}
