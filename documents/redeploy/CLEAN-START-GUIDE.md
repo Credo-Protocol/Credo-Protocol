@@ -154,6 +154,24 @@ export const CONTRACTS = {
 
 **Why update fallbacks?** If `.env.local` is missing, the app will still work with these addresses.
 
+### 3.3 Update `backend/.env` (⚠️ CRITICAL FOR REWARDS!)
+
+Open `backend/.env` and update the USDC contract address:
+
+```bash
+# Update USDC contract address for verification faucet
+USDC_CONTRACT_ADDRESS=0x<YOUR_NEW_USDC_ADDRESS>
+```
+
+**Why this is CRITICAL:**
+- The $50 USDC verification reward uses this address
+- Without updating, users won't receive rewards after verification
+- The transaction will fail silently with the old address
+
+**Where to find this in backend/.env:**
+- Search for `USDC_CONTRACT_ADDRESS` (around line 101)
+- Replace with the new MockUSDC address from `deployed-addresses.json`
+
 ---
 
 ## Step 4: Restart All Services
@@ -584,10 +602,12 @@ npm run dev
 **Files to Update After Redeployment:**
 1. `Credo-Protocol/.env.local` (6 variables)
 2. `Credo-Protocol/lib/contracts.js` (3 fallback addresses)
-3. `Credo-Protocol/contracts/scripts/register-deployer-issuer.ts` (only if it has hardcoded address)
+3. **`Credo-Protocol/backend/.env` (1 variable: USDC_CONTRACT_ADDRESS)** ← CRITICAL FOR REWARDS
+4. `Credo-Protocol/contracts/scripts/register-deployer-issuer.ts` (only if it has hardcoded address)
 
 **Important Addresses to Update:**
 - `NEXT_PUBLIC_CREDIT_ORACLE_ADDRESS` / `NEXT_PUBLIC_CREDIT_SCORE_ORACLE`
 - `NEXT_PUBLIC_LENDING_POOL_ADDRESS` / `NEXT_PUBLIC_LENDING_POOL`
 - `NEXT_PUBLIC_MOCK_USDC_ADDRESS` / `NEXT_PUBLIC_USDC`
+- **`USDC_CONTRACT_ADDRESS` (backend/.env)** ← CRITICAL FOR REWARDS
 

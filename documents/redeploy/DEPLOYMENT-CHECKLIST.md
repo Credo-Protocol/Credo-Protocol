@@ -65,8 +65,16 @@ export const CONTRACTS = {
 };
 ```
 
-**Backend** (`backend/.env`):
-No contract addresses needed - backend uses private keys only
+**Backend** (`backend/.env`) - ⚠️ CRITICAL FOR REWARDS:
+```bash
+# Update USDC contract address for verification faucet:
+USDC_CONTRACT_ADDRESS=0x<NEW_USDC_ADDRESS>
+```
+
+**Why this is critical:**
+- The $50 USDC verification rewards use this address
+- Without updating, rewards will fail silently
+- Users won't receive their USDC after verification
 
 ### 4. Restart Services
 
@@ -139,12 +147,14 @@ Your deployment is complete when:
 - ✅ Issuers registered (deployer + 3 mock issuers - script checks this)
 - ✅ `.env.local` updated (6 contract address variables)
 - ✅ `lib/contracts.js` fallback addresses updated
+- ✅ **`backend/.env` updated (USDC_CONTRACT_ADDRESS)** ← CRITICAL FOR REWARDS
 - ✅ Backend service running on port 3001
 - ✅ Frontend service running on port 3000
 - ✅ Can login with AIR Kit
 - ✅ Can issue credentials successfully
 - ✅ Credit score updates correctly
 - ✅ Can supply/borrow/repay in lending pool
+- ✅ **$50 USDC verification rewards work** ← TEST THIS!
 
 ---
 
@@ -156,7 +166,7 @@ Your deployment is complete when:
 
 ---
 
-**Last Updated**: October 27, 2025 (Verified Working)  
+**Last Updated**: October 29, 2025 (Updated with Backend USDC Fix)  
 **Current Deployment**: Moca Chain Devnet (Chain ID: 5151)  
 **Deployment Script**: `contracts/scripts/deploy.ts`  
 **Network Config**: `contracts/hardhat.config.ts`

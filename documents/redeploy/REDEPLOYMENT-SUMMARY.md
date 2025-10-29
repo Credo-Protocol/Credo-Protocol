@@ -1,4 +1,4 @@
-# ✅ Redeployment Summary - October 27, 2025
+# ✅ Redeployment Summary - October 29, 2025
 
 ## 🎉 Deployment Status: COMPLETE
 
@@ -10,12 +10,12 @@ All contracts have been successfully redeployed and all documentation updated.
 
 **Network:** Moca Chain Devnet (Chain ID: 5151)  
 **Deployer:** 0x32F91E4E2c60A9C16cAE736D3b42152B331c147F  
-**Timestamp:** 2025-10-27T04:15:06.820Z (Latest Deployment)
+**Timestamp:** 2025-10-29T09:05:34.193Z (Latest Deployment)
 
 ### Smart Contracts:
-- **CreditScoreOracle v2:** `0x12ad1aBfBde99Ce4D37fB18A5e622A619d59f705`
-- **LendingPool v2:** `0x3c30Cd9c071B9ee307C251a3e120DA6e8dde7bd4`
-- **MockUSDC:** `0xDBa63296abD241Ed9d485F890C63975452f1CD47`
+- **CreditScoreOracle v2:** `0x91f94Dd05D397de363CFcb5fcf396272a07a8dcd`
+- **LendingPool v2:** `0x5f8832b3F5D037F345e9aF9db9A0816E681E6C99`
+- **MockUSDC:** `0x53060dDE048c99bB6B1E9556c294D12E9272f52F`
 
 ### Issuer Addresses:
 - **Mock Exchange:** `0x499CEB20A05A1eF76D6805f293ea9fD570d6A431`
@@ -50,6 +50,7 @@ All contracts have been successfully redeployed and all documentation updated.
   - `NEXT_PUBLIC_USDC` (legacy)
 
 - Updated `lib/contracts.js` fallback addresses
+- **Updated `backend/.env` with USDC_CONTRACT_ADDRESS** ← CRITICAL FOR REWARDS
 
 ### 4. ✅ Documentation Updates
 - Updated `DEPLOYMENT-CHECKLIST.md` with accurate commands and paths
@@ -76,6 +77,9 @@ All contracts have been successfully redeployed and all documentation updated.
 ### Frontend Configuration:
 - ✅ `.env.local` - 6 contract address variables updated
 - ✅ `lib/contracts.js` - 3 fallback addresses updated
+
+### Backend Configuration:
+- ✅ **`backend/.env` - USDC_CONTRACT_ADDRESS updated** ← CRITICAL FOR REWARDS
 
 ### Documentation:
 - ✅ `documents/redeploy/DEPLOYMENT-CHECKLIST.md` - Fully updated
@@ -148,7 +152,10 @@ npx hardhat run --network moca-devnet scripts/register-deployer-issuer.ts
 # 3. Copy new addresses
 cat deployed-addresses.json
 
-# 4. Update .env.local (6 variables) and lib/contracts.js (3 fallbacks)
+# 4. Update configuration files:
+#    - .env.local (6 variables)
+#    - lib/contracts.js (3 fallbacks)
+#    - backend/.env (1 variable: USDC_CONTRACT_ADDRESS) ← CRITICAL FOR REWARDS
 
 # 5. Restart services
 # See DEPLOYMENT-CHECKLIST.md for details
@@ -202,6 +209,6 @@ Your system is now fully deployed and ready for:
 ---
 
 **Deployment Completed By:** AI Assistant (Claude)  
-**Date:** October 27, 2025  
-**Status:** ✅ VERIFIED & TESTED
+**Date:** October 29, 2025  
+**Status:** ✅ VERIFIED & TESTED (Includes Backend USDC Fix)
 
