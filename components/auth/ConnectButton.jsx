@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
 import { Button } from '@/components/ui/button';
-import { Loader2, LogOut, User, Copy, Check, Mail, Wallet, Coins, DollarSign } from 'lucide-react';
+import { Loader2, LogOut, User, Copy, Check, Mail, Wallet, Coins, DollarSign, Gift } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -368,10 +368,14 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
           <div className="px-2 py-3 space-y-3">
             {/* MOCA Balance */}
             <div className="flex items-center gap-2">
-              <Coins className="h-4 w-4 text-muted-foreground" />
+              <img 
+                src="/moca.jpg" 
+                alt="MOCA" 
+                className="h-4 w-4 rounded-sm object-cover"
+              />
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-muted-foreground">MOCA Balance</p>
-                <p className="text-sm font-bold">
+                <p className="text-xs text-muted-foreground mb-1">MOCA Balance</p>
+                <p className="text-sm font-medium">
                   {balancesLoading ? (
                     <span className="text-muted-foreground">Loading...</span>
                   ) : (
@@ -383,10 +387,14 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
             
             {/* USDC Balance */}
             <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <img 
+                src="/usd-coin-usdc-logo.png" 
+                alt="USDC" 
+                className="h-4 w-4 rounded-sm object-cover"
+              />
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-muted-foreground">MockUSDC Balance</p>
-                <p className="text-sm font-bold">
+                <p className="text-xs text-muted-foreground mb-1">MockUSDC Balance</p>
+                <p className="text-sm font-medium">
                   {balancesLoading ? (
                     <span className="text-muted-foreground">Loading...</span>
                   ) : (
@@ -396,6 +404,17 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
               </div>
             </div>
           </div>
+          
+          <DropdownMenuSeparator />
+          
+          {/* Rewards Hub Link */}
+          <DropdownMenuItem
+            onClick={() => router.push('/rewards')}
+            className="cursor-pointer text-muted-foreground"
+          >
+            <Gift className="mr-2 h-4 w-4 text-muted-foreground" />
+            <span>Rewards Hub</span>
+          </DropdownMenuItem>
           
           <DropdownMenuSeparator />
           
