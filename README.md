@@ -7,15 +7,15 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 
 ## 📍 Quick Reference - Latest Deployment
 
-**Deployed:** October 27, 2025, 4:15 AM UTC  
+**Deployed:** October 29, 2025, 9:05 AM UTC  
 **Network:** Moca Chain Devnet (Chain ID: 5151)  
 **Deployer:** `0x32F91E4E2c60A9C16cAE736D3b42152B331c147F`
 
 | Contract | Address |
 |----------|---------|
-| CreditScoreOracle v2 | `0x12ad1aBfBde99Ce4D37fB18A5e622A619d59f705` |
-| LendingPool v2 | `0x3c30Cd9c071B9ee307C251a3e120DA6e8dde7bd4` |
-| MockUSDC | `0xDBa63296abD241Ed9d485F890C63975452f1CD47` |
+| CreditScoreOracle v2 | `0x91f94Dd05D397de363CFcb5fcf396272a07a8dcd` |
+| LendingPool v2 | `0x5f8832b3F5D037F345e9aF9db9A0816E681E6C99` |
+| MockUSDC | `0x53060dDE048c99bB6B1E9556c294D12E9272f52F` |
 
 💡 *See `contracts/deployed-addresses.json` for complete deployment details including issuer addresses.*
 
@@ -80,11 +80,11 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 
 | Contract | Devnet Address | Version |
 |----------|----------------|---------|
-| **CreditScoreOracle v2** | `0x12ad1aBfBde99Ce4D37fB18A5e622A619d59f705` | Wave 3 |
-| **LendingPool v2** | `0x3c30Cd9c071B9ee307C251a3e120DA6e8dde7bd4` | Wave 3 |
-| **MockUSDC** | `0xDBa63296abD241Ed9d485F890C63975452f1CD47` | Wave 3 |
+| **CreditScoreOracle v2** | `0x91f94Dd05D397de363CFcb5fcf396272a07a8dcd` | Wave 3 |
+| **LendingPool v2** | `0x5f8832b3F5D037F345e9aF9db9A0816E681E6C99` | Wave 3 |
+| **MockUSDC** | `0x53060dDE048c99bB6B1E9556c294D12E9272f52F` | Wave 3 |
 
-**Deployed:** October 27, 2025  
+**Deployed:** October 29, 2025  
 [View on Explorer](https://devnet-scan.mocachain.org)
 
 ### What's Different from Wave 2
@@ -231,13 +231,13 @@ Credo Protocol bridges this gap by creating an **identity-backed lending model**
 
 ## 🚀 Deployed Contracts (Moca Chain Devnet)
 
-**Latest Deployment:** October 27, 2025, 4:15 AM UTC
+**Latest Deployment:** October 29, 2025, 9:05 AM UTC
 
 | Contract | Address | Explorer |
 |----------|---------|----------|
-| **CreditScoreOracle v2** | `0x12ad1aBfBde99Ce4D37fB18A5e622A619d59f705` | [View](https://devnet-scan.mocachain.org/address/0x12ad1aBfBde99Ce4D37fB18A5e622A619d59f705) |
-| **LendingPool v2** | `0x3c30Cd9c071B9ee307C251a3e120DA6e8dde7bd4` | [View](https://devnet-scan.mocachain.org/address/0x3c30Cd9c071B9ee307C251a3e120DA6e8dde7bd4) |
-| **MockUSDC** | `0xDBa63296abD241Ed9d485F890C63975452f1CD47` | [View](https://devnet-scan.mocachain.org/address/0xDBa63296abD241Ed9d485F890C63975452f1CD47) |
+| **CreditScoreOracle v2** | `0x91f94Dd05D397de363CFcb5fcf396272a07a8dcd` | [View](https://devnet-scan.mocachain.org/address/0x91f94Dd05D397de363CFcb5fcf396272a07a8dcd) |
+| **LendingPool v2** | `0x5f8832b3F5D037F345e9aF9db9A0816E681E6C99` | [View](https://devnet-scan.mocachain.org/address/0x5f8832b3F5D037F345e9aF9db9A0816E681E6C99) |
+| **MockUSDC** | `0x53060dDE048c99bB6B1E9556c294D12E9272f52F` | [View](https://devnet-scan.mocachain.org/address/0x53060dDE048c99bB6B1E9556c294D12E9272f52F) |
 
 ## 📋 How It Works
 
@@ -526,9 +526,9 @@ npm run dev
 - ✅ **38 tests including interest scenarios** - all passing
 
 **Contract Addresses** (Moca Devnet - Chain ID: 5151)
-- CreditScoreOracle v2: `0x12ad1aBfBde99Ce4D37fB18A5e622A619d59f705`
-- LendingPool v2: `0x3c30Cd9c071B9ee307C251a3e120DA6e8dde7bd4`
-- MockUSDC: `0xDBa63296abD241Ed9d485F890C63975452f1CD47`
+- CreditScoreOracle v2: `0x91f94Dd05D397de363CFcb5fcf396272a07a8dcd`
+- LendingPool v2: `0x5f8832b3F5D037F345e9aF9db9A0816E681E6C99`
+- MockUSDC: `0x53060dDE048c99bB6B1E9556c294D12E9272f52F`
 
 #### 2. Privacy-Preserving Credentials System
 
