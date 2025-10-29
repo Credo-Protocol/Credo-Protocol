@@ -141,7 +141,8 @@ app.get('/.well-known/jwks.json', (req, res) => {
 #### Accomplishments:
 ✅ **AIR Kit SDK Integration**
 - Updated `lib/airkit.js` with paymaster configuration
-- Gas sponsorship infrastructure ready (can be enabled with policy ID)
+- **ERC-20 Paymaster ACTIVE**: Users pay gas with USDC/MOCA automatically (no native gas tokens!)
+- **Sponsored Paymaster ready**: Can enable zero-cost txs with policy ID
 - Graceful degradation if paymaster unavailable
 
 ✅ **Credential Services Created**
@@ -245,11 +246,13 @@ await airService.issueCredential({
 - **User privacy** maintained (data not exposed to MOCA servers)
 - **Permanent storage** (credentials persist)
 
-### 3. Gas Sponsorship Infrastructure
-- **Paymaster integration built-in** and ready to enable
-- **Can be activated** with paymaster policy ID configuration
-- **Infrastructure complete** (optional feature flag)
-- **Future-ready** for gasless UX (requires policy setup)
+### 3. Gas Payment Mechanisms
+- **ERC-20 Paymaster ACTIVE**: Users pay gas with USDC/MOCA from smart account balance
+  - No native MOCA gas tokens needed!
+  - Automatic conversion handled by AIR Kit
+- **Sponsored Paymaster infrastructure ready**: Can be activated with policy ID
+  - Completely gasless for users (you pay all gas)
+  - Requires configuration in AIR Kit Dashboard
 
 ### 4. AIR Kit Dashboard Integration
 - **Credentials visible** in official dashboard

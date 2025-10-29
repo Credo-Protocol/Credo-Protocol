@@ -7,15 +7,15 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 
 ## 📍 Quick Reference - Latest Deployment
 
-**Deployed:** October 29, 2025, 9:05 AM UTC  
+**Deployed:** October 29, 2025, 3:58 PM UTC (FIXED: LendingPool accounting overflow)  
 **Network:** Moca Chain Devnet (Chain ID: 5151)  
 **Deployer:** `0x32F91E4E2c60A9C16cAE736D3b42152B331c147F`
 
 | Contract | Address |
 |----------|---------|
-| CreditScoreOracle v2 | `0x91f94Dd05D397de363CFcb5fcf396272a07a8dcd` |
-| LendingPool v2 | `0x5f8832b3F5D037F345e9aF9db9A0816E681E6C99` |
-| MockUSDC | `0x53060dDE048c99bB6B1E9556c294D12E9272f52F` |
+| CreditScoreOracle v2 | `0xe1eF0424D6a6603B69e04848B2a0Fc180097914f` |
+| LendingPool v2 (FIXED) | `0xC1E8Fd7C208D9D944E180174484B7f16d4deb086` |
+| MockUSDC | `0x521BB742701caE06576485897987c57E87C7f6C8` |
 
 💡 *See `contracts/deployed-addresses.json` for complete deployment details including issuer addresses.*
 
@@ -43,7 +43,7 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 - **✅ AIR Credential Issuance**: Official Issuer DID with 10 credential schemas published
 - **✅ AIR Credential Verification**: Verification programs with zero-knowledge proof validation
 - **Decentralized Storage**: Credentials stored on MOCA Chain Storage Providers (MCSP)
-- **Paymaster Infrastructure**: Built-in support for gas-sponsored transactions (configuration ready)
+- **Gas Sponsorship**: DEVNET fully sponsored by AIR Kit; MAINNET supports ERC-20 Paymaster (USDC/MOCA) or custom policies
 - **Partner JWT Authentication**: Secure backend-to-AIR Kit communication (RS256 with JWKS)
 - **Ecosystem Interoperability**: Credentials discoverable by any MOCA dApp
 
@@ -80,9 +80,9 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 
 | Contract | Devnet Address | Version |
 |----------|----------------|---------|
-| **CreditScoreOracle v2** | `0x91f94Dd05D397de363CFcb5fcf396272a07a8dcd` | Wave 3 |
-| **LendingPool v2** | `0x5f8832b3F5D037F345e9aF9db9A0816E681E6C99` | Wave 3 |
-| **MockUSDC** | `0x53060dDE048c99bB6B1E9556c294D12E9272f52F` | Wave 3 |
+| **CreditScoreOracle v2** | `0xe1eF0424D6a6603B69e04848B2a0Fc180097914f` | Wave 3 |
+| **LendingPool v2 (FIXED)** | `0xC1E8Fd7C208D9D944E180174484B7f16d4deb086` | Wave 3 |
+| **MockUSDC** | `0x521BB742701caE06576485897987c57E87C7f6C8` | Wave 3 |
 
 **Deployed:** October 29, 2025  
 [View on Explorer](https://devnet-scan.mocachain.org)
@@ -231,13 +231,13 @@ Credo Protocol bridges this gap by creating an **identity-backed lending model**
 
 ## 🚀 Deployed Contracts (Moca Chain Devnet)
 
-**Latest Deployment:** October 29, 2025, 9:05 AM UTC
+**Latest Deployment:** October 29, 2025, 3:58 PM UTC (FIXED: LendingPool accounting overflow)
 
 | Contract | Address | Explorer |
 |----------|---------|----------|
-| **CreditScoreOracle v2** | `0x91f94Dd05D397de363CFcb5fcf396272a07a8dcd` | [View](https://devnet-scan.mocachain.org/address/0x91f94Dd05D397de363CFcb5fcf396272a07a8dcd) |
-| **LendingPool v2** | `0x5f8832b3F5D037F345e9aF9db9A0816E681E6C99` | [View](https://devnet-scan.mocachain.org/address/0x5f8832b3F5D037F345e9aF9db9A0816E681E6C99) |
-| **MockUSDC** | `0x53060dDE048c99bB6B1E9556c294D12E9272f52F` | [View](https://devnet-scan.mocachain.org/address/0x53060dDE048c99bB6B1E9556c294D12E9272f52F) |
+| **CreditScoreOracle v2** | `0xe1eF0424D6a6603B69e04848B2a0Fc180097914f` | [View](https://devnet-scan.mocachain.org/address/0xe1eF0424D6a6603B69e04848B2a0Fc180097914f) |
+| **LendingPool v2 (FIXED)** | `0xC1E8Fd7C208D9D944E180174484B7f16d4deb086` | [View](https://devnet-scan.mocachain.org/address/0xC1E8Fd7C208D9D944E180174484B7f16d4deb086) |
+| **MockUSDC** | `0x521BB742701caE06576485897987c57E87C7f6C8` | [View](https://devnet-scan.mocachain.org/address/0x521BB742701caE06576485897987c57E87C7f6C8) |
 
 ## 📋 How It Works
 
@@ -526,9 +526,9 @@ npm run dev
 - ✅ **38 tests including interest scenarios** - all passing
 
 **Contract Addresses** (Moca Devnet - Chain ID: 5151)
-- CreditScoreOracle v2: `0x91f94Dd05D397de363CFcb5fcf396272a07a8dcd`
-- LendingPool v2: `0x5f8832b3F5D037F345e9aF9db9A0816E681E6C99`
-- MockUSDC: `0x53060dDE048c99bB6B1E9556c294D12E9272f52F`
+- CreditScoreOracle v2: `0xe1eF0424D6a6603B69e04848B2a0Fc180097914f`
+- LendingPool v2 (FIXED): `0xC1E8Fd7C208D9D944E180174484B7f16d4deb086`
+- MockUSDC: `0x521BB742701caE06576485897987c57E87C7f6C8`
 
 #### 2. Privacy-Preserving Credentials System
 
@@ -558,7 +558,8 @@ npm run dev
 - ✅ **10 issuance programs** configured for programmatic issuance
 - ✅ **W3C Verifiable Credentials** compliance via AIR Kit signing
 - ✅ **Partner JWT authentication** (RS256 with JWKS validation)
-- ✅ **Paymaster infrastructure ready** (gas sponsorship can be enabled with policy ID)
+- ✅ **ERC-20 Paymaster active** (users pay gas with USDC/MOCA - no native gas tokens needed!)
+- ✅ **Sponsored Paymaster ready** (optional: enable with policy ID for completely free txs)
 - ✅ **MCSP decentralized storage** (credentials stored on-chain)
 - ✅ **Ecosystem interoperability** (credentials discoverable by any MOCA dApp)
 
@@ -571,7 +572,8 @@ npm run dev
 
 **Frontend Integration**
 - ✅ **`lib/credentialServices.js`**: Official AIR Kit issuance flow
-- ✅ **Gas sponsorship infrastructure**: Paymaster support built-in (not currently enabled)
+- ✅ **ERC-20 Paymaster**: Users pay gas automatically with USDC/MOCA from smart account
+- ✅ **Sponsored Paymaster infrastructure**: Can enable zero-cost txs with policy ID
 - ✅ **Credential wallet display**: View issued credentials in app
 - ✅ **MCSP confirmation badges**: Visual feedback for decentralized storage
 - ✅ **Simplified 2-step flow**: Prepare → Issue (vs old 4-step)
@@ -657,7 +659,8 @@ npm run dev
 - ✅ Backend: Deployed with Partner JWT authentication
 - ✅ Smart contracts: Deployed and verified on Moca Devnet Explorer
 - ✅ Environment variables: Comprehensive `.env.example` files
-- ✅ Paymaster infrastructure: Code ready for gas sponsorship (requires policy ID)
+- ✅ ERC-20 Paymaster: Active - users pay gas with USDC/MOCA automatically
+- ✅ Sponsored Paymaster: Infrastructure ready (requires policy ID)
 
 **Comprehensive Documentation**
 - ✅ **Phase summaries**: 5 detailed implementation docs (Phase 1-5)
@@ -687,7 +690,9 @@ npm run dev
 - 🔜 **Zero-Knowledge Proofs** - Full ZK implementation via AIR Credential Services
   - Prove "income > $X" without revealing exact salary
   - Prove "balance stable for Y months" without exposing amounts
-- 🔜 **Gas Sponsorship Activation** - Enable paymaster for gasless credential issuance
+- 🔜 **Sponsored Paymaster** - Enable policy ID for completely gasless credential issuance
+  - Currently: Users pay gas with USDC/MOCA via ERC-20 Paymaster (no native MOCA needed)
+  - Future: Completely sponsored (zero-cost for users)
 - 🔜 **Additional Reward Tiers** - Multiple verification rewards (Credit Score Champion, Whale Supplier)
 - 🔜 **Liquidation Mechanism** - Automated liquidations with keeper incentives
 - 🔜 **Issuer SDK v1.0** - Open framework for third-party credential providers
@@ -717,6 +722,13 @@ npm run dev
 - Composable credit score as infrastructure primitive
 - Cross-chain credit score portability
 - DAO governance and $CREDO token launch
+
+## 📖 Additional Documentation
+
+- **[Gas Fees Explained](./GAS-FEES-EXPLAINED.md)** - Complete guide to gas sponsorship (DEVNET vs MAINNET)
+- **[Integration Guide](./INTEGRATION-GUIDE.md)** - For third-party developers
+- **[Deployment Checklist](./DEPLOYMENT-CHECKLIST.md)** - Production deployment steps
+- **[Wave 3 Documentation](./documents/wave%203/)** - Detailed phase-by-phase implementation
 
 ## 👥 Team
 

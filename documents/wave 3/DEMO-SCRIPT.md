@@ -201,7 +201,7 @@ By the end of this demo, judges should understand:
 > - **W3C standard compliance** for interoperability
 > - **Public schema registry** - other dApps can read our credential definitions
 > 
-> We've also built in **Paymaster infrastructure** - the code supports gas sponsorship, just needs a policy ID to activate. For this demo, minimal MOCA gas fees."
+> We're using **ERC-20 Paymaster** - users pay gas with USDC/MOCA automatically, no native gas tokens needed! We can also enable sponsored paymaster with a policy ID for completely free transactions."
 > 
 > **[Credential completes - Success message with MCSP badge appears]**
 > 
@@ -408,7 +408,8 @@ By the end of this demo, judges should understand:
 > - **Official AIR Kit integration** - Partner JWT authentication with RS256 + JWKS
 > - **MCSP decentralized storage** - credentials stored on-chain, not in databases
 > - **W3C VC compliance** - JSON-LD credentials with cryptographic proofs
-> - **Paymaster-ready** - code supports gas sponsorship via policy ID
+> - **ERC-20 Paymaster active** - users pay gas with USDC/MOCA (no native tokens needed)
+> - **Sponsored Paymaster ready** - can enable zero-cost txs via policy ID
 > - **Ecosystem interoperability** - any MOCA dApp can discover our credentials
 > 
 > This is just the beginning. The technical roadmap includes:
@@ -459,7 +460,8 @@ Before the demo, take high-quality screenshots of:
 ### MOCA Integration Points (Technical):
 - ✅ "Partner JWT authentication with **RS256 + JWKS validation**"
 - ✅ "Credentials stored on **MCSP (MOCA Chain Storage Providers)** - decentralized"
-- ✅ "Paymaster infrastructure built-in (can enable via policy ID)"
+- ✅ "ERC-20 Paymaster active - users pay gas with USDC/MOCA automatically"
+- ✅ "Sponsored Paymaster ready (can enable zero-cost txs via policy ID)"
 - ✅ "**W3C Verifiable Credentials** (JSON-LD) standard compliance"
 - ✅ "Ecosystem interoperability - credentials discoverable by any MOCA dApp"
 
@@ -583,7 +585,7 @@ Before the demo, take high-quality screenshots of:
 > 2. Implement **W3C VC signing** logic ourselves
 > 3. Set up **IPFS/Arweave** for decentralized storage
 > 4. Build **EIP-4337 bundler** infrastructure for account abstraction
-> 5. Create **paymaster contracts** and fund them manually
+> 5. Create **paymaster contracts**, fund them, and handle ERC-20 gas conversion manually
 > 6. Build credential verification logic from scratch
 > 
 > **On MOCA, we get:**
@@ -591,7 +593,7 @@ Before the demo, take high-quality screenshots of:
 > 2. **Partner JWT plus JWKS** - proven auth pattern with AIR Kit credential issuance
 > 3. **MCSP built-in** - decentralized storage handled automatically
 > 4. **AIR Kit wallets** - EIP-4337 AA wallets with MPC key management
-> 5. **Paymaster infrastructure** - just add policy ID, no custom contracts
+> 5. **ERC-20 Paymaster built-in** - users pay with USDC/MOCA automatically, sponsor with policy ID
 > 6. **Schema registry** - W3C VC templates already deployed
 > 
 > **Time Saved**: ~3-4 months of infrastructure work → 2 weeks integration
@@ -781,7 +783,7 @@ This demo script now includes deep technical explanations for:
 - MCSP (MOCA Chain Storage Providers) decentralized storage
 - W3C Verifiable Credentials (JSON-LD) standard
 - AIR Kit credential issuance 5-step technical flow
-- Paymaster infrastructure architecture
+- ERC-20 Paymaster architecture (users pay gas with USDC/MOCA)
 
 ### **Privacy & Security:**
 - bytes32 hash storage (not human-readable on-chain)

@@ -65,7 +65,7 @@ Add Wave 3 section at the top:
 - **✅ AIR Credential Issuance**: Official Issuer DID with 10 credential schemas
 - **✅ AIR Credential Verification**: Verification programs with ZK proof validation
 - **Decentralized Storage**: Credentials stored on MOCA Chain Storage Providers (MCSP)
-- **Gas Sponsorship Infrastructure**: Paymaster support built-in (configuration ready)
+- **Gas Sponsorship**: DEVNET sponsored by default; Mainnet supports ERC-20 Paymaster & custom policies
 - **Partner JWT Authentication**: Secure backend-to-AIR Kit communication (RS256 + JWKS)
 - **Ecosystem Interoperability**: Credentials discoverable by any MOCA dApp
 
@@ -154,7 +154,7 @@ Add Wave 3 section at the top:
 - 🎯 **True Integration**: Official MOCA infrastructure (not just SSO)
 - 🧱 **Infrastructure Primitive**: Foundational layer for DeFi identity
 - 💡 **Innovation**: Brings TradFi credit concepts to Web3
-- ⚡ **Gas Sponsorship**: Demonstrates seamless UX with paymaster
+- ⚡ **Gas Sponsorship**: DEVNET fully sponsored; Mainnet uses ERC-20 Paymaster (USDC/MOCA)
 
 ---
 ```
@@ -516,7 +516,7 @@ Clean Up:
 - [ ] ✅ Phase 5.1 (Dashboard Setup) complete
   - [ ] Official Issuer DID registered and active
   - [ ] All 10 credential schemas created
-  - [ ] Paymaster infrastructure configured
+  - [ ] Paymaster infrastructure configured (DEVNET: auto-sponsored, MAINNET: ERC-20 or custom policy)
 - [ ] ✅ Phase 5.2 (Backend Refactor) complete
   - [ ] Backend using Partner JWT authentication
   - [ ] All API endpoints tested
@@ -556,7 +556,7 @@ After Phase 6 (and ALL of Wave 3), you'll have:
 ✅ **Production-Grade Protocol**: Testnet-deployed, interest-accruing lending pool  
 ✅ **Advanced Credentials**: Privacy-preserving bucketed credentials  
 ✅ **Official MOCA Integration**: True AIR Kit credential services (not just SSO!)  
-✅ **Gas-Sponsored UX**: Zero-friction onboarding with paymaster  
+✅ **Gas-Sponsored UX**: DEVNET fully sponsored; MAINNET ERC-20 Paymaster (no native tokens needed)  
 ✅ **Decentralized Storage**: Credentials on MOCA Chain Storage Providers  
 ✅ **Ecosystem Interoperability**: Credentials discoverable by all MOCA dApps  
 ✅ **Intuitive UX**: Score Builder Wizard with crystal-clear journey  

@@ -37,7 +37,7 @@ By end of Wave 3, judges should be able to:
 ✅ **Access a public API** to pull any user's credit score (composability)  
 ✅ **Use the protocol on Moca testnet** (production-ready signal)  
 ✅ **Understand the adoption path** via leaderboard and partnerships  
-🔥 **Request credentials WITHOUT paying gas** (gas sponsorship via Paymaster)  
+🔥 **Request credentials without native gas tokens** (ERC-20 Paymaster uses USDC/MOCA)  
 🔥 **View issued credentials in AIR Kit Dashboard** (official MOCA integration)  
 🔥 **Verify credentials are stored on MCSP** (decentralized storage)  
 🔥 **See official Issuer DIDs registered** in AIR Kit Dashboard
@@ -109,7 +109,7 @@ By end of Wave 3, judges should be able to:
   - Register official Issuer DIDs (Bank, Employment, CEX)
   - Register Verifier DID (Credo Protocol)
   - Create 10 credential schemas (bucketed data)
-  - Configure gas sponsorship (Paymaster)
+  - Configure gas sponsorship (ERC-20 Paymaster active by default)
 
 - **Phase 5.2**: [Backend Refactor](./PHASE5.2-BACKEND-REFACTOR.md) (2-3 hours)
   - Replace custom mock issuers with Partner JWT generation
@@ -260,7 +260,7 @@ Phase 6 (Documentation & Demo)
 - ✅ 2nd advanced credential (Income)
 - ✅ Interest accrual display
 - ✅ Leaderboard
-- ✅ Gas sponsorship (Paymaster)
+- ✅ ERC-20 Paymaster (users pay gas with USDC/MOCA automatically)
 
 **Nice-to-Have (P2)**:
 - ⭕ Score API

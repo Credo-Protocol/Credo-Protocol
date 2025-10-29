@@ -33,7 +33,7 @@ This is now the **most critical** phase before finalizing Wave 3. It's been spli
 - Register 1 Verifier DID
 - Create 10 credential schemas
 - Create 10 verifier programs
-- Enable gas sponsorship (paymaster)
+- Configure paymaster (ERC-20 Paymaster active by default)
 - Generate Partner secret for JWT
 
 #### Sub-Phase 5.2: Backend Refactor (2-3 hours)
@@ -50,9 +50,10 @@ This is now the **most critical** phase before finalizing Wave 3. It's been spli
 
 **Document**: `PHASE5.3-FRONTEND-INTEGRATION.md`
 
-- Update AIR Kit initialization with paymaster
+- Update AIR Kit initialization with paymaster config
 - Refactor credential issuance to use `airService.credential.issue()`
-- Add gas sponsorship configuration
+- ERC-20 Paymaster: Users pay gas with USDC/MOCA automatically
+- Optional: Add sponsored paymaster policy ID for zero-cost txs
 - Create credential wallet component
 - Update environment variables
 - Test end-to-end with gas sponsorship
@@ -212,7 +213,8 @@ Judges will recognize the difference immediately.
 - **Dashboard setup**: Check MOCA Discord #dev-chat
 - **JWT generation**: See `backend/src/auth/jwt.js` example in Phase 5 doc
 - **AIR Kit API**: Read https://docs.moca.network/airkit/usage/credential/
-- **Gas sponsorship**: Contact MOCA support to enable paymaster
+- **Gas payment**: ERC-20 Paymaster active (users pay with USDC/MOCA)
+- **Sponsored gas**: Contact MOCA support to enable sponsored paymaster policy
 
 **Remember**: This migration is worth it. It transforms your project from "good" to "excellent" in judges' eyes.
 
