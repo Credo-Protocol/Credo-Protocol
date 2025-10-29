@@ -9,7 +9,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import AppNav from '@/components/layout/AppNav';
 import ConnectButton from '@/components/auth/ConnectButton';
-import VerifyCredentialModal from '@/components/VerifyCredentialModal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,10 +24,11 @@ import {
   ChevronDown,
   ChevronUp,
   TrendingUp,
-  Coins
+  Coins,
+  AlertCircle
 } from 'lucide-react';
 import { useAirKit } from '@/hooks/useAirKit';
-import { checkClaimStatus } from '@/lib/verificationService';
+import { checkClaimStatus, verifyCredential } from '@/lib/verificationService';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
 import { AuroraText } from '@/components/ui/aurora-text';
@@ -46,11 +46,14 @@ export default function RewardsPage() {
     loading: airKitLoading
   } = useAirKit();
 
-  const [showModal, setShowModal] = useState(false);
   const [claimed, setClaimed] = useState(null);
   const [txHash, setTxHash] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expandedReward, setExpandedReward] = useState(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState(''); // 'verifying', 'sending', 'complete'
+  const [verificationResults, setVerificationResults] = useState([]);
+  const [verificationError, setVerificationError] = useState(null);
 
   // Check claim status on mount
   useEffect(() => {
@@ -78,6 +81,53 @@ export default function RewardsPage() {
     }
   };
 
+  // Handle inline verification
+  const handleVerify = async () => {
+    try {
+      setVerifying(true);
+      setVerificationError(null);
+      setVerificationResults([]);
+      setVerificationStatus('verifying');
+
+      console.log('💰 Starting $50 USDC claim verification...');
+
+      const result = await verifyCredential({
+        targetUserAddress: userAddress,
+        requiredCredentialType: 'EMPLOYMENT',
+        userInfo
+      });
+
+      // If verification succeeded and there's a reward, show sending status
+      if (result.verified && result.reward) {
+        setVerificationStatus('sending');
+        // Small delay to show the "Sending" state
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      }
+
+      const verificationResult = {
+        credentialType: 'EMPLOYMENT',
+        ...result
+      };
+
+      setVerificationResults([verificationResult]);
+      setVerificationStatus('complete');
+
+      // If verified and reward received, update claimed status
+      if (result.verified && result.reward) {
+        setClaimed(true);
+        setTxHash(result.reward.txHash);
+        console.log('🎉 $50 USDC claimed!', result.reward.txHash);
+      }
+
+    } catch (err) {
+      console.error('Verification error:', err);
+      setVerificationError(err.message || 'Verification failed');
+      setVerificationStatus('');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
   // Not connected - show connect prompt
   if (!isConnected) {
     if (airKitLoading) {
@@ -100,7 +150,7 @@ export default function RewardsPage() {
         <RetroGrid className="opacity-50" />
         <div className="max-w-md w-full p-8 space-y-6 text-center relative z-10">
           <div className="mb-6">
-            <Gift className="w-20 h-20 mx-auto mb-4 text-blue-600" />
+            <Gift className="w-20 h-20 mx-auto mb-4 text-green-600" />
           </div>
           <h1 className="text-5xl font-bold mb-4">Claim Rewards</h1>
           <AnimatedShinyText className="text-xl mb-8">
@@ -125,7 +175,7 @@ export default function RewardsPage() {
         {/* Header Section */}
         <div className="max-w-4xl mx-auto text-center mb-12">
           <div className="mb-6">
-            <h2 className="text-8xl md:text-9xl font-bold text-blue-600">
+            <h2 className="text-8xl md:text-9xl font-bold text-green-600">
               {claimed ? '0' : '1'}
             </h2>
             <p className="text-lg text-black/60 mt-2">Available Rewards</p>
@@ -136,7 +186,7 @@ export default function RewardsPage() {
           </h1>
           
           <p className="text-xl text-black/60 max-w-2xl mx-auto">
-            Verify your employment credential and receive instant rewards.
+            Verify your credentials and receive instant rewards.
           </p>
         </div>
 
@@ -149,8 +199,8 @@ export default function RewardsPage() {
               claimed === true 
                 ? 'border-green-200 bg-gradient-to-br from-green-50 to-emerald-50' 
                 : expandedReward === 1
-                ? 'border-blue-200 bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50'
-                : 'border-black/10 hover:border-blue-200 cursor-pointer'
+                ? 'border-green-200 bg-white'
+                : 'border-black/10 hover:border-green-200 cursor-pointer'
             }`}
             onClick={() => {
               if (expandedReward !== 1 && claimed !== true) {
@@ -159,7 +209,7 @@ export default function RewardsPage() {
             }}
           >
             {claimed === true && <BorderBeam size={250} duration={15} borderWidth={2} colorFrom="#22c55e" colorTo="#10b981" />}
-            {expandedReward === 1 && claimed !== true && <BorderBeam size={250} duration={12} borderWidth={2} />}
+            {expandedReward === 1 && claimed !== true && <BorderBeam size={250} duration={12} borderWidth={2} colorFrom="#22c55e" colorTo="#10b981" />}
             
             <CardContent className="p-6">
               {/* Reward Header */}
@@ -168,7 +218,7 @@ export default function RewardsPage() {
                   <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
                     claimed === true 
                       ? 'bg-green-500' 
-                      : 'bg-gradient-to-br from-blue-500 to-cyan-500'
+                      : 'bg-gradient-to-br from-green-500 to-emerald-500'
                   }`}>
                     {claimed === true ? (
                       <CheckCircle className="w-7 h-7 text-white" />
@@ -183,10 +233,10 @@ export default function RewardsPage() {
                         {claimed === true ? 'Reward Claimed!' : 'First-Time User Bonus'}
                       </h3>
                       {claimed !== true && (
-                        <Badge className="bg-blue-600 hover:bg-blue-700">Available</Badge>
+                        <Badge className="bg-green-600 hover:bg-green-700">Available</Badge>
                       )}
                     </div>
-                    <p className="text-2xl font-bold text-blue-600">
+                    <p className="text-2xl font-bold text-green-600">
                       ${REWARD_AMOUNT} {REWARD_TOKEN}
                     </p>
                   </div>
@@ -219,69 +269,143 @@ export default function RewardsPage() {
                     </div>
                   ) : (
                     <>
-                      {/* Features Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="p-4 bg-white rounded-lg border border-blue-200">
-                          <Shield className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                          <p className="text-sm font-medium text-black text-center">Instant Reward</p>
-                          <p className="text-xs text-black/60 mt-1 text-center">Receive USDC immediately</p>
-                        </div>
-                        <div className="p-4 bg-white rounded-lg border border-blue-200">
-                          <Lock className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                          <p className="text-sm font-medium text-black text-center">Privacy First</p>
-                          <p className="text-xs text-black/60 mt-1 text-center">Zero-knowledge proofs</p>
-                        </div>
-                        <div className="p-4 bg-white rounded-lg border border-blue-200">
-                          <CheckCircle className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                          <p className="text-sm font-medium text-black text-center">One-Time Only</p>
-                          <p className="text-xs text-black/60 mt-1 text-center">First user bonus</p>
-                        </div>
-                      </div>
-
                       {/* Requirements */}
-                      <div className="space-y-3">
-                        <h4 className="font-semibold text-black">Requirements:</h4>
-                        <div className="space-y-2">
-                          <div className="flex items-start gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                            <p className="text-sm text-black/70">Employment credential in your AIR Kit wallet</p>
+                      <div className="space-y-4">
+                        <h4 className="text-xl font-bold text-black">Requirements:</h4>
+                        <div className="space-y-4">
+                          <div className="flex items-start gap-3">
+                            <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-lg text-black/80">Employment credential in your AIR Kit wallet</p>
                           </div>
-                          <div className="flex items-start gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                            <p className="text-sm text-black/70">First-time claim (one per wallet)</p>
+                          <div className="flex items-start gap-3">
+                            <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-lg text-black/80">First-time claim (one per wallet)</p>
                           </div>
-                          <div className="flex items-start gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                            <p className="text-sm text-black/70">Complete ZK verification process</p>
+                          <div className="flex items-start gap-3">
+                            <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-lg text-black/80">Complete ZK verification process</p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Claim Button */}
-                      <div className="text-center">
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowModal(true);
-                          }}
-                          size="lg"
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-6 text-lg h-auto"
-                        >
-                          <Gift className="mr-2 h-5 w-5" />
-                          Verify & Claim ${REWARD_AMOUNT}
-                          <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                        
-                        <p className="text-xs text-black/50 mt-3">
-                          Don&apos;t have an employment credential?{' '}
-                          <a 
-                            href="/credentials" 
-                            className="text-blue-600 hover:text-blue-800 font-medium underline"
+                      {/* Verification UI */}
+                      {verificationResults.length === 0 ? (
+                        // Show verification button or loading states
+                        <div className="text-center space-y-4">
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleVerify();
+                            }}
+                            disabled={verifying}
+                            size="lg"
+                            className="bg-green-600 hover:bg-green-700 text-white px-12 py-6 text-lg h-auto"
                           >
-                            Get one here →
-                          </a>
-                        </p>
-                      </div>
+                            {verificationStatus === 'verifying' ? (
+                              <>
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Verifying credentials...
+                              </>
+                            ) : verificationStatus === 'sending' ? (
+                              <>
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Sending ${REWARD_AMOUNT} USDC...
+                              </>
+                            ) : (
+                              <>
+                                <Gift className="mr-2 h-5 w-5" />
+                                Verify & Claim ${REWARD_AMOUNT}
+                                <ArrowRight className="ml-2 h-5 w-5" />
+                              </>
+                            )}
+                          </Button>
+                          
+                          {verificationStatus && (
+                            <div className="max-w-md mx-auto p-3 bg-white border-2 border-black/10 rounded-lg">
+                              <div className="flex items-center gap-2 justify-center">
+                                {verificationStatus === 'verifying' && (
+                                  <>
+                                    <Shield className="h-4 w-4 text-black" />
+                                    <p className="text-sm font-medium text-black">Verifying your employment credential...</p>
+                                  </>
+                                )}
+                                {verificationStatus === 'sending' && (
+                                  <>
+                                    <DollarSign className="h-4 w-4 text-black" />
+                                    <p className="text-sm font-medium text-black">Processing your ${REWARD_AMOUNT} USDC reward...</p>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {verificationError && (
+                            <div className="mt-4 p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+                              <div className="flex items-start gap-2">
+                                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                                <p className="text-sm font-medium text-red-700">{verificationError}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        // Show verification results
+                        <div className="space-y-4">
+                          <div className="p-4 bg-white border-2 border-green-200 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-base font-bold text-black">EMPLOYMENT</span>
+                              <Badge className="bg-green-600">
+                                {verificationResults[0].verified ? 'Verified ✓' : 'Failed'}
+                              </Badge>
+                            </div>
+                            
+                            {verificationResults[0].reward && (
+                              <div className="mt-3 p-3 bg-green-50 border-2 border-green-300 rounded">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <DollarSign className="h-4 w-4 text-green-700" />
+                                  <p className="text-sm text-green-700 font-bold">
+                                    {verificationResults[0].reward.amount} {verificationResults[0].reward.token} sent!
+                                  </p>
+                                </div>
+                                {verificationResults[0].reward.txHash && (
+                                  <a
+                                    href={`https://devnet-scan.mocachain.org/tx/${verificationResults[0].reward.txHash}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-xs text-green-700 font-mono hover:underline flex items-center gap-1"
+                                  >
+                                    View transaction <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setVerificationResults([]);
+                                setVerificationError(null);
+                                setVerificationStatus('');
+                              }}
+                              variant="outline"
+                              className="flex-1"
+                            >
+                              Verify Again
+                            </Button>
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedReward(null);
+                              }}
+                              className="flex-1 bg-green-600 hover:bg-green-700"
+                            >
+                              Done
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
@@ -290,13 +414,13 @@ export default function RewardsPage() {
               {/* Claimed State Details */}
               {claimed === true && (
                 <div className="mt-6 pt-6 border-t border-green-200">
-                  <div className="text-center space-y-4">
+                  <div className="text-center space-y-6">
                     <p className="text-lg text-green-700">
                       You&apos;ve successfully received your ${REWARD_AMOUNT} {REWARD_TOKEN}
                     </p>
                     
                     <div className="inline-flex items-center gap-3 px-6 py-3 bg-white rounded-lg border border-green-200">
-                      <DollarSign className="w-6 h-6 text-green-600" />
+                      <img src="/usd-coin-usdc-logo.png" alt="USDC" className="w-6 h-6" />
                       <div className="text-left">
                         <p className="text-sm text-green-600 font-medium">Amount Received</p>
                         <p className="text-2xl font-bold text-green-900">${REWARD_AMOUNT} {REWARD_TOKEN}</p>
@@ -304,15 +428,17 @@ export default function RewardsPage() {
                     </div>
 
                     {txHash && (
-                      <a
-                        href={`https://devnet-scan.mocachain.org/tx/${txHash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-green-700 hover:text-green-900 font-medium transition-colors"
-                      >
-                        View transaction on block explorer
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
+                      <div>
+                        <a
+                          href={`https://devnet-scan.mocachain.org/tx/${txHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-green-700 hover:text-green-900 font-medium transition-colors"
+                        >
+                          View transaction on block explorer
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -376,24 +502,6 @@ export default function RewardsPage() {
 
         </div>
       </main>
-
-      {/* Verification Modal */}
-      <VerifyCredentialModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        targetUserAddress={userAddress}
-        requiredCredentials={['EMPLOYMENT']}
-        userInfo={userInfo}
-        onVerificationComplete={(result) => {
-          console.log('Verification completed:', result);
-          
-          if (result.allVerified && result.results[0]?.reward) {
-            setClaimed(true);
-            setTxHash(result.results[0].reward.txHash);
-            console.log('🎉 $50 USDC claimed!', result.results[0].reward.txHash);
-          }
-        }}
-      />
     </div>
   );
 }
