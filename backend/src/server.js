@@ -17,6 +17,7 @@ require('dotenv').config();
 
 // Import routes
 const credentialsRouter = require('./routes/credentials');
+const verificationRouter = require('./routes/verification');
 const { getJWKS } = require('./auth/jwks');
 
 // Create Express app
@@ -70,6 +71,7 @@ try {
 
 // Routes
 app.use('/api/credentials', credentialsRouter);
+app.use('/api/verification', verificationRouter);
 
 /**
  * GET /.well-known/jwks.json
@@ -151,7 +153,10 @@ app.get('/', (req, res) => {
       health: 'GET /health',
       jwks: 'GET /.well-known/jwks.json',
       credentialTypes: 'GET /api/credentials/types',
-      prepareCredential: 'POST /api/credentials/prepare'
+      prepareCredential: 'POST /api/credentials/prepare',
+      verificationPrepare: 'POST /api/verification/prepare',
+      verificationResult: 'POST /api/verification/result',
+      verificationClaimStatus: 'GET /api/verification/claim-status/:address'
     },
     migration: {
       status: 'Phase 5.2 Complete',
