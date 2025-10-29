@@ -351,15 +351,23 @@ export default function RewardsPage() {
                       ) : (
                         // Show verification results
                         <div className="space-y-4">
-                          <div className="p-4 bg-white border-2 border-green-200 rounded-lg">
+                          <div className={`p-4 bg-white border-2 rounded-lg ${
+                            verificationResults[0].verified 
+                              ? 'border-green-200' 
+                              : 'border-red-200'
+                          }`}>
                             <div className="flex items-center justify-between mb-2">
                               <span className="text-base font-bold text-black">EMPLOYMENT</span>
-                              <Badge className="bg-green-600">
+                              <Badge className={
+                                verificationResults[0].verified 
+                                  ? 'bg-green-600' 
+                                  : 'bg-red-600 hover:bg-red-700'
+                              }>
                                 {verificationResults[0].verified ? 'Verified ✓' : 'Failed'}
                               </Badge>
                             </div>
                             
-                            {verificationResults[0].reward && (
+                            {verificationResults[0].verified && verificationResults[0].reward ? (
                               <div className="mt-3 p-3 bg-green-50 border-2 border-green-300 rounded">
                                 <div className="flex items-center gap-2 mb-1">
                                   <DollarSign className="h-4 w-4 text-green-700" />
@@ -378,31 +386,46 @@ export default function RewardsPage() {
                                   </a>
                                 )}
                               </div>
+                            ) : !verificationResults[0].verified && (
+                              <div className="mt-3 p-3 bg-red-50 border-2 border-red-300 rounded">
+                                <div className="flex items-start gap-2">
+                                  <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                                  <div className="flex-1">
+                                    <p className="text-sm text-red-700 font-bold mb-1">
+                                      Verification Failed
+                                    </p>
+                                    <p className="text-sm text-red-600">
+                                      {verificationResults[0].message || 
+                                       verificationResults[0].error || 
+                                       'You do not have the required employment credential. Please submit an employment credential first.'}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
                             )}
                           </div>
                           
                           <div className="flex gap-2">
-                            <Button
+                            <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setVerificationResults([]);
                                 setVerificationError(null);
                                 setVerificationStatus('');
                               }}
-                              variant="outline"
-                              className="flex-1"
+                              className="flex-1 h-11 px-8 py-2.5 bg-white border-2 border-black/20 rounded-md text-base font-medium text-black hover:bg-black/5 transition-colors"
                             >
                               Verify Again
-                            </Button>
-                            <Button
+                            </button>
+                            <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setExpandedReward(null);
                               }}
-                              className="flex-1 bg-green-600 hover:bg-green-700"
+                              className="flex-1 h-11 px-8 py-2.5 bg-green-600 hover:bg-green-700 rounded-md text-base font-medium text-white transition-colors"
                             >
                               Done
-                            </Button>
+                            </button>
                           </div>
                         </div>
                       )}
