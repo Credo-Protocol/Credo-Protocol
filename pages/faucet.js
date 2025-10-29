@@ -10,7 +10,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
-import Image from 'next/image';
 import Link from 'next/link';
 import AppNav from '@/components/layout/AppNav';
 import ConnectButton from '@/components/auth/ConnectButton';
@@ -133,25 +132,11 @@ export default function Faucet() {
       <div className="min-h-screen flex items-center justify-center bg-white text-black relative overflow-hidden">
         <RetroGrid className="opacity-50" />
         <div className="max-w-md w-full p-8 space-y-6 text-center relative z-10">
-          <div className="flex justify-center mb-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 backdrop-blur-sm">
-              <Image src="/moca.jpg" alt="Moca" width={16} height={16} className="rounded-full" />
-              <span className="text-sm font-medium">Built on Moca Chain</span>
-            </div>
-          </div>
-          <Droplets className="h-16 w-16 mx-auto text-black" />
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold">MockUSDC Faucet</h1>
-            <AnimatedShinyText className="text-lg">
-              Get test tokens for Moca Chain Devnet
-            </AnimatedShinyText>
-          </div>
+          <h1 className="text-5xl font-bold">Credo Protocol</h1>
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
           </div>
-          <p className="text-sm text-black/60">
-            Initializing AIR Kit...
-          </p>
+          <p className="text-sm text-black/60">Initializing AIR Kit...</p>
         </div>
       </div>
     );
@@ -162,49 +147,17 @@ export default function Faucet() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white text-black relative overflow-hidden">
         <RetroGrid className="opacity-50" />
-        <div className="max-w-md w-full p-8 space-y-6 relative z-10">
-          <div className="text-center space-y-4">
-            <div className="flex justify-center mb-4">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 backdrop-blur-sm">
-                <Image src="/moca.jpg" alt="Moca" width={16} height={16} className="rounded-full" />
-                <span className="text-sm font-medium">Built on Moca Chain</span>
-              </div>
-            </div>
-            <Droplets className="h-16 w-16 mx-auto text-black" />
-            <div className="space-y-2">
-              <h1 className="text-4xl font-bold">MockUSDC Faucet</h1>
-              <AnimatedShinyText className="text-lg">
-                Get test tokens for Moca Chain Devnet
-              </AnimatedShinyText>
-            </div>
-          </div>
-
-          <div className="p-6 rounded-2xl border border-black/10 bg-white/50 backdrop-blur-sm">
-            <div className="flex items-start gap-3 mb-4">
-              <Info className="h-5 w-5 text-black/60 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-black mb-1">Test Tokens Only</h3>
-                <p className="text-sm text-black/60">
-                  These tokens have no real value and are for testing purposes only on Moca Chain Devnet.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center">
+        <div className="max-w-md w-full p-8 space-y-6 text-center relative z-10">
+          <h1 className="text-5xl font-bold">Credo Protocol</h1>
+          <AnimatedShinyText className="text-xl">
+            Identity-Backed DeFi Lending
+          </AnimatedShinyText>
+          <div className="flex justify-center py-8">
             <ConnectButton size="lg" onConnectionChange={handleConnectionChange} />
           </div>
-
-          <div className="text-center">
-            <Button 
-              variant="ghost" 
-              onClick={() => router.push('/dashboard')}
-              className="text-sm text-black/70 hover:text-black hover:bg-black/5"
-            >
-              <Home className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </div>
+          <p className="text-sm text-black/60">
+            Connect with AIR Kit to access the faucet
+          </p>
         </div>
       </div>
     );
