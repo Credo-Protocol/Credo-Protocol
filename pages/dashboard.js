@@ -200,11 +200,6 @@ export default function Dashboard() {
           <div className="flex items-center justify-between flex-wrap gap-4 mb-2">
             <h1 className="text-4xl font-bold text-black">
               Welcome Back
-              {userInfo?.user?.email && (
-                <span className="text-2xl text-black/60 ml-3">
-                  {userInfo.user.email}
-                </span>
-              )}
             </h1>
             {/* $50 USDC Reward Banner */}
             <RewardBanner />
