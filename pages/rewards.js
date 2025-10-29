@@ -393,11 +393,16 @@ export default function RewardsPage() {
                                   <div className="flex-1">
                                     <p className="text-sm text-red-700 font-bold mb-1">
                                       Verification Failed
+                                      {verificationResults[0].proofData?.status && 
+                                        ` - ${verificationResults[0].proofData.status}`
+                                      }
                                     </p>
                                     <p className="text-sm text-red-600">
-                                      {verificationResults[0].message || 
-                                       verificationResults[0].error || 
-                                       'You do not have the required employment credential. Please submit an employment credential first.'}
+                                      {verificationResults[0].proofData?.status === 'Revoked' 
+                                        ? 'Your employment credential has been revoked. Please obtain a new employment credential.'
+                                        : verificationResults[0].message || 
+                                          verificationResults[0].error || 
+                                          'You do not have the required employment credential. Please submit an employment credential first.'}
                                     </p>
                                   </div>
                                 </div>
