@@ -12,6 +12,7 @@ import Link from 'next/link';
 import CreditScoreCard from '@/components/CreditScoreCard';
 import AppNav from '@/components/layout/AppNav';
 import ConnectButton from '@/components/auth/ConnectButton';
+import RewardBanner from '@/components/RewardBanner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Wallet, TrendingUp, BarChart3, Sparkles, Coins, Droplets } from 'lucide-react';
@@ -196,14 +197,18 @@ export default function Dashboard() {
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-black mb-2">
-            Welcome Back
-            {userInfo?.user?.email && (
-              <span className="text-2xl text-black/60 ml-3">
-                {userInfo.user.email}
-              </span>
-            )}
-          </h1>
+          <div className="flex items-center justify-between flex-wrap gap-4 mb-2">
+            <h1 className="text-4xl font-bold text-black">
+              Welcome Back
+              {userInfo?.user?.email && (
+                <span className="text-2xl text-black/60 ml-3">
+                  {userInfo.user.email}
+                </span>
+              )}
+            </h1>
+            {/* $50 USDC Reward Banner */}
+            <RewardBanner />
+          </div>
           <p className="text-black/60">
             Manage your on-chain credit and access DeFi lending
           </p>
