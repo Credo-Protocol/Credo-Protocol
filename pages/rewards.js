@@ -21,7 +21,11 @@ import {
   DollarSign,
   Lock,
   ArrowRight,
-  Loader2
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  TrendingUp,
+  Coins
 } from 'lucide-react';
 import { useAirKit } from '@/hooks/useAirKit';
 import { checkClaimStatus } from '@/lib/verificationService';
@@ -46,6 +50,7 @@ export default function RewardsPage() {
   const [claimed, setClaimed] = useState(null);
   const [txHash, setTxHash] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [expandedReward, setExpandedReward] = useState(null);
 
   // Check claim status on mount
   useEffect(() => {
@@ -119,52 +124,186 @@ export default function RewardsPage() {
       <main className="container mx-auto px-4 py-12">
         {/* Header Section */}
         <div className="max-w-4xl mx-auto text-center mb-12">
+          <div className="mb-6">
+            <h2 className="text-8xl md:text-9xl font-bold text-blue-600">
+              {claimed ? '0' : '1'}
+            </h2>
+            <p className="text-lg text-black/60 mt-2">Available Rewards</p>
+          </div>
+          
           <h1 className="text-5xl md:text-6xl font-bold mb-4">
             Verify & Earn Rewards
           </h1>
           
           <p className="text-xl text-black/60 max-w-2xl mx-auto">
-            Verify your employment credential and receive instant rewards. 
-            Privacy-preserving verification powered by zero-knowledge proofs.
+            Verify your employment credential and receive instant rewards.
           </p>
         </div>
 
-        {/* Main Reward Card */}
-        <div className="max-w-4xl mx-auto mb-12">
-          {loading ? (
-            <Card className="p-12 text-center">
-              <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-black/40" />
-              <p className="text-black/60">Checking claim status...</p>
-            </Card>
-          ) : claimed === true ? (
-            // Already Claimed State
-            <Card className="relative overflow-hidden border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
-              <BorderBeam size={250} duration={15} borderWidth={2} colorFrom="#22c55e" colorTo="#10b981" />
-              
-              <CardContent className="p-12">
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-500 mb-6">
-                    <CheckCircle className="w-10 h-10 text-white" />
+        {/* Rewards List */}
+        <div className="max-w-4xl mx-auto space-y-4">
+          
+          {/* Reward 1: First-Time User $50 USDC - Expandable & Functional */}
+          <Card 
+            className={`relative overflow-hidden border-2 transition-all duration-300 ${
+              claimed === true 
+                ? 'border-green-200 bg-gradient-to-br from-green-50 to-emerald-50' 
+                : expandedReward === 1
+                ? 'border-blue-200 bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50'
+                : 'border-black/10 hover:border-blue-200 cursor-pointer'
+            }`}
+            onClick={() => {
+              if (expandedReward !== 1 && claimed !== true) {
+                setExpandedReward(1);
+              }
+            }}
+          >
+            {claimed === true && <BorderBeam size={250} duration={15} borderWidth={2} colorFrom="#22c55e" colorTo="#10b981" />}
+            {expandedReward === 1 && claimed !== true && <BorderBeam size={250} duration={12} borderWidth={2} />}
+            
+            <CardContent className="p-6">
+              {/* Reward Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 flex-1">
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
+                    claimed === true 
+                      ? 'bg-green-500' 
+                      : 'bg-gradient-to-br from-blue-500 to-cyan-500'
+                  }`}>
+                    {claimed === true ? (
+                      <CheckCircle className="w-7 h-7 text-white" />
+                    ) : (
+                      <Gift className="w-7 h-7 text-white" />
+                    )}
                   </div>
                   
-                  <h2 className="text-4xl font-bold text-green-900 mb-3">
-                    Reward Claimed!
-                  </h2>
-                  
-                  <p className="text-lg text-green-700 mb-6">
-                    You&apos;ve successfully received your ${REWARD_AMOUNT} {REWARD_TOKEN}
-                  </p>
-
-                  <div className="inline-flex items-center gap-3 px-6 py-3 bg-white rounded-lg border border-green-200">
-                    <DollarSign className="w-6 h-6 text-green-600" />
-                    <div className="text-left">
-                      <p className="text-sm text-green-600 font-medium">Amount Received</p>
-                      <p className="text-2xl font-bold text-green-900">${REWARD_AMOUNT} {REWARD_TOKEN}</p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-xl font-bold">
+                        {claimed === true ? 'Reward Claimed!' : 'First-Time User Bonus'}
+                      </h3>
+                      {claimed !== true && (
+                        <Badge className="bg-blue-600 hover:bg-blue-700">Available</Badge>
+                      )}
                     </div>
+                    <p className="text-2xl font-bold text-blue-600">
+                      ${REWARD_AMOUNT} {REWARD_TOKEN}
+                    </p>
                   </div>
+                </div>
+                
+                {claimed !== true && (
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpandedReward(expandedReward === 1 ? null : 1);
+                    }}
+                    className="p-2 hover:bg-black/5 rounded-full transition-colors"
+                  >
+                    {expandedReward === 1 ? (
+                      <ChevronUp className="w-6 h-6" />
+                    ) : (
+                      <ChevronDown className="w-6 h-6" />
+                    )}
+                  </button>
+                )}
+              </div>
 
-                  {txHash && (
-                    <div className="mt-6">
+              {/* Expanded Content */}
+              {expandedReward === 1 && claimed !== true && (
+                <div className="mt-6 pt-6 border-t border-black/10 space-y-6">
+                  {loading ? (
+                    <div className="text-center py-8">
+                      <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-black/40" />
+                      <p className="text-black/60">Checking claim status...</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Features Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="p-4 bg-white rounded-lg border border-blue-200">
+                          <Shield className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+                          <p className="text-sm font-medium text-black text-center">Instant Reward</p>
+                          <p className="text-xs text-black/60 mt-1 text-center">Receive USDC immediately</p>
+                        </div>
+                        <div className="p-4 bg-white rounded-lg border border-blue-200">
+                          <Lock className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+                          <p className="text-sm font-medium text-black text-center">Privacy First</p>
+                          <p className="text-xs text-black/60 mt-1 text-center">Zero-knowledge proofs</p>
+                        </div>
+                        <div className="p-4 bg-white rounded-lg border border-blue-200">
+                          <CheckCircle className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+                          <p className="text-sm font-medium text-black text-center">One-Time Only</p>
+                          <p className="text-xs text-black/60 mt-1 text-center">First user bonus</p>
+                        </div>
+                      </div>
+
+                      {/* Requirements */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-black">Requirements:</h4>
+                        <div className="space-y-2">
+                          <div className="flex items-start gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-sm text-black/70">Employment credential in your AIR Kit wallet</p>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-sm text-black/70">First-time claim (one per wallet)</p>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-sm text-black/70">Complete ZK verification process</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Claim Button */}
+                      <div className="text-center">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowModal(true);
+                          }}
+                          size="lg"
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-6 text-lg h-auto"
+                        >
+                          <Gift className="mr-2 h-5 w-5" />
+                          Verify & Claim ${REWARD_AMOUNT}
+                          <ArrowRight className="ml-2 h-5 w-5" />
+                        </Button>
+                        
+                        <p className="text-xs text-black/50 mt-3">
+                          Don&apos;t have an employment credential?{' '}
+                          <a 
+                            href="/credentials" 
+                            className="text-blue-600 hover:text-blue-800 font-medium underline"
+                          >
+                            Get one here →
+                          </a>
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Claimed State Details */}
+              {claimed === true && (
+                <div className="mt-6 pt-6 border-t border-green-200">
+                  <div className="text-center space-y-4">
+                    <p className="text-lg text-green-700">
+                      You&apos;ve successfully received your ${REWARD_AMOUNT} {REWARD_TOKEN}
+                    </p>
+                    
+                    <div className="inline-flex items-center gap-3 px-6 py-3 bg-white rounded-lg border border-green-200">
+                      <DollarSign className="w-6 h-6 text-green-600" />
+                      <div className="text-left">
+                        <p className="text-sm text-green-600 font-medium">Amount Received</p>
+                        <p className="text-2xl font-bold text-green-900">${REWARD_AMOUNT} {REWARD_TOKEN}</p>
+                      </div>
+                    </div>
+
+                    {txHash && (
                       <a
                         href={`https://devnet-scan.mocachain.org/tx/${txHash}`}
                         target="_blank"
@@ -174,137 +313,67 @@ export default function RewardsPage() {
                         View transaction on block explorer
                         <ExternalLink className="w-4 h-4" />
                       </a>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          ) : (
-            // Unclaimed State - Main Reward Card
-            <Card className="relative overflow-hidden border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50">
-              <BorderBeam size={250} duration={12} borderWidth={2} />
-              
-              <CardContent className="p-10">
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 mb-6 shadow-lg">
-                    <Gift className="w-12 h-12 text-white" />
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Reward 2: Credit Score > 800 - Locked */}
+          <Card className="relative overflow-hidden border-2 border-black/10 bg-black/5">
+            <CardContent className="p-6 opacity-60">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 flex-1">
+                  <div className="w-14 h-14 rounded-full bg-black/20 flex items-center justify-center">
+                    <TrendingUp className="w-7 h-7 text-black/40" />
                   </div>
                   
-                  <div className="mb-6">
-                    <Badge className="mb-4 text-sm px-4 py-1.5 bg-blue-600 hover:bg-blue-700">
-                      First-Time User Reward
-                    </Badge>
-                    <h2 className="text-5xl md:text-6xl font-bold mb-4">
-                      <AuroraText className="bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600">
-                        ${REWARD_AMOUNT} {REWARD_TOKEN}
-                      </AuroraText>
-                    </h2>
-                    <p className="text-xl text-blue-700 font-medium">
-                      Available to claim right now!
-                    </p>
-                  </div>
-
-                  <div className="max-w-2xl mx-auto mb-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="p-4 bg-white rounded-lg border border-blue-200">
-                        <Shield className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                        <p className="text-sm font-medium text-black">Instant Reward</p>
-                        <p className="text-xs text-black/60 mt-1">Receive USDC immediately</p>
-                      </div>
-                      <div className="p-4 bg-white rounded-lg border border-blue-200">
-                        <Lock className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                        <p className="text-sm font-medium text-black">Privacy First</p>
-                        <p className="text-xs text-black/60 mt-1">Zero-knowledge proofs</p>
-                      </div>
-                      <div className="p-4 bg-white rounded-lg border border-blue-200">
-                        <CheckCircle className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                        <p className="text-sm font-medium text-black">One-Time Only</p>
-                        <p className="text-xs text-black/60 mt-1">First user bonus</p>
-                      </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-xl font-bold text-black/60">Credit Score Champion</h3>
+                      <Badge variant="outline" className="border-black/20 text-black/50">
+                        <Lock className="w-3 h-3 mr-1" />
+                        Locked
+                      </Badge>
                     </div>
-                  </div>
-
-                  <Button
-                    onClick={() => setShowModal(true)}
-                    size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-6 text-lg h-auto"
-                  >
-                    <Gift className="mr-2 h-5 w-5" />
-                    Verify & Claim ${REWARD_AMOUNT}
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Requirements Section */}
-        <div className="max-w-4xl mx-auto">
-          <Card className="border-2 border-black/5">
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <Shield className="w-6 h-6" />
-                Requirements
-              </h3>
-              
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium">Employment Credential</p>
-                    <p className="text-sm text-black/60">
-                      You must have an active employment credential in your AIR Kit wallet
-                    </p>
+                    <p className="text-lg font-semibold text-black/50">Coming Soon</p>
+                    <p className="text-sm text-black/40 mt-1">Requirement: Credit Score &gt; 800</p>
                   </div>
                 </div>
-
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium">First-Time Claim</p>
-                    <p className="text-sm text-black/60">
-                      This reward can only be claimed once per wallet address
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium">Verification Process</p>
-                    <p className="text-sm text-black/60">
-                      Complete the zero-knowledge proof verification through AIR Kit
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-900">
-                  <strong>Don&apos;t have an employment credential yet?</strong>
-                  {' '}
-                  <a 
-                    href="/credentials" 
-                    className="text-blue-600 hover:text-blue-800 font-medium underline"
-                  >
-                    Get one from the credentials page →
-                  </a>
-                </p>
+                
+                <Lock className="w-6 h-6 text-black/30" />
               </div>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Coming Soon Section */}
-        <div className="max-w-4xl mx-auto mt-12 text-center">
-          <div className="p-8 border-2 border-dashed border-black/10 rounded-2xl">
-            <Gift className="w-12 h-12 mx-auto mb-4 text-black/40" />
-            <h3 className="text-2xl font-bold mb-2">More Rewards Coming Soon</h3>
-            <p className="text-black/60">
-              Stay tuned for additional reward opportunities and challenges
-            </p>
-          </div>
+          {/* Reward 3: Supplied > 10,000 USDC - Locked */}
+          <Card className="relative overflow-hidden border-2 border-black/10 bg-black/5">
+            <CardContent className="p-6 opacity-60">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 flex-1">
+                  <div className="w-14 h-14 rounded-full bg-black/20 flex items-center justify-center">
+                    <Coins className="w-7 h-7 text-black/40" />
+                  </div>
+                  
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-xl font-bold text-black/60">Whale Supplier</h3>
+                      <Badge variant="outline" className="border-black/20 text-black/50">
+                        <Lock className="w-3 h-3 mr-1" />
+                        Locked
+                      </Badge>
+                    </div>
+                    <p className="text-lg font-semibold text-black/50">Coming Soon</p>
+                    <p className="text-sm text-black/40 mt-1">Requirement: Supplied &gt; 10,000 USDC</p>
+                  </div>
+                </div>
+                
+                <Lock className="w-6 h-6 text-black/30" />
+              </div>
+            </CardContent>
+          </Card>
+
         </div>
       </main>
 
