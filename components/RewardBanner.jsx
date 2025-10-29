@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Gift, CheckCircle, ExternalLink } from 'lucide-react';
+import { Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { checkClaimStatus } from '@/lib/verificationService';
 import { useAirKit } from '@/hooks/useAirKit';
@@ -18,7 +18,6 @@ const REWARD_TOKEN = process.env.NEXT_PUBLIC_REWARD_TOKEN || 'USDC';
 export default function RewardBanner() {
   const router = useRouter();
   const [claimed, setClaimed] = useState(null);
-  const [txHash, setTxHash] = useState(null);
   const { userAddress, isConnected } = useAirKit();
 
   // Check claim status on mount
@@ -45,33 +44,9 @@ export default function RewardBanner() {
     return null;
   }
 
-  // If already claimed, show success
+  // If already claimed, don't show the banner
   if (claimed === true) {
-    return (
-      <div className="inline-flex items-center gap-3 px-4 py-2 bg-white border-2 border-green-500/20 rounded-lg">
-        <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-          <CheckCircle className="h-4 w-4 text-white" />
-        </div>
-        <div className="flex items-center gap-2">
-          <h4 className="font-bold text-black text-sm whitespace-nowrap">
-            ✅ Reward Claimed!
-          </h4>
-          <p className="text-xs text-black/60 whitespace-nowrap">
-            ${REWARD_AMOUNT} {REWARD_TOKEN} received
-          </p>
-          {txHash && (
-            <a 
-              href={`https://devnet-scan.mocachain.org/tx/${txHash}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-black/50 hover:text-black hover:underline flex items-center gap-1 transition-colors whitespace-nowrap"
-            >
-              View TX <ExternalLink className="h-3 w-3" />
-            </a>
-          )}
-        </div>
-      </div>
-    );
+    return null;
   }
 
   // If not claimed, show reward offer
