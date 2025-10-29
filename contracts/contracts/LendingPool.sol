@@ -305,9 +305,21 @@ contract LendingPool is Ownable, ReentrancyGuard {
             userBorrowIndex[msg.sender][asset] = globalBorrowIndex[asset];
         } else {
             // Existing borrow: compound accrued interest into principal first
+            uint256 previousPrincipal = userAccounts[msg.sender].borrowed[asset];
             uint256 totalOwed = getBorrowBalanceWithInterest(msg.sender, asset);
+
+            // Update user's principal to include accrued interest
             userAccounts[msg.sender].borrowed[asset] = totalOwed;
-            
+
+            // Keep pool accounting consistent: replace previous principal with totalOwed
+            // This prevents underflow during future repayments
+            if (assets[asset].totalBorrowed >= previousPrincipal) {
+                assets[asset].totalBorrowed = assets[asset].totalBorrowed - previousPrincipal + totalOwed;
+            } else {
+                // In the unlikely event of inconsistency, reset to a safe value
+                assets[asset].totalBorrowed = totalOwed;
+            }
+
             // Reset user's index to current (interest is now in principal)
             userBorrowIndex[msg.sender][asset] = globalBorrowIndex[asset];
         }
