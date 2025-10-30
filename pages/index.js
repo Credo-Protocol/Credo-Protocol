@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
 import { LiquidChrome } from '@/components/ui/liquid-chrome';
+import { RetroGrid } from '@/components/ui/retro-grid';
+import { StickyRetroBackground } from '@/components/ui/sticky-retro-background';
 import { MagicCard } from '@/components/ui/magic-card';
 import { NumberTicker } from '@/components/ui/number-ticker';
 import { Marquee } from '@/components/ui/marquee';
@@ -141,146 +143,153 @@ export default function Home() {
       </div>
 
       {/* Social Proof / Marquee */}
-      <div className="py-16 border-y border-black/10">
-        <p className="text-center text-sm text-black/50 mb-8 uppercase tracking-wide">Trusted Credential Issuers</p>
-        <Marquee pauseOnHover className="[--duration:30s]">
-          <MarqueeItem text="Banks" />
-          <MarqueeItem text="Employers" />
-          <MarqueeItem text="Exchanges" />
-          <MarqueeItem text="DeFi Protocols" />
-          <MarqueeItem text="Identity Providers" />
-          <MarqueeItem text="Credit Bureaus" />
-        </Marquee>
-      </div>
-
-      {/* How It Works Section */}
-      <div className="container mx-auto px-4 py-32">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2 
-            className="text-5xl md:text-6xl font-bold text-center mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            How It Works
-          </motion.h2>
-          
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-4 gap-6 items-stretch"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.15
-                }
-              }
-            }}
-          >
-            <StepCard
-              number="01"
-              icon={<Shield className="w-6 h-6" />}
-              title="Login with Moca ID"
-              description="Connect via Google, Email, or Wallet. No complex setup required."
-            />
-            <StepCard
-              number="02"
-              icon={<CheckCircle className="w-6 h-6" />}
-              title="Get Credentials"
-              description="Request verifiable credentials from trusted issuers."
-            />
-            <StepCard
-              number="03"
-              icon={<BarChart3 className="w-6 h-6" />}
-              title="Build Score"
-              description="Your credit score updates on-chain based on credentials."
-            />
-            <StepCard
-              number="04"
-              icon={<TrendingUp className="w-6 h-6" />}
-              title="Borrow More"
-              description="Higher scores unlock lower collateral requirements."
-            />
-          </motion.div>
+      <div className="relative py-16 border-y border-black/10 overflow-hidden">
+        <RetroGrid className="opacity-20" />
+        <div className="relative z-10">
+          <p className="text-center text-sm text-black/50 mb-8 uppercase tracking-wide">Trusted Credential Issuers</p>
+          <Marquee pauseOnHover className="[--duration:30s]">
+            <MarqueeItem text="Banks" />
+            <MarqueeItem text="Employers" />
+            <MarqueeItem text="Exchanges" />
+            <MarqueeItem text="DeFi Protocols" />
+            <MarqueeItem text="Identity Providers" />
+            <MarqueeItem text="Credit Bureaus" />
+          </Marquee>
         </div>
       </div>
 
-      {/* Features Section with Magic Cards */}
-      <div className="container mx-auto px-4 py-32">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2 
-            className="text-5xl md:text-6xl font-bold text-center mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            Key Features
-          </motion.h2>
-          
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.1
-                }
-              }
-            }}
-          >
-            <FeatureCard
-              icon={<TrendingUp className="w-10 h-10" />}
-              title="Score Builder Wizard"
-              description="Interactive simulation tool. Preview score changes before submitting credentials. See exactly what unlocks your next tier with real-time progress tracking."
-            />
-            <FeatureCard
-              icon={<Lock className="w-10 h-10" />}
-              title="Privacy-Preserving Buckets"
-              description="Prove income ($3k-$8k+) or balance ($1k-$10k+) ranges without revealing exact amounts. Only brackets disclosed, never specific numbers."
-            />
-            <FeatureCard
-              icon={<Shield className="w-10 h-10" />}
-              title="Official AIR Kit Integration"
-              description="W3C verifiable credentials from registered Issuer DIDs. Stored on MCSP decentralized storage. Discoverable across the MOCA ecosystem."
-            />
-            <FeatureCard
-              icon={<BarChart3 className="w-10 h-10" />}
-              title="Time-Based Interest"
-              description="Borrow with 5-18% APR based on credit tier. Watch interest accrue every 5 seconds. Transparent breakdown of principal + interest."
-            />
-            <FeatureCard
-              icon={<Sparkles className="w-10 h-10" />}
-              title="Live Leaderboard"
-              description="Track top credit scores across the network. See how you rank against other users. Trophy rewards for top 3 positions."
-            />
-            <FeatureCard
-              icon={<Zap className="w-10 h-10" />}
-              title="Composable Credit API"
-              description="Public REST endpoint for any dApp to query credit scores. CORS enabled. Use Credo scores in GameFi, DAOs, NFTs, and more."
-            />
-          </motion.div>
-        </div>
-      </div>
+      {/* Persistent RetroGrid for sections below - appears after Marquee */}
+      <div className="relative">
+        <StickyRetroBackground targetOpacity={0.25} triggerRatio={0.55} />
 
-      {/* Comparison Section */}
-      <div className="container mx-auto px-4 py-32">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2 
-            className="text-5xl md:text-6xl font-bold text-center mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            Better Than Traditional DeFi
-          </motion.h2>
-          
-          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 items-stretch">
+        {/* How It Works Section */}
+        <div className="container mx-auto px-4 py-32">
+          <div className="max-w-7xl mx-auto">
+            <motion.h2 
+              className="text-5xl md:text-6xl font-bold text-center mb-20"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              How It Works
+            </motion.h2>
+            
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-4 gap-6 items-stretch"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.15
+                  }
+                }
+              }}
+            >
+              <StepCard
+                number="01"
+                icon={<Shield className="w-6 h-6" />}
+                title="Login with Moca ID"
+                description="Connect via Google, Email, or Wallet. No complex setup required."
+              />
+              <StepCard
+                number="02"
+                icon={<CheckCircle className="w-6 h-6" />}
+                title="Get Credentials"
+                description="Request verifiable credentials from trusted issuers."
+              />
+              <StepCard
+                number="03"
+                icon={<BarChart3 className="w-6 h-6" />}
+                title="Build Score"
+                description="Your credit score updates on-chain based on credentials."
+              />
+              <StepCard
+                number="04"
+                icon={<TrendingUp className="w-6 h-6" />}
+                title="Borrow More"
+                description="Higher scores unlock lower collateral requirements."
+              />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Features Section with Magic Cards */}
+        <div className="container mx-auto px-4 py-32">
+          <div className="max-w-7xl mx-auto">
+            <motion.h2 
+              className="text-5xl md:text-6xl font-bold text-center mb-20"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              Key Features
+            </motion.h2>
+            
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.1
+                  }
+                }
+              }}
+            >
+              <FeatureCard
+                icon={<TrendingUp className="w-10 h-10" />}
+                title="Score Builder Wizard"
+                description="Interactive simulation tool. Preview score changes before submitting credentials. See exactly what unlocks your next tier with real-time progress tracking."
+              />
+              <FeatureCard
+                icon={<Lock className="w-10 h-10" />}
+                title="Privacy-Preserving Buckets"
+                description="Prove income ($3k-$8k+) or balance ($1k-$10k+) ranges without revealing exact amounts. Only brackets disclosed, never specific numbers."
+              />
+              <FeatureCard
+                icon={<Shield className="w-10 h-10" />}
+                title="Official AIR Kit Integration"
+                description="W3C verifiable credentials from registered Issuer DIDs. Stored on MCSP decentralized storage. Discoverable across the MOCA ecosystem."
+              />
+              <FeatureCard
+                icon={<BarChart3 className="w-10 h-10" />}
+                title="Time-Based Interest"
+                description="Borrow with 5-18% APR based on credit tier. Watch interest accrue every 5 seconds. Transparent breakdown of principal + interest."
+              />
+              <FeatureCard
+                icon={<Sparkles className="w-10 h-10" />}
+                title="Live Leaderboard"
+                description="Track top credit scores across the network. See how you rank against other users. Trophy rewards for top 3 positions."
+              />
+              <FeatureCard
+                icon={<Zap className="w-10 h-10" />}
+                title="Composable Credit API"
+                description="Public REST endpoint for any dApp to query credit scores. CORS enabled. Use Credo scores in GameFi, DAOs, NFTs, and more."
+              />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Comparison Section */}
+        <div className="container mx-auto px-4 py-32">
+          <div className="max-w-7xl mx-auto">
+            <motion.h2 
+              className="text-5xl md:text-6xl font-bold text-center mb-20"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              Better Than Traditional DeFi
+            </motion.h2>
+            
+            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 items-stretch">
             {/* Traditional DeFi Card - Faded */}
             <motion.div 
               className="relative group"
@@ -377,13 +386,13 @@ export default function Home() {
               </ul>
             </div>
           </motion.div>
+            </div>
+          </div>
         </div>
-      </div>
-      </div>
 
-      {/* CTA Section */}
-      <div className="container mx-auto px-4 py-32 relative">
-        <div className="max-w-5xl mx-auto">
+        {/* CTA Section */}
+        <div className="container mx-auto px-4 py-32 relative">
+          <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.95 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -444,6 +453,7 @@ export default function Home() {
               </motion.div>
             </MagicCard>
           </motion.div>
+          </div>
         </div>
       </div>
 

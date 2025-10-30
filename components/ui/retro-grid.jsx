@@ -5,7 +5,7 @@
 
 import { cn } from "@/lib/utils";
 
-export function RetroGrid({ className, angle = 65 }) {
+export function RetroGrid({ className, angle = 65, showGradient = true }) {
   return (
     <div
       className={cn(
@@ -28,8 +28,10 @@ export function RetroGrid({ className, angle = 65 }) {
         />
       </div>
 
-      {/* Gradient Fade */}
-      <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent to-90% dark:from-black" />
+      {/* Gradient Fade (optional) */}
+      {showGradient && (
+        <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent to-90% dark:from-black" />
+      )}
     </div>
   );
 }
