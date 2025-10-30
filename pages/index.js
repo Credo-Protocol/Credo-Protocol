@@ -27,7 +27,7 @@ export default function Home() {
             {/* Logo and Brand */}
             <Link href="/" className="flex items-center gap-1 group">
               <img 
-                src="/credo.jpg" 
+                src="/credo.png" 
                 alt="Credo Protocol" 
                 className="w-8 h-8 rounded-lg object-cover transition-transform group-hover:scale-105" 
               />
@@ -56,7 +56,7 @@ export default function Home() {
           <LiquidChrome
             baseColor={[0.85, 0.85, 0.85]}
             speed={0.3}
-            amplitude={0.6}
+            amplitude={0.3}
             vibrancy={0.12}
             interactive={true}
           />
@@ -176,7 +176,7 @@ export default function Home() {
             </motion.h2>
             
             <motion.div 
-              className="grid grid-cols-1 md:grid-cols-4 gap-6 items-stretch"
+              className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] gap-6 items-center"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
@@ -194,18 +194,54 @@ export default function Home() {
                 title="Login with Moca ID"
                 description="Connect via Google, Email, or Wallet. No complex setup required."
               />
+              
+              {/* Arrow 1 */}
+              <motion.div 
+                className="hidden md:flex items-center justify-center"
+                variants={{
+                  hidden: { opacity: 0, x: -20 },
+                  visible: { opacity: 1, x: 0, transition: { duration: 0.5 } }
+                }}
+              >
+                <ArrowRight className="w-8 h-8 text-black" />
+              </motion.div>
+              
               <StepCard
                 number="02"
                 icon={<CheckCircle className="w-6 h-6" />}
                 title="Get Credentials"
                 description="Request verifiable credentials from trusted issuers."
               />
+              
+              {/* Arrow 2 */}
+              <motion.div 
+                className="hidden md:flex items-center justify-center"
+                variants={{
+                  hidden: { opacity: 0, x: -20 },
+                  visible: { opacity: 1, x: 0, transition: { duration: 0.5 } }
+                }}
+              >
+                <ArrowRight className="w-8 h-8 text-black" />
+              </motion.div>
+              
               <StepCard
                 number="03"
                 icon={<BarChart3 className="w-6 h-6" />}
                 title="Build Score"
                 description="Your credit score updates on-chain based on credentials."
               />
+              
+              {/* Arrow 3 */}
+              <motion.div 
+                className="hidden md:flex items-center justify-center"
+                variants={{
+                  hidden: { opacity: 0, x: -20 },
+                  visible: { opacity: 1, x: 0, transition: { duration: 0.5 } }
+                }}
+              >
+                <ArrowRight className="w-8 h-8 text-black" />
+              </motion.div>
+              
               <StepCard
                 number="04"
                 icon={<TrendingUp className="w-6 h-6" />}
@@ -356,7 +392,7 @@ export default function Home() {
                 
                 <h3 className="relative text-3xl font-bold mb-10 text-black flex items-center gap-3">
                   Credo Protocol
-                  <Sparkles className="w-6 h-6" />
+                  <img src="/credo.png" alt="Credo" className="w-10 h-10 rounded-lg object-cover" />
                 </h3>
                 <ul className="relative space-y-6">
                   <li className="flex items-start gap-3 text-lg">
@@ -392,7 +428,7 @@ export default function Home() {
 
         {/* CTA Section */}
         <div className="container mx-auto px-4 py-32 relative">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.95 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -466,7 +502,7 @@ export default function Home() {
               {/* Brand Section */}
               <div className="md:col-span-2">
                 <div className="flex items-center gap-3 mb-4">
-                  <img src="/credo.jpg" alt="Credo Protocol" className="w-8 h-8 rounded-lg object-cover" />
+                  <img src="/credo.png" alt="Credo Protocol" className="w-8 h-8 rounded-lg object-cover" />
                   <h3 className="text-2xl font-bold">Credo Protocol</h3>
                 </div>
                 <p className="text-white/70 text-lg leading-relaxed max-w-md">

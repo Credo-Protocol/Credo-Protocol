@@ -32,7 +32,7 @@ export function AppNav({ onConnectionChange }) {
           {/* Logo and Brand */}
           <Link href="/" className="flex items-center gap-1 group">
             <img 
-              src="/credo.jpg" 
+              src="/credo.png" 
               alt="Credo Protocol" 
               className="w-8 h-8 rounded-lg object-cover transition-transform group-hover:scale-105" 
             />
