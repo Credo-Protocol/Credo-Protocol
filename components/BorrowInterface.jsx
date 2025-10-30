@@ -17,10 +17,9 @@ import { Slider } from '@/components/ui/slider';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, TrendingDown, Info, CheckCircle2 } from 'lucide-react';
-import { CONTRACTS, LENDING_POOL_ABI, calculateCollateralFactor, calculateInterestRate, getScoreColor } from '@/lib/contracts';
+import { CONTRACTS, LENDING_POOL_ABI, calculateCollateralFactor } from '@/lib/contracts';
 import { handleTransactionError } from '@/lib/errorHandler';
 import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
-import { AuroraText } from '@/components/ui/aurora-text';
 
 export default function BorrowInterface({ userAddress, creditScore, onSuccess, provider }) {
   const [borrowAmount, setBorrowAmount] = useState(0);
@@ -40,12 +39,6 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
 
   // Calculate collateral factor from validated credit score
   const collateralFactor = calculateCollateralFactor(validCreditScore);
-  
-  // Calculate interest rate from validated credit score
-  const interestRate = calculateInterestRate(validCreditScore);
-  
-  // Get dynamic color for credit score display
-  const scoreColor = getScoreColor(validCreditScore);
 
   // Fetch max borrowing capacity (recalculate when credit score changes)
   useEffect(() => {
@@ -322,38 +315,6 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
         <CardDescription>Borrow against your supplied collateral</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Credit Score Info */}
-        <div className="max-w-xl mx-auto p-4 bg-muted rounded-lg space-y-4">
-          <div className="text-center space-y-1">
-            <span className="text-sm font-medium block text-black">Your Credit Score</span>
-            <span className={`text-5xl font-bold block ${scoreColor}`}>{validCreditScore}</span>
-          </div>
-          
-          {/* Collateral Factor */}
-          <div className="text-center space-y-1">
-            <span className="text-sm font-medium block text-black">Collateral Factor</span>
-            <AuroraText 
-              className={`text-5xl font-bold leading-none ${
-                validCreditScore >= 900 ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500' : 
-                validCreditScore >= 800 ? 'bg-gradient-to-r from-green-500 via-lime-500 to-emerald-500' :
-                validCreditScore >= 700 ? 'bg-gradient-to-r from-lime-500 via-yellow-500 to-green-500' :
-                validCreditScore >= 600 ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500' :
-                validCreditScore >= 500 ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
-                'bg-gradient-to-r from-red-500 via-rose-500 to-pink-500'
-              }`}
-            >
-              {collateralFactor}%
-            </AuroraText>
-          </div>
-          
-          {/* Interest Rate Pill */}
-          <div className="flex justify-center">
-            <div className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-black border border-black">
-              Current Interest Rate: {interestRate}% APR
-            </div>
-          </div>
-        </div>
-
         {/* Credit Limit Display */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -457,26 +418,25 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
             )}
 
             {/* Borrow Button */}
-            <Button 
-              className="w-full" 
-              size="lg"
+            <button 
+              className="w-full h-12 text-base bg-primary text-primary-foreground rounded-md transition-all duration-300 hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" 
               onClick={handleBorrow}
               disabled={borrowing || borrowAmount <= 0 || borrowAmount > maxBorrow}
             >
               {borrowing ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                   Borrowing...
                 </>
               ) : (
                 <>
-                  <TrendingDown className="mr-2 h-4 w-4" />
+                  <TrendingDown className="h-5 w-5" />
                   <span className="flex items-center gap-1.5">
                     Borrow ${borrowAmount.toFixed(2)} <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC
                   </span>
                 </>
               )}
-            </Button>
+            </button>
           </>
         ) : (
           <Alert>

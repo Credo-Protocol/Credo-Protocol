@@ -10,6 +10,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
+import Image from 'next/image';
 import AppNav from '@/components/layout/AppNav';
 import LendingInterface from '@/components/LendingInterface';
 import ConnectButton from '@/components/auth/ConnectButton';
@@ -19,6 +20,7 @@ import { getBestProvider, callWithTimeout, getPublicProvider } from '@/lib/rpcPr
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
 import { Card } from '@/components/ui/card';
+import { ExternalLink } from 'lucide-react';
 
 export default function LendingPage() {
   const router = useRouter();
@@ -55,20 +57,21 @@ export default function LendingPage() {
     return () => setIsMounted(false);
   }, []);
 
-  // Fetch credit score for lending
+  // Fetch all data at once (credit score + pool stats) for better performance
   useEffect(() => {
     if (userAddress && provider) {
-      fetchCreditScore();
-      fetchPoolStats();
+      fetchAllData();
     }
   }, [userAddress, provider]);
 
-  const fetchCreditScore = async () => {
+  // Fetch credit score and pool stats in parallel
+  const fetchAllData = async () => {
     if (!isMounted || !isConnected || !userAddress) return;
 
     try {
       setLoading(true);
       
+      // Get provider once for both fetches
       let reliableProvider;
       try {
         reliableProvider = await getBestProvider(provider);
@@ -76,49 +79,83 @@ export default function LendingPage() {
         reliableProvider = getPublicProvider();
       }
       
+      // Create contract instances
       const oracleContract = new ethers.Contract(
         CONTRACTS.CREDIT_ORACLE,
         CREDIT_ORACLE_ABI,
         reliableProvider
       );
+      
+      const lendingPoolContract = new ethers.Contract(
+        CONTRACTS.LENDING_POOL,
+        LENDING_POOL_ABI,
+        reliableProvider
+      );
 
-      let scoreData;
-      try {
-        const details = await callWithTimeout(
-          () => oracleContract.getScoreDetails(userAddress),
+      // Fetch both in parallel
+      const [scoreResult, poolResult] = await Promise.allSettled([
+        // Fetch credit score
+        callWithTimeout(
+          () => oracleContract.getCreditScore(userAddress),
           { timeout: 30000, retries: 2 }
-        );
-        // Convert BigInt to Number and ensure it's within valid range (0-1000)
-        const rawScore = Number(details[0]);
-        scoreData = { score: Math.min(Math.max(rawScore, 0), 1000) };
-      } catch {
-        try {
-          const score = await callWithTimeout(
-            () => oracleContract.getCreditScore(userAddress),
-            { timeout: 30000, retries: 2 }
-          );
-          // Convert BigInt to Number and ensure it's within valid range (0-1000)
-          const rawScore = Number(score);
-          scoreData = { score: Math.min(Math.max(rawScore, 0), 1000) };
-        } catch {
-          scoreData = { score: 500 };
+        ),
+        // Fetch pool stats
+        callWithTimeout(
+          () => lendingPoolContract.assets(CONTRACTS.MOCK_USDC),
+          { timeout: 30000, retries: 2 }
+        )
+      ]);
+
+      // Process credit score
+      let finalScore = 500; // Default
+      if (scoreResult.status === 'fulfilled') {
+        const rawScore = Number(scoreResult.value);
+        if (rawScore >= 0 && rawScore <= 1000 && Number.isFinite(rawScore)) {
+          finalScore = rawScore;
         }
       }
 
+      // Process pool stats
+      let finalPoolStats = {
+        totalLiquidity: '0',
+        availableLiquidity: '0',
+        totalBorrowed: '0',
+        utilizationRate: 0
+      };
+      
+      if (poolResult.status === 'fulfilled') {
+        const assetData = poolResult.value;
+        const totalLiquidityBigInt = assetData[0];
+        const totalBorrowedBigInt = assetData[1];
+        const availableLiquidityBigInt = totalLiquidityBigInt - totalBorrowedBigInt;
+        const utilizationRate = totalLiquidityBigInt > 0n 
+          ? Number((totalBorrowedBigInt * 10000n) / totalLiquidityBigInt) / 100 
+          : 0;
+
+        finalPoolStats = {
+          totalLiquidity: ethers.formatUnits(totalLiquidityBigInt, 6),
+          availableLiquidity: ethers.formatUnits(availableLiquidityBigInt, 6),
+          totalBorrowed: ethers.formatUnits(totalBorrowedBigInt, 6),
+          utilizationRate
+        };
+      }
+
+      // Update all state at once
       if (isMounted) {
-        // Final validation: ensure score is a valid number between 0-1000
-        const validScore = Math.min(Math.max(scoreData.score, 0), 1000);
-        setCreditScore(validScore);
+        setCreditScore(finalScore);
+        setPoolStats(finalPoolStats);
       }
     } catch (error) {
-      console.error('Error fetching credit score:', error);
-      if (isMounted) setCreditScore(500);
+      console.error('Error fetching data:', error);
+      if (isMounted) {
+        setCreditScore(500);
+      }
     } finally {
       if (isMounted) setLoading(false);
     }
   };
 
-  // Fetch pool liquidity stats from the lending pool
+  // Separate function for refreshing pool stats only (used after transactions)
   const fetchPoolStats = async () => {
     if (!isMounted) return;
 
@@ -136,18 +173,14 @@ export default function LendingPage() {
         reliableProvider
       );
 
-      // Fetch USDC asset data from the pool
       const assetData = await callWithTimeout(
         () => lendingPoolContract.assets(CONTRACTS.MOCK_USDC),
         { timeout: 30000, retries: 2 }
       );
 
-      // Extract totalSupply and totalBorrowed from the assets struct
-      const totalLiquidityBigInt = assetData[0]; // totalSupply
-      const totalBorrowedBigInt = assetData[1];  // totalBorrowed
+      const totalLiquidityBigInt = assetData[0];
+      const totalBorrowedBigInt = assetData[1];
       const availableLiquidityBigInt = totalLiquidityBigInt - totalBorrowedBigInt;
-      
-      // Calculate utilization rate (percentage)
       const utilizationRate = totalLiquidityBigInt > 0n 
         ? Number((totalBorrowedBigInt * 10000n) / totalLiquidityBigInt) / 100 
         : 0;
@@ -162,7 +195,6 @@ export default function LendingPage() {
       }
     } catch (error) {
       console.error('Error fetching pool stats:', error);
-      // Keep default values on error
     }
   };
 
@@ -218,63 +250,96 @@ export default function LendingPage() {
           </p>
         </div>
 
-        {/* Pool Liquidity Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          {/* Total Pool Liquidity */}
-          <Card className="p-6 border-black/10 hover:border-black/20 transition-colors">
-            <div className="space-y-2">
-              <p className="text-sm text-black/60 font-medium">Total Pool Size</p>
-              <p className="text-3xl font-bold text-black">
-                {parseFloat(poolStats.totalLiquidity).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })}
-              </p>
-              <p className="text-xs text-black/50">USDC</p>
-            </div>
-          </Card>
-
-          {/* Available Liquidity */}
-          <Card className="p-6 border-black/10 hover:border-black/20 transition-colors">
-            <div className="space-y-2">
-              <p className="text-sm text-black/60 font-medium">Available to Borrow</p>
-              <p className="text-3xl font-bold text-black">
-                {parseFloat(poolStats.availableLiquidity).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })}
-              </p>
-              <p className="text-xs text-black/50">USDC</p>
-            </div>
-          </Card>
-
-          {/* Total Borrowed */}
-          <Card className="p-6 border-black/10 hover:border-black/20 transition-colors">
-            <div className="space-y-2">
-              <p className="text-sm text-black/60 font-medium">Total Borrowed</p>
-              <p className="text-3xl font-bold text-black">
-                {parseFloat(poolStats.totalBorrowed).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })}
-              </p>
-              <p className="text-xs text-black/50">USDC</p>
-            </div>
-          </Card>
-
-          {/* Utilization Rate */}
-          <Card className="p-6 border-black/10 hover:border-black/20 transition-colors">
-            <div className="space-y-2">
-              <p className="text-sm text-black/60 font-medium">Utilization Rate</p>
-              <p className="text-3xl font-bold text-black">
-                {poolStats.utilizationRate.toFixed(2)}%
-              </p>
-              <p className="text-xs text-black/50">
-                {poolStats.utilizationRate < 50 ? 'Low' : poolStats.utilizationRate < 80 ? 'Moderate' : 'High'}
-              </p>
-            </div>
-          </Card>
+        {/* Moca Chain Badge */}
+        <div className="flex items-center gap-1.5 mb-3">
+          <Image 
+            src="/moca.jpg" 
+            alt="Moca Chain" 
+            width={16} 
+            height={16}
+            className="rounded-sm object-cover"
+          />
+          <span className="text-sm text-black/60 font-medium">Moca Chain</span>
         </div>
+
+        {/* Pool Liquidity Stats - Aave Style */}
+        <Card className="mb-8 border-black/10">
+          <div className="p-6">
+            {/* Asset Header */}
+            <div className="flex items-center justify-between mb-6 pb-6 border-b border-black/10">
+              <div className="flex items-center gap-3">
+                <div className="relative w-10 h-10">
+                  <Image 
+                    src="/usd-coin-usdc-logo.png" 
+                    alt="USDC" 
+                    width={40} 
+                    height={40}
+                    className="rounded-full"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-bold text-black">USDC</h3>
+                    <a
+                      href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || 'https://devnet-scan.mocachain.org'}/address/${CONTRACTS.LENDING_POOL}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-black/60 hover:text-black transition-colors"
+                      title="View Lending Pool Contract"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </div>
+                  <p className="text-sm text-black/60">USD Coin</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Pool Metrics Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {/* Total Pool Size */}
+              <div className="space-y-1">
+                <p className="text-xs text-black/50 font-medium uppercase tracking-wide">Total Pool Size</p>
+                <p className="text-2xl font-bold text-black">
+                  ${parseFloat(poolStats.totalLiquidity).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}
+                </p>
+              </div>
+
+              {/* Available Liquidity */}
+              <div className="space-y-1">
+                <p className="text-xs text-black/50 font-medium uppercase tracking-wide">Available Liquidity</p>
+                <p className="text-2xl font-bold text-black">
+                  ${parseFloat(poolStats.availableLiquidity).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}
+                </p>
+              </div>
+
+              {/* Total Borrowed */}
+              <div className="space-y-1">
+                <p className="text-xs text-black/50 font-medium uppercase tracking-wide">Total Borrowed</p>
+                <p className="text-2xl font-bold text-black">
+                  ${parseFloat(poolStats.totalBorrowed).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}
+                </p>
+              </div>
+
+              {/* Utilization Rate */}
+              <div className="space-y-1">
+                <p className="text-xs text-black/50 font-medium uppercase tracking-wide">Utilization Rate</p>
+                <p className="text-2xl font-bold text-black">
+                  {poolStats.utilizationRate.toFixed(2)}%
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
 
         {/* Lending Interface */}
         <LendingInterface

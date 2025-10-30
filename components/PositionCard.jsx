@@ -15,12 +15,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { AlertTriangle, TrendingUp, TrendingDown, Clock } from 'lucide-react';
-import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI, calculateCollateralFactor } from '@/lib/contracts';
+import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI, calculateCollateralFactor, calculateInterestRate, getScoreColor } from '@/lib/contracts';
 import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
+import RepayModal from '@/components/RepayModal';
 
 export default function PositionCard({ userAddress, creditScore, refresh, provider }) {
   const [loading, setLoading] = useState(true);
+  const [repayModalOpen, setRepayModalOpen] = useState(false);
   const [position, setPosition] = useState({
     totalCollateralInUSD: 0,
     totalDebtInUSD: 0,
@@ -36,12 +40,25 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
   const [totalOwed, setTotalOwed] = useState(0);
   const [userAPR, setUserAPR] = useState(0);
 
-  // Fetch position data (recalculate when credit score changes)
+  // Calculate credit limit reactively based on current credit score
+  // This updates when creditScore changes without needing to refetch position data
+  const currentCollateralFactor = calculateCollateralFactor(creditScore);
+  const calculatedCreditLimit = position.totalCollateralInUSD > 0 
+    ? Math.max(0, (position.totalCollateralInUSD / currentCollateralFactor) * 100 - position.totalDebtInUSD)
+    : 0;
+  
+  // Calculate interest rate and score color
+  const interestRate = calculateInterestRate(creditScore);
+  const scoreColor = getScoreColor(creditScore);
+
+  // Fetch position data
+  // Note: creditScore is NOT in dependencies because it's only used for display calculations
+  // It doesn't affect the fetched data, so we don't need to re-fetch when it changes
   useEffect(() => {
-    if (userAddress && provider && creditScore >= 0) {
+    if (userAddress && provider) {
       fetchPosition();
     }
-  }, [userAddress, refresh, provider, creditScore]);
+  }, [userAddress, refresh, provider]);
   
   // Phase 3: Auto-refresh interest every 5 seconds
   // Only run when there's meaningful debt (>= $0.01), not dust amounts
@@ -134,16 +151,6 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
       const totalCollateralUSD = Number(ethers.formatUnits(accountData[0], 6));
       const totalDebtUSD = Number(ethers.formatUnits(accountData[1], 6));
       
-      // Fetch asset data to check pool liquidity (assets is a public mapping)
-      const assetData = await callWithTimeout(
-        () => lendingPool.assets(CONTRACTS.MOCK_USDC),
-        { timeout: 30000, retries: 2 }
-      ).catch(() => null);
-      
-      if (!assetData) {
-        throw new Error('Disconnected');
-      }
-      
       // Fetch supplied amount for MockUSDC
       const supplied = await callWithTimeout(
         () => lendingPool.getUserSupplied(userAddress, CONTRACTS.MOCK_USDC),
@@ -157,26 +164,11 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
       // to avoid caching issues and ensure consistency
       const borrowedFormatted = totalDebtUSD;
       
-      // Calculate pool's available liquidity
-      const poolTotalSupply = Number(ethers.formatUnits(assetData[0], 6));
-      const poolTotalBorrowed = Number(ethers.formatUnits(assetData[1], 6));
-      const poolAvailableLiquidity = poolTotalSupply - poolTotalBorrowed;
-      
-      // Calculate available borrow based on user's credit score collateral factor
-      const collateralFactor = calculateCollateralFactor(creditScore);
-      const maxBorrowFromCollateral = (totalCollateralUSD / collateralFactor) * 100;
-      const availableBorrowsFromCredit = maxBorrowFromCollateral - totalDebtUSD;
-      
-      // Show credit-based limit in the UI
-      const availableBorrowsUSD = Math.max(0, availableBorrowsFromCredit);
-      
-      // Store actual borrowable amount (limited by pool liquidity) for validation
-      const actualBorrowableAmount = Math.max(0, Math.min(availableBorrowsFromCredit, poolAvailableLiquidity));
-      
+      // Store position data (credit limit will be calculated reactively based on current credit score)
       const positionData = {
         totalCollateralInUSD: totalCollateralUSD,
         totalDebtInUSD: totalDebtUSD,
-        availableBorrowsInUSD: availableBorrowsUSD,
+        availableBorrowsInUSD: 0, // Not used, calculated reactively
         currentLiquidationThreshold: Number(accountData[3]),
         healthFactor: Number(ethers.formatUnits(accountData[4], 18)), // 18 decimals for health factor
         suppliedAmount: suppliedFormatted,
@@ -257,6 +249,7 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
   }
 
   return (
+    <>
     <Card>
       <CardHeader>
         <CardTitle>Your Position</CardTitle>
@@ -275,65 +268,124 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
         )}
 
         {/* Position Stats */}
-        <div className="grid grid-cols-2 gap-4">
-          {/* Supplied Collateral */}
-          <div className="space-y-1">
-            <div className="flex items-center gap-1">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <p className="text-sm text-muted-foreground">Supplied</p>
+        <div className="flex justify-center">
+          <div className="grid grid-cols-2 gap-36 max-w-3xl">
+            {/* Supplied Collateral */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-green-500" />
+                <p className="text-base text-muted-foreground">Supplied</p>
+              </div>
+              <p className="text-4xl font-bold">${position.suppliedAmount.toFixed(2)}</p>
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC
+              </p>
             </div>
-            <p className="text-2xl font-bold">${position.suppliedAmount.toFixed(2)}</p>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={12} height={12} className="inline" /> USDC
-            </p>
-          </div>
 
-          {/* Borrowed Amount */}
-          <div className="space-y-1">
-            <div className="flex items-center gap-1">
-              <TrendingDown className="h-4 w-4 text-red-500" />
-              <p className="text-sm text-muted-foreground">Borrowed</p>
+            {/* Borrowed Amount */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <TrendingDown className="h-5 w-5 text-red-500" />
+                <p className="text-base text-muted-foreground">Borrowed</p>
+              </div>
+              <p className="text-4xl font-bold">${position.borrowedAmount.toFixed(2)}</p>
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC
+              </p>
             </div>
-            <p className="text-2xl font-bold">${position.borrowedAmount.toFixed(2)}</p>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={12} height={12} className="inline" /> USDC
-            </p>
+          </div>
+        </div>
+
+        {/* Credit Score Info */}
+        <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            {/* Credit Score */}
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Credit Score</p>
+              {creditScore > 0 && !loading ? (
+                <p className={`text-2xl font-bold ${scoreColor}`}>{creditScore}</p>
+              ) : (
+                <Skeleton className="h-8 w-full" />
+              )}
+            </div>
+
+            {/* Collateral Factor */}
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Collateral Factor</p>
+              {creditScore > 0 && !loading ? (
+                <p className="text-2xl font-bold text-orange-500">{currentCollateralFactor}%</p>
+              ) : (
+                <Skeleton className="h-8 w-full" />
+              )}
+            </div>
+
+            {/* Interest Rate */}
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">Interest Rate</p>
+              {creditScore > 0 && !loading ? (
+                <p className="text-2xl font-bold">{interestRate}%</p>
+              ) : (
+                <Skeleton className="h-8 w-full" />
+              )}
+            </div>
           </div>
         </div>
 
         {/* Phase 3: Real-Time Interest Display (NEW!) */}
         {/* Only show when there's meaningful debt (>= $0.01), not dust amounts */}
         {hasMeaningfulDebt && (
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Interest Accruing</span>
-              <Badge variant="outline" className="text-yellow-700 border-yellow-400">
+          <div className="p-5 bg-gray-50 border border-gray-200 rounded-lg space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+              <span className="text-base font-semibold text-gray-900">Debt Overview</span>
+              <Badge variant="outline" className="text-orange-700 border-orange-400 font-medium">
                 {(userAPR / 100).toFixed(2)}% APR
               </Badge>
             </div>
             
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Principal:</span>
-                <span className="font-semibold">${position.borrowedAmount.toFixed(2)}</span>
+            {/* Current Borrowed Amount */}
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Current Borrowed Amount</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-gray-900">
+                    ${position.borrowedAmount.toFixed(2)}
+                  </span>
+                  <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={20} height={20} className="inline" />
+                </div>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Accrued Interest:</span>
-                <span className="font-semibold text-yellow-700">
+
+              {/* Interest Section */}
+              <div className="p-3 bg-orange-50 border border-orange-200 rounded-md space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-orange-700 font-medium uppercase tracking-wide">Accrued Interest</span>
+                  <div className="flex items-center gap-1 text-xs text-orange-600">
+                    <Clock className="w-3 h-3" />
+                    <span>Live</span>
+                  </div>
+                </div>
+                <p className="text-xl font-bold text-orange-700">
                   +${accruedInterest.toFixed(6)}
-                </span>
+                </p>
               </div>
-              <div className="h-px bg-gray-300 my-2" />
-              <div className="flex justify-between">
-                <span className="font-medium text-gray-900">Total Owed:</span>
-                <span className="font-bold text-lg">${totalOwed.toFixed(2)}</span>
+
+              {/* Total Owed */}
+              <div className="pt-3 border-t-2 border-gray-300">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-sm font-semibold text-gray-900">Total Amount to Repay:</span>
+                  <span className="text-2xl font-bold text-gray-900">${totalOwed.toFixed(2)}</span>
+                </div>
               </div>
             </div>
-            
-            <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
-              <Clock className="w-3 h-3" />
-              <span>Updates every 5 seconds</span>
-            </div>
+
+            {/* Repay Button */}
+            <button 
+              className="w-full h-12 text-base bg-green-600 text-white rounded-md transition-all duration-300 hover:bg-green-700 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md"
+              onClick={() => setRepayModalOpen(true)}
+            >
+              <TrendingUp className="h-5 w-5" />
+              <span className="flex items-center gap-1.5">Repay <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC</span>
+            </button>
           </div>
         )}
 
@@ -360,11 +412,29 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
         <div className="pt-4 border-t">
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">Credit Limit</p>
-            <p className="text-lg font-semibold">${position.availableBorrowsInUSD.toFixed(2)}</p>
+            {creditScore > 0 && !loading ? (
+              <p className="text-lg font-semibold">${calculatedCreditLimit.toFixed(2)}</p>
+            ) : (
+              <Skeleton className="h-7 w-24" />
+            )}
           </div>
         </div>
       </CardContent>
     </Card>
+
+    {/* Repay Modal */}
+    <RepayModal
+      isOpen={repayModalOpen}
+      onClose={() => setRepayModalOpen(false)}
+      userAddress={userAddress}
+      onSuccess={() => {
+        setRepayModalOpen(false);
+        // Trigger refresh by updating the key
+        window.location.reload();
+      }}
+      provider={provider}
+    />
+    </>
   );
 }
 

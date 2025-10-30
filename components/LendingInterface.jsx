@@ -4,9 +4,8 @@
  * Main lending interface with tabs for:
  * - Supply: Deposit collateral
  * - Borrow: Borrow against collateral
- * - Repay: Pay back borrowed funds
  * 
- * Also displays user's position with health factor
+ * Displays user's position with health factor and repay functionality
  */
 
 import { useState } from 'react';
@@ -17,12 +16,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import PositionCard from '@/components/PositionCard';
 import BorrowInterface from '@/components/BorrowInterface';
 import SupplyModal from '@/components/SupplyModal';
-import RepayModal from '@/components/RepayModal';
 import { TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 
 export default function LendingInterface({ userAddress, creditScore, provider, onPoolRefresh }) {
   const [supplyModalOpen, setSupplyModalOpen] = useState(false);
-  const [repayModalOpen, setRepayModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Refresh position data and pool stats when transactions complete
@@ -120,25 +117,6 @@ export default function LendingInterface({ userAddress, creditScore, provider, o
             onSuccess={handleTransactionSuccess}
             provider={provider}
           />
-
-          {/* Repay Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Repay Debt</CardTitle>
-              <CardDescription className="flex items-center gap-1.5 flex-wrap">
-                Pay back your borrowed <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC to reduce debt and improve health factor
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <button 
-                className="w-full h-12 text-base bg-green-600 text-white rounded-md transition-all duration-300 hover:bg-green-700 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md" 
-                onClick={() => setRepayModalOpen(true)}
-              >
-                <TrendingUp className="h-5 w-5" />
-                <span className="flex items-center gap-1.5">Repay <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC</span>
-              </button>
-            </CardContent>
-          </Card>
         </TabsContent>
         </Tabs>
       </div>
@@ -147,15 +125,6 @@ export default function LendingInterface({ userAddress, creditScore, provider, o
       <SupplyModal
         isOpen={supplyModalOpen}
         onClose={() => setSupplyModalOpen(false)}
-        userAddress={userAddress}
-        onSuccess={handleTransactionSuccess}
-        provider={provider}
-      />
-
-      {/* Repay Modal */}
-      <RepayModal
-        isOpen={repayModalOpen}
-        onClose={() => setRepayModalOpen(false)}
         userAddress={userAddress}
         onSuccess={handleTransactionSuccess}
         provider={provider}
