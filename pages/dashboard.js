@@ -195,18 +195,16 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between flex-wrap gap-4 mb-2">
-            <h1 className="text-4xl font-bold text-black">
-              Welcome Back
-            </h1>
-            {/* $50 USDC Reward Banner */}
-            <RewardBanner />
+        {/* Welcome Section with Reward Banner */}
+        <div className="flex items-start justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-black mb-2">Welcome Back</h1>
+            <p className="text-black/60">
+              Manage your on-chain credit and access DeFi lending
+            </p>
           </div>
-          <p className="text-black/60">
-            Manage your on-chain credit and access DeFi lending
-          </p>
+          {/* $50 USDC Reward Banner */}
+          <RewardBanner />
         </div>
 
         {/* Stats Grid */}
