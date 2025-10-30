@@ -592,7 +592,7 @@ function StepCard({ number, icon, title, description }) {
         }
       }}
     >
-      <MagicCard className="p-8 relative h-full flex flex-col" gradientColor="#000000" gradientOpacity={0.05}>
+      <MagicCard className="glass-card p-8 relative h-full flex flex-col" gradientColor="#000000" gradientOpacity={0.05}>
         <div className="absolute top-6 right-6 text-7xl font-bold text-black/5">
           {number}
         </div>

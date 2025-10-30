@@ -43,7 +43,10 @@ export function MagicCard({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={cn(
-        "group relative overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900",
+        // Avoid setting a solid background when using glass-card
+        (typeof className === "string" && className.includes("glass-card")
+          ? "group relative overflow-hidden rounded-xl"
+          : "group relative overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900"),
         className
       )}
     >
