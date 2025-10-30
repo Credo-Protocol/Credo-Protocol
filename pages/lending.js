@@ -88,21 +88,27 @@ export default function LendingPage() {
           () => oracleContract.getScoreDetails(userAddress),
           { timeout: 30000, retries: 2 }
         );
-        scoreData = { score: Number(details[0]) };
+        // Convert BigInt to Number and ensure it's within valid range (0-1000)
+        const rawScore = Number(details[0]);
+        scoreData = { score: Math.min(Math.max(rawScore, 0), 1000) };
       } catch {
         try {
           const score = await callWithTimeout(
             () => oracleContract.getCreditScore(userAddress),
             { timeout: 30000, retries: 2 }
           );
-          scoreData = { score: Number(score) };
+          // Convert BigInt to Number and ensure it's within valid range (0-1000)
+          const rawScore = Number(score);
+          scoreData = { score: Math.min(Math.max(rawScore, 0), 1000) };
         } catch {
           scoreData = { score: 500 };
         }
       }
 
       if (isMounted) {
-        setCreditScore(scoreData.score);
+        // Final validation: ensure score is a valid number between 0-1000
+        const validScore = Math.min(Math.max(scoreData.score, 0), 1000);
+        setCreditScore(validScore);
       }
     } catch (error) {
       console.error('Error fetching credit score:', error);

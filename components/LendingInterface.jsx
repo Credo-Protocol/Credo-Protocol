@@ -37,27 +37,31 @@ export default function LendingInterface({ userAddress, creditScore, provider, o
   };
 
   return (
-    <div className="space-y-6">
-      {/* Position Overview */}
-      <PositionCard 
-        userAddress={userAddress} 
-        creditScore={creditScore}
-        refresh={refreshKey}
-        provider={provider}
-      />
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Left Side: Position Overview - Always visible */}
+      <div className="lg:sticky lg:top-6 lg:self-start">
+        <PositionCard 
+          userAddress={userAddress} 
+          creditScore={creditScore}
+          refresh={refreshKey}
+          provider={provider}
+        />
+      </div>
 
-      {/* Main Interface with Tabs */}
-      <Tabs defaultValue="supply" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="supply" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Supply
-          </TabsTrigger>
-          <TabsTrigger value="borrow" className="flex items-center gap-2">
-            <TrendingDown className="h-4 w-4" />
-            Borrow
-          </TabsTrigger>
-        </TabsList>
+      {/* Right Side: Supply/Borrow Interface */}
+      <div className="space-y-6">
+        {/* Main Interface with Tabs */}
+        <Tabs defaultValue="supply" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="supply" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Supply
+            </TabsTrigger>
+            <TabsTrigger value="borrow" className="flex items-center gap-2">
+              <TrendingDown className="h-4 w-4" />
+              Borrow
+            </TabsTrigger>
+          </TabsList>
 
         {/* Supply Tab */}
         <TabsContent value="supply" className="space-y-4">
@@ -136,8 +140,9 @@ export default function LendingInterface({ userAddress, creditScore, provider, o
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
-
+        </Tabs>
+      </div>
+      
       {/* Supply Modal */}
       <SupplyModal
         isOpen={supplyModalOpen}

@@ -35,14 +35,17 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
   const [successDetails, setSuccessDetails] = useState({ amount: 0, txHash: '' });
   const inputRef = useRef(null);
 
-  // Calculate collateral factor from credit score
-  const collateralFactor = calculateCollateralFactor(creditScore);
+  // Validate and cap credit score between 0-1000
+  const validCreditScore = Math.min(Math.max(creditScore || 0, 0), 1000);
+
+  // Calculate collateral factor from validated credit score
+  const collateralFactor = calculateCollateralFactor(validCreditScore);
   
-  // Calculate interest rate from credit score
-  const interestRate = calculateInterestRate(creditScore);
+  // Calculate interest rate from validated credit score
+  const interestRate = calculateInterestRate(validCreditScore);
   
   // Get dynamic color for credit score display
-  const scoreColor = getScoreColor(creditScore);
+  const scoreColor = getScoreColor(validCreditScore);
 
   // Fetch max borrowing capacity (recalculate when credit score changes)
   useEffect(() => {
@@ -320,22 +323,22 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Credit Score Info */}
-        <div className="max-w-xl mx-auto p-6 bg-muted rounded-lg space-y-6">
-          <div className="text-center space-y-3">
-            <span className="text-base font-medium block text-black">Your Credit Score</span>
-            <span className={`text-8xl font-bold block ${scoreColor}`}>{creditScore}</span>
+        <div className="max-w-xl mx-auto p-4 bg-muted rounded-lg space-y-4">
+          <div className="text-center space-y-1">
+            <span className="text-sm font-medium block text-black">Your Credit Score</span>
+            <span className={`text-5xl font-bold block ${scoreColor}`}>{validCreditScore}</span>
           </div>
           
           {/* Collateral Factor */}
-          <div className="text-center space-y-3">
-            <span className="text-base font-medium block text-black">Collateral Factor</span>
+          <div className="text-center space-y-1">
+            <span className="text-sm font-medium block text-black">Collateral Factor</span>
             <AuroraText 
-              className={`text-7xl font-bold leading-none ${
-                creditScore >= 900 ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500' : 
-                creditScore >= 800 ? 'bg-gradient-to-r from-green-500 via-lime-500 to-emerald-500' :
-                creditScore >= 700 ? 'bg-gradient-to-r from-lime-500 via-yellow-500 to-green-500' :
-                creditScore >= 600 ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500' :
-                creditScore >= 500 ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
+              className={`text-5xl font-bold leading-none ${
+                validCreditScore >= 900 ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500' : 
+                validCreditScore >= 800 ? 'bg-gradient-to-r from-green-500 via-lime-500 to-emerald-500' :
+                validCreditScore >= 700 ? 'bg-gradient-to-r from-lime-500 via-yellow-500 to-green-500' :
+                validCreditScore >= 600 ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500' :
+                validCreditScore >= 500 ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
                 'bg-gradient-to-r from-red-500 via-rose-500 to-pink-500'
               }`}
             >
@@ -345,7 +348,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
           
           {/* Interest Rate Pill */}
           <div className="flex justify-center">
-            <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-black border border-black">
+            <div className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-black border border-black">
               Current Interest Rate: {interestRate}% APR
             </div>
           </div>
