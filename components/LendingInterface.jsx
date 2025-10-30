@@ -20,15 +20,20 @@ import SupplyModal from '@/components/SupplyModal';
 import RepayModal from '@/components/RepayModal';
 import { TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 
-export default function LendingInterface({ userAddress, creditScore, provider }) {
+export default function LendingInterface({ userAddress, creditScore, provider, onPoolRefresh }) {
   const [supplyModalOpen, setSupplyModalOpen] = useState(false);
   const [repayModalOpen, setRepayModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Refresh position data when transactions complete
+  // Refresh position data and pool stats when transactions complete
   const handleTransactionSuccess = () => {
-    console.log('Transaction successful, refreshing position...');
+    console.log('Transaction successful, refreshing position and pool...');
     setRefreshKey(prev => prev + 1);
+    
+    // Refresh pool liquidity stats on parent page
+    if (onPoolRefresh) {
+      onPoolRefresh();
+    }
   };
 
   return (

@@ -14,10 +14,11 @@ import AppNav from '@/components/layout/AppNav';
 import LendingInterface from '@/components/LendingInterface';
 import ConnectButton from '@/components/auth/ConnectButton';
 import { useAirKit } from '@/hooks/useAirKit';
-import { CONTRACTS, CREDIT_ORACLE_ABI } from '@/lib/contracts';
+import { CONTRACTS, CREDIT_ORACLE_ABI, LENDING_POOL_ABI } from '@/lib/contracts';
 import { getBestProvider, callWithTimeout, getPublicProvider } from '@/lib/rpcProvider';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
+import { Card } from '@/components/ui/card';
 
 export default function LendingPage() {
   const router = useRouter();
@@ -32,6 +33,14 @@ export default function LendingPage() {
   const [creditScore, setCreditScore] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(true);
+  
+  // Pool liquidity stats
+  const [poolStats, setPoolStats] = useState({
+    totalLiquidity: '0',
+    availableLiquidity: '0',
+    totalBorrowed: '0',
+    utilizationRate: 0
+  });
 
   const handleConnectionChange = useCallback((connectionData) => {
     if (connectionData.connected && refreshUserInfo) {
@@ -50,6 +59,7 @@ export default function LendingPage() {
   useEffect(() => {
     if (userAddress && provider) {
       fetchCreditScore();
+      fetchPoolStats();
     }
   }, [userAddress, provider]);
 
@@ -99,6 +109,54 @@ export default function LendingPage() {
       if (isMounted) setCreditScore(500);
     } finally {
       if (isMounted) setLoading(false);
+    }
+  };
+
+  // Fetch pool liquidity stats from the lending pool
+  const fetchPoolStats = async () => {
+    if (!isMounted) return;
+
+    try {
+      let reliableProvider;
+      try {
+        reliableProvider = await getBestProvider(provider);
+      } catch (providerError) {
+        reliableProvider = getPublicProvider();
+      }
+      
+      const lendingPoolContract = new ethers.Contract(
+        CONTRACTS.LENDING_POOL,
+        LENDING_POOL_ABI,
+        reliableProvider
+      );
+
+      // Fetch USDC asset data from the pool
+      const assetData = await callWithTimeout(
+        () => lendingPoolContract.assets(CONTRACTS.MOCK_USDC),
+        { timeout: 30000, retries: 2 }
+      );
+
+      // Extract totalSupply and totalBorrowed from the assets struct
+      const totalLiquidityBigInt = assetData[0]; // totalSupply
+      const totalBorrowedBigInt = assetData[1];  // totalBorrowed
+      const availableLiquidityBigInt = totalLiquidityBigInt - totalBorrowedBigInt;
+      
+      // Calculate utilization rate (percentage)
+      const utilizationRate = totalLiquidityBigInt > 0n 
+        ? Number((totalBorrowedBigInt * 10000n) / totalLiquidityBigInt) / 100 
+        : 0;
+
+      if (isMounted) {
+        setPoolStats({
+          totalLiquidity: ethers.formatUnits(totalLiquidityBigInt, 6),
+          availableLiquidity: ethers.formatUnits(availableLiquidityBigInt, 6),
+          totalBorrowed: ethers.formatUnits(totalBorrowedBigInt, 6),
+          utilizationRate
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching pool stats:', error);
+      // Keep default values on error
     }
   };
 
@@ -154,11 +212,70 @@ export default function LendingPage() {
           </p>
         </div>
 
+        {/* Pool Liquidity Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          {/* Total Pool Liquidity */}
+          <Card className="p-6 border-black/10 hover:border-black/20 transition-colors">
+            <div className="space-y-2">
+              <p className="text-sm text-black/60 font-medium">Total Pool Size</p>
+              <p className="text-3xl font-bold text-black">
+                {parseFloat(poolStats.totalLiquidity).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}
+              </p>
+              <p className="text-xs text-black/50">USDC</p>
+            </div>
+          </Card>
+
+          {/* Available Liquidity */}
+          <Card className="p-6 border-black/10 hover:border-black/20 transition-colors">
+            <div className="space-y-2">
+              <p className="text-sm text-black/60 font-medium">Available to Borrow</p>
+              <p className="text-3xl font-bold text-black">
+                {parseFloat(poolStats.availableLiquidity).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}
+              </p>
+              <p className="text-xs text-black/50">USDC</p>
+            </div>
+          </Card>
+
+          {/* Total Borrowed */}
+          <Card className="p-6 border-black/10 hover:border-black/20 transition-colors">
+            <div className="space-y-2">
+              <p className="text-sm text-black/60 font-medium">Total Borrowed</p>
+              <p className="text-3xl font-bold text-black">
+                {parseFloat(poolStats.totalBorrowed).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}
+              </p>
+              <p className="text-xs text-black/50">USDC</p>
+            </div>
+          </Card>
+
+          {/* Utilization Rate */}
+          <Card className="p-6 border-black/10 hover:border-black/20 transition-colors">
+            <div className="space-y-2">
+              <p className="text-sm text-black/60 font-medium">Utilization Rate</p>
+              <p className="text-3xl font-bold text-black">
+                {poolStats.utilizationRate.toFixed(2)}%
+              </p>
+              <p className="text-xs text-black/50">
+                {poolStats.utilizationRate < 50 ? 'Low' : poolStats.utilizationRate < 80 ? 'Moderate' : 'High'}
+              </p>
+            </div>
+          </Card>
+        </div>
+
         {/* Lending Interface */}
         <LendingInterface
           userAddress={userAddress}
           creditScore={creditScore}
           provider={provider}
+          onPoolRefresh={fetchPoolStats}
         />
       </main>
     </div>
