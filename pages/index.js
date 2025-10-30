@@ -8,7 +8,7 @@ import { ArrowRight, Shield, TrendingUp, CheckCircle, Lock, BarChart3, Sparkles,
 import { Button } from '@/components/ui/button';
 import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
-import { RetroGrid } from '@/components/ui/retro-grid';
+import { LiquidChrome } from '@/components/ui/liquid-chrome';
 import { MagicCard } from '@/components/ui/magic-card';
 import { NumberTicker } from '@/components/ui/number-ticker';
 import { Marquee } from '@/components/ui/marquee';
@@ -46,11 +46,21 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Retro Grid Background */}
-        <RetroGrid className="opacity-50" />
+      <div 
+        className="relative min-h-screen flex items-center justify-center overflow-hidden group"
+      >
+        {/* Liquid Chrome Background */}
+        <div className="absolute inset-0 opacity-70 pointer-events-none">
+          <LiquidChrome
+            baseColor={[0.85, 0.85, 0.85]}
+            speed={0.3}
+            amplitude={0.6}
+            vibrancy={0.12}
+            interactive={true}
+          />
+        </div>
         
-        <div className="container mx-auto px-4 py-32 relative z-10">
+        <div className="container mx-auto px-4 py-32 relative z-10 pointer-events-auto">
           <div className="max-w-6xl mx-auto text-center space-y-12">
             {/* Badge */}
             <div className="flex justify-center">
