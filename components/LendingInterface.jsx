@@ -62,7 +62,7 @@ export default function LendingInterface({ userAddress, creditScore, provider, o
 
         {/* Supply Tab */}
         <TabsContent value="supply" className="space-y-4">
-          <Card>
+          <Card className="glass-card glass-strong hover-expand">
             <CardHeader>
               <CardTitle>Supply Collateral</CardTitle>
               <CardDescription className="flex items-center gap-1.5">

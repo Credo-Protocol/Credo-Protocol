@@ -309,7 +309,7 @@ export default function BorrowInterface({ userAddress, creditScore, onSuccess, p
 
   return (
     <>
-    <Card>
+    <Card className="glass-card glass-strong hover-expand">
       <CardHeader>
         <CardTitle>Borrow</CardTitle>
         <CardDescription>Borrow against your supplied collateral</CardDescription>

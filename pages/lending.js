@@ -19,6 +19,7 @@ import { CONTRACTS, CREDIT_ORACLE_ABI, LENDING_POOL_ABI } from '@/lib/contracts'
 import { getBestProvider, callWithTimeout, getPublicProvider } from '@/lib/rpcProvider';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
+import Iridescence from '@/components/ui/iridescence';
 import { Card } from '@/components/ui/card';
 import { ExternalLink } from 'lucide-react';
 
@@ -238,10 +239,21 @@ export default function LendingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-white text-black relative overflow-hidden">
+      {/* Iridescence Background */}
+      <div className="fixed inset-0 opacity-16 pointer-events-none">
+        <Iridescence
+          color={[0.9, 0.9, 0.92]}
+          mouseReact={true}
+          amplitude={0.12}
+          speed={0.35}
+          saturation={0.08}
+        />
+      </div>
+
       <AppNav onConnectionChange={handleConnectionChange} />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-black mb-2">Lending Pool</h1>
@@ -263,7 +275,7 @@ export default function LendingPage() {
         </div>
 
         {/* Pool Liquidity Stats - Aave Style */}
-        <Card className="mb-8 border-black/10">
+        <Card className="glass-card glass-strong hover-expand mb-8">
           <div className="p-6">
             {/* Asset Header */}
             <div className="flex items-center justify-between mb-6 pb-6 border-b border-black/10">
