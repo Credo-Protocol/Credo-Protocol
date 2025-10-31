@@ -74,7 +74,7 @@ export function CredentialWallet() {
   // No need for "not connected" state since users can't access this page without being connected
   if (loading || !isConnected || !userAddress) {
     return (
-      <Card>
+      <Card className="glass-card glass-strong hover-expand">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wallet className="h-5 w-5" />
@@ -94,7 +94,7 @@ export function CredentialWallet() {
   }
 
   return (
-    <Card>
+    <Card className="glass-card glass-strong hover-expand">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>

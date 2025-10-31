@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAirKit } from '@/hooks/useAirKit';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
+import Iridescence from '@/components/ui/iridescence';
 import { Lock, Database, Clock } from 'lucide-react';
 
 export default function CredentialsPage() {
@@ -82,10 +83,21 @@ export default function CredentialsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-white text-black relative overflow-hidden">
+      {/* Iridescence Background */}
+      <div className="fixed inset-0 opacity-16 pointer-events-none">
+        <Iridescence
+          color={[0.9, 0.9, 0.92]}
+          mouseReact={true}
+          amplitude={0.12}
+          speed={0.35}
+          saturation={0.08}
+        />
+      </div>
+
       <AppNav onConnectionChange={handleConnectionChange} />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-black mb-2">Credentials</h1>
@@ -116,7 +128,7 @@ export default function CredentialsPage() {
             <CredentialWallet />
             
             {/* Info Section */}
-            <div className="p-6 rounded-lg border border-black/10 bg-neutral-50">
+            <div className="glass-card glass-strong hover-expand p-6 rounded-lg">
               <h3 className="font-semibold text-lg mb-4 text-black">About Credentials</h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">

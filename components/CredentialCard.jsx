@@ -18,10 +18,10 @@ export default function CredentialCard({ credential, onRequest, isLoading, isSub
   const isPhase2Format = credential.category !== undefined;
   
   return (
-    <Card className={`flex flex-col h-full transition-all duration-300 ${
+    <Card className={`glass-card glass-strong hover-expand flex flex-col h-full transition-all duration-300 ${
       isSubmitted 
-        ? 'bg-neutral-50 border-black/10 opacity-75' 
-        : 'border-black/10 bg-white hover:shadow-lg'
+        ? 'opacity-75' 
+        : 'hover:shadow-lg'
     }`}>
       <CardHeader>
         {/* Submitted Badge */}
