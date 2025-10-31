@@ -14,17 +14,18 @@ import {
   getUserInfo,
   getProvider,
   isUserLoggedIn,
-  getSmartAccountAddress
+  getSmartAccountAddress,
+  isInitialized as isAirKitInitialized
 } from '@/lib/airkit';
 
 export function useAirKit() {
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(() => isAirKitInitialized());
+  const [isConnected, setIsConnected] = useState(() => isUserLoggedIn());
   const [userAddress, setUserAddress] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !isAirKitInitialized());
   const [error, setError] = useState(null);
 
   /**
@@ -39,8 +40,19 @@ export function useAirKit() {
    */
   const initialize = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
+
+      // If AIR Kit is already initialized globally, avoid re-initializing
+      if (isAirKitInitialized()) {
+        setIsInitialized(true);
+        setLoading(false);
+        if (isUserLoggedIn()) {
+          await updateUserState();
+        }
+        return;
+      }
+
+      setLoading(true);
 
       // Initialize AIR Kit
       await initializeAirKit({
