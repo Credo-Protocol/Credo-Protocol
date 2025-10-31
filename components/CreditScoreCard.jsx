@@ -20,7 +20,7 @@ export default function CreditScoreCard({ score = 0, credentialCount = 0, lastUp
   // Enhanced loading state with skeleton
   if (loading) {
     return (
-      <Card className="border border-black/10 bg-white">
+      <Card className="glass-card glass-strong hover-expand">
         <CardHeader>
           <CardTitle className="text-xl font-bold text-black flex items-center gap-2">
             <Award className="w-5 h-5" />
@@ -50,7 +50,7 @@ export default function CreditScoreCard({ score = 0, credentialCount = 0, lastUp
   }
 
   return (
-    <Card className="border border-black/10 bg-white hover:shadow-lg transition-all duration-300">
+    <Card className="glass-card glass-strong hover-expand hover:shadow-lg transition-all duration-300">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-black flex items-center gap-2">
           <Award className="w-5 h-5" />

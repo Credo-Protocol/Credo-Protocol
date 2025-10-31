@@ -22,6 +22,7 @@ import { getBestProvider, callWithTimeout, getPublicProvider } from '@/lib/rpcPr
 import { AuroraText } from '@/components/ui/aurora-text';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
+import Iridescence from '@/components/ui/iridescence';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -190,11 +191,22 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-white text-black relative overflow-hidden">
+      {/* Iridescence Background */}
+      <div className="fixed inset-0 opacity-16 pointer-events-none">
+        <Iridescence
+          color={[0.9, 0.9, 0.92]}
+          mouseReact={true}
+          amplitude={0.12}
+          speed={0.35}
+          saturation={0.08}
+        />
+      </div>
+
       <AppNav onConnectionChange={handleConnectionChange} />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         {/* Welcome Section with Reward Banner */}
         <div className="flex items-start justify-between gap-4 mb-8">
           <div>
@@ -220,7 +232,7 @@ export default function Dashboard() {
           </div>
 
           {/* Collateral Factor Card */}
-          <Card className="hover:shadow-lg transition-shadow flex flex-col">
+          <Card className="glass-card glass-strong hover-expand hover:shadow-lg transition-shadow flex flex-col">
             <CardContent className="flex-1 flex flex-col items-center justify-center py-12 px-6 text-center">
               <p className="text-sm text-black/60 mb-6">Your Collateral Factor</p>
               <AuroraText 
@@ -247,7 +259,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Login Method Card */}
-          <Card className="hover:shadow-lg transition-shadow flex flex-col">
+          <Card className="glass-card glass-strong hover-expand hover:shadow-lg transition-shadow flex flex-col">
             <CardContent className="flex-1 flex flex-col items-center justify-center py-12 px-6 text-center">
               <p className="text-sm text-black/60 mb-6">Login Method</p>
               <h3 className="text-6xl font-bold text-black mb-6 leading-tight">
@@ -305,7 +317,7 @@ export default function Dashboard() {
 function QuickLinkCard({ href, icon, title, description, gradient }) {
   return (
     <Link href={href}>
-      <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-black/20 h-full">
+      <Card className="glass-card glass-strong hover-expand group hover:shadow-xl transition-all duration-300 cursor-pointer h-full">
         <CardContent className="p-6">
           <div className="w-16 h-16 rounded-xl bg-black flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
             {icon}
