@@ -15,7 +15,7 @@ import Image from 'next/image';
 import AppNav from '@/components/layout/AppNav';
 import ConnectButton from '@/components/auth/ConnectButton';
 import { Button } from '@/components/ui/button';
-import { Loader2, Droplets, CheckCircle2, Info, ArrowRight } from 'lucide-react';
+import { Loader2, Droplets, CheckCircle2, Info, ArrowRight, ExternalLink } from 'lucide-react';
 import { CONTRACTS, ERC20_ABI, MOCA_CHAIN } from '@/lib/contracts';
 import { useAirKit } from '@/hooks/useAirKit';
 import { handleTransactionError } from '@/lib/errorHandler';
@@ -231,9 +231,11 @@ export default function Faucet() {
                           href={`${MOCA_CHAIN.blockExplorers.default.url}/address/${CONTRACTS.MOCK_USDC}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs px-2 py-1 rounded-md bg-black text-white hover:bg-black/90"
+                          className="text-black hover:text-black/70 transition-colors"
+                          aria-label="Open in Explorer"
+                          title="Open in Explorer"
                         >
-                          Explorer
+                          <ExternalLink className="h-4 w-4" />
                         </a>
                       </div>
                     </div>
