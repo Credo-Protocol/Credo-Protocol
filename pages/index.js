@@ -133,7 +133,7 @@ export default function Home() {
                 description="Transparent on-chain scoring"
               />
               <StatCard
-                value={3}
+                value={10}
                 label="Credential Types"
                 description="Build your reputation"
               />
@@ -281,32 +281,32 @@ export default function Home() {
               <FeatureCard
                 icon={<TrendingUp className="w-10 h-10" />}
                 title="Score Builder Wizard"
-                description="Interactive simulation tool. Preview score changes before submitting credentials. See exactly what unlocks your next tier with real-time progress tracking."
+                description="Simulate score changes before submitting. See what unlocks next tier in real-time."
               />
               <FeatureCard
                 icon={<Lock className="w-10 h-10" />}
                 title="Privacy-Preserving Buckets"
-                description="Prove income ($3k-$8k+) or balance ($1k-$10k+) ranges without revealing exact amounts. Only brackets disclosed, never specific numbers."
+                description="Prove income/balance ranges without exact amounts. Only brackets disclosed."
               />
               <FeatureCard
                 icon={<Shield className="w-10 h-10" />}
                 title="Official AIR Kit Integration"
-                description="W3C verifiable credentials from registered Issuer DIDs. Stored on MCSP decentralized storage. Discoverable across the MOCA ecosystem."
+                description="W3C credentials with registered DIDs. MCSP storage. MOCA ecosystem discoverable."
               />
               <FeatureCard
                 icon={<BarChart3 className="w-10 h-10" />}
                 title="Time-Based Interest"
-                description="Borrow with 5-18% APR based on credit tier. Watch interest accrue every 5 seconds. Transparent breakdown of principal + interest."
+                description="5-18% APR by tier. Interest accrues every 5 seconds with full transparency."
               />
               <FeatureCard
                 icon={<Sparkles className="w-10 h-10" />}
                 title="Live Leaderboard"
-                description="Track top credit scores across the network. See how you rank against other users. Trophy rewards for top 3 positions."
+                description="Track top scores and rankings. Trophy rewards for top 3."
               />
               <FeatureCard
                 icon={<Zap className="w-10 h-10" />}
                 title="Composable Credit API"
-                description="Public REST endpoint for any dApp to query credit scores. CORS enabled. Use Credo scores in GameFi, DAOs, NFTs, and more."
+                description="Public API for dApps to query scores. Use in GameFi, DAOs, NFTs."
               />
             </motion.div>
           </div>
