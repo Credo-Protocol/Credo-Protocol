@@ -29,16 +29,20 @@ import {
   loginWithAirKit,
   logout,
   getUserInfo,
-  isUserLoggedIn
+  isUserLoggedIn,
+  isInitialized as isAirKitInitialized,
+  getCachedUserInfo
 } from '@/lib/airkit';
 import { CONTRACTS, ERC20_ABI } from '@/lib/contracts';
 import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 
 export default function ConnectButton({ onConnectionChange, size = 'default', variant = 'default' }) {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userInfo, setUserInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const cachedInfo = getCachedUserInfo();
+  const initialLoggedIn = isUserLoggedIn();
+  const [isLoggedIn, setIsLoggedIn] = useState(initialLoggedIn);
+  const [userInfo, setUserInfo] = useState(cachedInfo);
+  const [loading, setLoading] = useState(() => !isAirKitInitialized() || (initialLoggedIn && !cachedInfo));
   const [loggingIn, setLoggingIn] = useState(false);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -59,18 +63,20 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
    */
   async function initAirKit() {
     try {
-      setLoading(true);
       setError(null);
 
-      // Initialize AIR Kit
-      await initializeAirKit({
-        skipRehydration: false, // Enable automatic re-login (30-day sessions)
-        enableLogging: true, // Enable for development
-      });
+      // Skip re-initialization if already initialized
+      if (!isAirKitInitialized()) {
+        setLoading(true);
+        await initializeAirKit({
+          skipRehydration: false, // Enable automatic re-login (30-day sessions)
+          enableLogging: true, // Enable for development
+        });
+      }
 
       // Check if user is already logged in (session rehydration)
       if (isUserLoggedIn()) {
-        const info = await getUserInfo();
+        const info = getCachedUserInfo() || await getUserInfo();
         setUserInfo(info);
         setIsLoggedIn(true);
 
@@ -303,12 +309,12 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
     }
   }
 
-  // Loading state
-  if (loading) {
+  // Loading or resolving session state
+  if (loading || (isLoggedIn && !userInfo)) {
     return (
       <Button disabled className="h-[44px] px-4">
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        <span className="text-sm">Initializing...</span>
+        <span className="text-sm">Restoring session...</span>
       </Button>
     );
   }
