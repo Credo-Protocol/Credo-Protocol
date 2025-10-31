@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
 import Link from 'next/link';
+import Image from 'next/image';
 import AppNav from '@/components/layout/AppNav';
 import ConnectButton from '@/components/auth/ConnectButton';
 import { Button } from '@/components/ui/button';
@@ -191,198 +192,216 @@ export default function Faucet() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 relative z-10">
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-7xl mx-auto space-y-8">
           {/* Page Heading */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-black">MockUSDC Faucet</h1>
+            <h1 className="text-4xl font-bold text-black">MockUSDC Faucet</h1>
             <p className="text-black/60 mt-2">Get test tokens for Moca Chain Devnet</p>
           </div>
-          {/* Balance Card */}
-          <div className="glass-card glass-strong hover-expand p-8 rounded-2xl">
-            <p className="text-sm text-black/60 mb-6">Your Balance</p>
-            <div className="text-center py-8">
-              <p className="text-6xl font-bold mb-2 text-black">{balance.toLocaleString()}</p>
-              <p className="text-xl text-black/60">USDC</p>
-            </div>
-            <p className="text-xs text-black/50 text-center mt-4">
-              Current MockUSDC balance on Moca Chain Devnet
-            </p>
-          </div>
 
-          {/* Faucet Card */}
-          <div className="glass-card glass-strong hover-expand p-8 rounded-2xl space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-black flex items-center gap-2 mb-2">
-                <Droplets className="h-5 w-5" />
-                Request Test Tokens
-              </h2>
-              <p className="text-sm text-black/60">
-                Get 10,000 MockUSDC tokens to test the lending protocol
-              </p>
-            </div>
-
-            {/* Info Box */}
-            <div className="p-6 rounded-xl border border-black/10 bg-neutral-50">
-              <div className="flex items-start gap-3">
-                <Info className="h-5 w-5 text-black/60 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-black mb-3">How it works</h3>
-                  <ul className="space-y-2.5 text-sm text-black/70">
-                    <li className="flex items-start gap-2.5">
-                      <span className="text-black/40 font-bold">•</span>
-                      <span>Click the button below to request tokens</span>
-                    </li>
-                    <li className="flex items-start gap-2.5">
-                      <span className="text-black/40 font-bold">•</span>
-                      <span>Approve the transaction in your wallet</span>
-                    </li>
-                    <li className="flex items-start gap-2.5">
-                      <span className="text-black/40 font-bold">•</span>
-                      <span>Receive 10,000 USDC instantly (max per transaction)</span>
-                    </li>
-                    <li className="flex items-start gap-2.5">
-                      <span className="text-black/40 font-bold">•</span>
-                      <span>You can request multiple times if needed</span>
-                    </li>
-                  </ul>
+          {/* Main grid: Left column (Balance + Contract), Right column (Request + Next Steps) */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            {/* Left Column */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Balance Card */}
+              <div className="glass-card glass-strong hover-expand p-8 rounded-2xl">
+                <div className="flex items-center gap-2 mb-6">
+                  <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={20} height={20} className="rounded-full" />
+                  <p className="text-sm text-black/60">Your Balance</p>
                 </div>
-              </div>
-            </div>
+                <div className="text-center py-8">
+                  <p className="text-6xl font-bold mb-2 text-black">{balance.toLocaleString()}</p>
+                  <p className="text-xl text-black/60">USDC</p>
+                </div>
+                <p className="text-xs text-black/50 text-center mt-4">
+                  Current MockUSDC balance on Moca Chain Devnet
+                </p>
 
-            {/* Success Message */}
-            {success && (
-              <div className="p-4 rounded-xl border border-green-500/20 bg-green-50">
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-green-900 mb-1">Success!</h3>
-                    <p className="text-sm text-green-700">
-                      You received 10,000 USDC. Your balance has been updated.
-                      {txHash && (
+                {/* Inline Contract Information */}
+                <div className="mt-8 pt-6 border-t border-black/10">
+                  <h2 className="text-sm font-semibold text-black mb-4">Contract Information</h2>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-black/5">
+                      <span className="text-sm text-black/60">MockUSDC Contract</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-mono text-black">
+                          {CONTRACTS.MOCK_USDC.slice(0, 10)}...{CONTRACTS.MOCK_USDC.slice(-8)}
+                        </span>
                         <a
-                          href={`${MOCA_CHAIN.blockExplorers.default.url}/tx/${txHash}`}
+                          href={`${MOCA_CHAIN.blockExplorers.default.url}/address/${CONTRACTS.MOCK_USDC}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="block mt-2 text-green-900 font-medium hover:underline"
+                          className="text-xs px-2 py-1 rounded-md bg-black text-white hover:bg-black/90"
                         >
-                          View transaction on explorer →
+                          Explorer
                         </a>
-                      )}
-                    </p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-black/5">
+                      <span className="text-sm text-black/60">Network</span>
+                      <span className="text-sm font-semibold text-black">{MOCA_CHAIN.name}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-black/5">
+                      <span className="text-sm text-black/60">Chain ID</span>
+                      <span className="text-sm font-semibold text-black">{MOCA_CHAIN.id}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-sm text-black/60">Token Decimals</span>
+                      <span className="text-sm font-semibold text-black">6</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="p-4 rounded-xl border border-red-500/20 bg-red-50">
-                <p className="text-sm text-red-900">{error}</p>
-              </div>
-            )}
+            {/* Right Column */}
+            <div className="lg:col-span-3 space-y-6">
+              {/* Faucet Card */}
+              <div className="glass-card glass-strong hover-expand p-8 rounded-2xl space-y-6">
+                <div>
+                  <h2 className="text-xl font-bold text-black flex items-center gap-2 mb-2">
+                    <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={20} height={20} className="rounded-full" />
+                    Request Test Tokens
+                  </h2>
+                  <p className="text-sm text-black/60">
+                    Get 10,000 MockUSDC tokens to test the lending protocol
+                  </p>
+                </div>
 
-            {/* Faucet Button */}
-            <Button 
-              size="lg" 
-              className="w-full h-14 text-lg bg-black text-white hover:bg-black/90 transition-all duration-300 hover:scale-[1.02]"
-              onClick={handleFaucet}
-              disabled={requesting}
-            >
-              {requesting ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Requesting Tokens...
-                </>
-              ) : (
-                <>
-                  <Droplets className="mr-2 h-5 w-5" />
-                  Request 10,000 USDC
-                </>
-              )}
-            </Button>
-          </div>
+                {/* Info Box */}
+                <div className="p-6 rounded-xl border border-black/10 bg-neutral-50">
+                  <div className="flex items-start gap-3">
+                    <Info className="h-5 w-5 text-black/60 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-black mb-3">How it works</h3>
+                      <ul className="space-y-2.5 text-sm text-black/70">
+                        <li className="flex items-start gap-2.5">
+                          <span className="text-black/40 font-bold">•</span>
+                          <span>Click the button below to request tokens</span>
+                        </li>
+                        <li className="flex items-start gap-2.5">
+                          <span className="text-black/40 font-bold">•</span>
+                          <span>Approve the transaction in your wallet</span>
+                        </li>
+                        <li className="flex items-start gap-2.5">
+                          <span className="text-black/40 font-bold">•</span>
+                          <span>Receive 10,000 USDC instantly (max per transaction)</span>
+                        </li>
+                        <li className="flex items-start gap-2.5">
+                          <span className="text-black/40 font-bold">•</span>
+                          <span>You can request multiple times if needed</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
 
-          {/* Contract Info */}
-          <div className="glass-card glass-strong hover-expand p-6 rounded-2xl">
-            <h2 className="text-lg font-bold text-black mb-6">Contract Information</h2>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center py-2 border-b border-black/5">
-                <span className="text-sm text-black/60">MockUSDC Contract</span>
-                <a
-                  href={`${MOCA_CHAIN.blockExplorers.default.url}/address/${CONTRACTS.MOCK_USDC}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-mono text-black hover:underline"
+                {/* Success Message */}
+                {success && (
+                  <div className="p-4 rounded-xl border border-green-500/20 bg-green-50">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-green-900 mb-1">Success!</h3>
+                        <p className="text-sm text-green-700">
+                          You received 10,000 USDC. Your balance has been updated.
+                          {txHash && (
+                            <a
+                              href={`${MOCA_CHAIN.blockExplorers.default.url}/tx/${txHash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block mt-2 text-green-900 font-medium hover:underline"
+                            >
+                              View transaction on explorer →
+                            </a>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {error && (
+                  <div className="p-4 rounded-xl border border-red-500/20 bg-red-50">
+                    <p className="text-sm text-red-900">{error}</p>
+                  </div>
+                )}
+
+                {/* Faucet Button */}
+                <Button 
+                  size="lg" 
+                  className="w-full h-14 text-lg bg-black text-white hover:bg-black/90 transition-all duration-300 hover:scale-[1.02]"
+                  onClick={handleFaucet}
+                  disabled={requesting}
                 >
-                  {CONTRACTS.MOCK_USDC.slice(0, 10)}...{CONTRACTS.MOCK_USDC.slice(-8)}
-                </a>
+                  {requesting ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Requesting Tokens...
+                    </>
+                  ) : (
+                    <>
+                      <Droplets className="mr-2 h-5 w-5" />
+                      Request 10,000 USDC
+                    </>
+                  )}
+                </Button>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-black/5">
-                <span className="text-sm text-black/60">Network</span>
-                <span className="text-sm font-semibold text-black">{MOCA_CHAIN.name}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-black/5">
-                <span className="text-sm text-black/60">Chain ID</span>
-                <span className="text-sm font-semibold text-black">{MOCA_CHAIN.id}</span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="text-sm text-black/60">Token Decimals</span>
-                <span className="text-sm font-semibold text-black">6</span>
+
+              {/* Next Steps */}
+              <div className="glass-card glass-strong hover-expand p-8 rounded-2xl">
+                <h2 className="text-lg font-bold text-black mb-4">Next Steps</h2>
+                <p className="text-sm text-black/60 mb-6">
+                  After getting test USDC, you can:
+                </p>
+                <ul className="space-y-6 mb-6">
+                  <li className="flex items-start gap-4">
+                    <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">
+                      1
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-black mb-1">Go to Lending Pool</p>
+                      <p className="text-sm text-black/60">
+                        Supply USDC as collateral
+                      </p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-4">
+                    <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">
+                      2
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-black mb-1">Build Credit Score</p>
+                      <p className="text-sm text-black/60">
+                        Submit credentials to increase your score
+                      </p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-4">
+                    <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">
+                      3
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-black mb-1">Borrow with Better Terms</p>
+                      <p className="text-sm text-black/60">
+                        Higher credit score = lower collateral requirements
+                      </p>
+                    </div>
+                  </li>
+                </ul>
+                <Link href="/dashboard">
+                  <Button 
+                    className="w-full h-12 bg-black text-white hover:bg-black/90 transition-all duration-300 hover:scale-[1.02]"
+                  >
+                    <span className="flex items-center gap-2">
+                      Go to Dashboard
+                      <ArrowRight className="h-4 w-4" />
+                    </span>
+                  </Button>
+                </Link>
               </div>
             </div>
-          </div>
-
-          {/* Next Steps */}
-          <div className="glass-card glass-strong hover-expand p-8 rounded-2xl">
-            <h2 className="text-lg font-bold text-black mb-4">Next Steps</h2>
-            <p className="text-sm text-black/60 mb-6">
-              After getting test USDC, you can:
-            </p>
-            <ul className="space-y-6 mb-6">
-              <li className="flex items-start gap-4">
-                <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">
-                  1
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-black mb-1">Go to Lending Pool</p>
-                  <p className="text-sm text-black/60">
-                    Supply USDC as collateral
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start gap-4">
-                <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">
-                  2
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-black mb-1">Build Credit Score</p>
-                  <p className="text-sm text-black/60">
-                    Submit credentials to increase your score
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start gap-4">
-                <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">
-                  3
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-black mb-1">Borrow with Better Terms</p>
-                  <p className="text-sm text-black/60">
-                    Higher credit score = lower collateral requirements
-                  </p>
-                </div>
-              </li>
-            </ul>
-            <Link href="/dashboard">
-              <Button 
-                className="w-full h-12 bg-black text-white hover:bg-black/90 transition-all duration-300 hover:scale-[1.02]"
-              >
-                <span className="flex items-center gap-2">
-                  Go to Dashboard
-                  <ArrowRight className="h-4 w-4" />
-                </span>
-              </Button>
-            </Link>
           </div>
         </div>
       </main>
