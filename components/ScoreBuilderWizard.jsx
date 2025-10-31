@@ -159,7 +159,7 @@ export default function ScoreBuilderWizard({
             {/* Current vs Simulated Score */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Current Score */}
-                <Card className="p-8 border border-black/10 bg-white hover:shadow-lg transition-all duration-300">
+                <Card className="glass-card glass-strong hover-expand p-8">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
                             <Lock className="w-5 h-5 text-black/40" />
@@ -183,30 +183,34 @@ export default function ScoreBuilderWizard({
                 </Card>
                 
                 {/* Simulated Score */}
-                <Card className="p-8 border-2 border-black bg-neutral-50 hover:shadow-lg transition-all duration-300">
+                <Card className="glass-card glass-strong hover-expand glass-card--black-border p-8 bg-neutral-50">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
                             <Unlock className="w-5 h-5 text-black" />
                             <span className="text-sm font-medium text-black">Simulated Score</span>
                         </div>
                         {simulatedScore > currentScore && (
-                            <Badge className="bg-black text-white">
+                            <Badge className="bg-green-600 text-white">
                                 +{simulatedScore - currentScore} pts
                             </Badge>
                         )}
                     </div>
-                    <p className="text-6xl font-bold mb-4 text-black">{simulatedScore}</p>
+                    <p className={`text-6xl font-bold mb-4 ${simulatedScore > currentScore ? 'text-green-600' : 'text-black'}`}>{simulatedScore}</p>
                     <Badge className="bg-black/10 text-black border-black/20">
                         {getCurrentTier(simulatedScore).name}
                     </Badge>
                     <div className="mt-6 space-y-3 text-sm text-black/60">
                         <div className="flex justify-between items-center py-2 border-b border-black/10">
                             <span>Collateral Required:</span>
-                            <span className="font-semibold text-black">{getCurrentTier(simulatedScore).collateral}</span>
+                            <span className={`font-semibold ${simulatedScore > currentScore ? 'text-green-600' : 'text-black'}`}>
+                                {getCurrentTier(simulatedScore).collateral}
+                            </span>
                         </div>
                         <div className="flex justify-between items-center py-2">
                             <span>Borrow APR:</span>
-                            <span className="font-semibold text-black">{getCurrentTier(simulatedScore).apr}</span>
+                            <span className={`font-semibold ${simulatedScore > currentScore ? 'text-green-600' : 'text-black'}`}>
+                                {getCurrentTier(simulatedScore).apr}
+                            </span>
                         </div>
                     </div>
                 </Card>
@@ -214,7 +218,7 @@ export default function ScoreBuilderWizard({
             
             {/* Progress to Next Tier */}
             {nextTier && (
-                <Card className="p-8 border border-black/10 bg-white hover:shadow-lg transition-all duration-300">
+                <Card className="glass-card glass-strong hover-expand p-8">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="font-semibold text-xl flex items-center gap-2 text-black">
                             <TrendingUp className="w-6 h-6" />
@@ -232,12 +236,12 @@ export default function ScoreBuilderWizard({
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-black/70">
                         <div className="flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5 text-black flex-shrink-0" />
-                            <span>Better collateral: <strong className="text-black">{nextTier.collateral}</strong> vs {currentTier.collateral}</span>
+                            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                            <span>Better collateral: <strong className="text-green-600">{nextTier.collateral}</strong> vs {currentTier.collateral}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5 text-black flex-shrink-0" />
-                            <span>Lower APR: <strong className="text-black">{nextTier.apr}</strong> vs {currentTier.apr}</span>
+                            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                            <span>Lower APR: <strong className="text-green-600">{nextTier.apr}</strong> vs {currentTier.apr}</span>
                         </div>
                     </div>
                     
@@ -253,7 +257,7 @@ export default function ScoreBuilderWizard({
             )}
             
             {/* Credential Selector */}
-            <Card className="p-8 border border-black/10 bg-white hover:shadow-lg transition-all duration-300">
+            <Card className="glass-card glass-strong hover-expand p-8">
                 <h3 className="font-semibold text-2xl mb-6 text-black">Select Credentials to Request</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {availableCredentials.map(cred => {
@@ -309,7 +313,7 @@ export default function ScoreBuilderWizard({
             
             {/* Action Buttons */}
             {selectedCredentials.length > 0 && (
-                <Card className="p-6 bg-neutral-50 border-2 border-black">
+                <Card className="glass-card glass-strong hover-expand glass-card--black-border p-6 bg-neutral-50">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
                             <p className="font-semibold text-black text-lg">

@@ -153,7 +153,7 @@ export default function Leaderboard() {
     };
     
     return (
-        <Card className="p-8 border border-black/10 bg-white hover:shadow-lg transition-all duration-300">
+        <Card className="glass-card glass-strong hover-expand p-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>
