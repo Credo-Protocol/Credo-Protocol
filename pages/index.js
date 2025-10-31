@@ -66,7 +66,7 @@ export default function Home() {
           <div className="max-w-6xl mx-auto text-center space-y-12">
             {/* Badge */}
             <div className="flex justify-center">
-              <div className="glass-badge inline-flex items-center gap-2 px-4 py-2">
+              <div className="glass-badge glass-badge--strong inline-flex items-center gap-2 px-4 py-2">
                 <img src="/moca.jpg" alt="Moca Chain" className="w-4 h-4 rounded-sm object-cover" />
                 <span className="text-sm font-medium">Built on Moca Chain</span>
               </div>
@@ -554,7 +554,7 @@ export default function Home() {
 // Component: Stat Card with Number Ticker
 function StatCard({ value, suffix = "", label, description }) {
   return (
-    <MagicCard className="glass-card p-8 text-center space-y-3" gradientColor="#000000" gradientOpacity={0.02}>
+    <MagicCard className="glass-card glass-strong p-8 text-center space-y-3" gradientColor="#000000" gradientOpacity={0.02}>
       <div className="text-6xl font-bold flex items-center justify-center gap-1">
         <NumberTicker value={value} />
         {suffix && <span>{suffix}</span>}

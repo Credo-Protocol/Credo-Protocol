@@ -286,6 +286,15 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Stronger opacity variants (apply selectively) */
+.glass-strong {
+  background: rgba(255, 255, 255, 0.6) !important;
+}
+
+.glass-badge--strong {
+  background: rgba(255, 255, 255, 0.6);
+}
+
 .glass-card::after {
   content: '';
   position: absolute;
