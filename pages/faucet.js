@@ -21,6 +21,7 @@ import { handleTransactionError } from '@/lib/errorHandler';
 import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
+import Iridescence from '@/components/ui/iridescence';
 
 export default function Faucet() {
   const router = useRouter();
@@ -174,11 +175,22 @@ export default function Faucet() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-white text-black relative overflow-hidden">
+      {/* Iridescence Background */}
+      <div className="fixed inset-0 opacity-16 pointer-events-none">
+        <Iridescence
+          color={[0.9, 0.9, 0.92]}
+          mouseReact={true}
+          amplitude={0.12}
+          speed={0.35}
+          saturation={0.08}
+        />
+      </div>
+
       <AppNav onConnectionChange={handleConnectionChange} />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-2xl mx-auto space-y-6">
           {/* Page Heading */}
           <div className="mb-8">
@@ -186,7 +198,7 @@ export default function Faucet() {
             <p className="text-black/60 mt-2">Get test tokens for Moca Chain Devnet</p>
           </div>
           {/* Balance Card */}
-          <div className="p-8 border border-black/10 rounded-2xl bg-white hover:shadow-lg transition-all duration-300">
+          <div className="glass-card glass-strong hover-expand p-8 rounded-2xl">
             <p className="text-sm text-black/60 mb-6">Your Balance</p>
             <div className="text-center py-8">
               <p className="text-6xl font-bold mb-2 text-black">{balance.toLocaleString()}</p>
@@ -198,7 +210,7 @@ export default function Faucet() {
           </div>
 
           {/* Faucet Card */}
-          <div className="p-8 border border-black/10 rounded-2xl bg-white hover:shadow-lg transition-all duration-300 space-y-6">
+          <div className="glass-card glass-strong hover-expand p-8 rounded-2xl space-y-6">
             <div>
               <h2 className="text-xl font-bold text-black flex items-center gap-2 mb-2">
                 <Droplets className="h-5 w-5" />
@@ -291,7 +303,7 @@ export default function Faucet() {
           </div>
 
           {/* Contract Info */}
-          <div className="p-6 border border-black/10 rounded-2xl bg-white hover:shadow-lg transition-all duration-300">
+          <div className="glass-card glass-strong hover-expand p-6 rounded-2xl">
             <h2 className="text-lg font-bold text-black mb-6">Contract Information</h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-black/5">
@@ -321,7 +333,7 @@ export default function Faucet() {
           </div>
 
           {/* Next Steps */}
-          <div className="p-8 border border-black/10 rounded-2xl bg-white hover:shadow-lg transition-all duration-300">
+          <div className="glass-card glass-strong hover-expand p-8 rounded-2xl">
             <h2 className="text-lg font-bold text-black mb-4">Next Steps</h2>
             <p className="text-sm text-black/60 mb-6">
               After getting test USDC, you can:
