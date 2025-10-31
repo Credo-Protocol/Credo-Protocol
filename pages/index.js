@@ -66,7 +66,7 @@ export default function Home() {
           <div className="max-w-6xl mx-auto text-center space-y-12">
             {/* Badge */}
             <div className="flex justify-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 backdrop-blur-sm">
+              <div className="glass-badge inline-flex items-center gap-2 px-4 py-2">
                 <img src="/moca.jpg" alt="Moca Chain" className="w-4 h-4 rounded-sm object-cover" />
                 <span className="text-sm font-medium">Built on Moca Chain</span>
               </div>
@@ -334,8 +334,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative p-12 rounded-3xl border-2 border-black/10 bg-neutral-50/50 backdrop-blur-sm hover:bg-neutral-100/50 transition-all duration-300">
+              <div className="glass-card relative p-12 transition-all duration-300">
                 <h3 className="text-3xl font-bold mb-10 text-black/40 group-hover:text-black/50 transition-colors">
                   Traditional DeFi
                 </h3>
@@ -386,7 +385,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="relative p-12 rounded-3xl border-2 border-black bg-white shadow-2xl overflow-hidden">
+              <div className="glass-card glass-card--black-border relative p-12 overflow-hidden">
                 {/* Border Beam Animation */}
                 <BorderBeam size={250} duration={10} borderWidth={2} />
                 
@@ -436,9 +435,9 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <MagicCard 
-              className="rounded-3xl border border-black/10 p-16 text-center"
+              className="glass-card p-16 text-center"
               gradientColor="#000000" 
-              gradientOpacity={0.06}
+              gradientOpacity={0.02}
             >
               <motion.h2 
                 className="text-5xl md:text-6xl font-bold mb-6"
@@ -555,7 +554,7 @@ export default function Home() {
 // Component: Stat Card with Number Ticker
 function StatCard({ value, suffix = "", label, description }) {
   return (
-    <MagicCard className="p-8 text-center space-y-3 border border-black/10" gradientColor="#000000" gradientOpacity={0.05}>
+    <MagicCard className="glass-card p-8 text-center space-y-3" gradientColor="#000000" gradientOpacity={0.02}>
       <div className="text-6xl font-bold flex items-center justify-center gap-1">
         <NumberTicker value={value} />
         {suffix && <span>{suffix}</span>}
@@ -612,7 +611,7 @@ function StepCard({ number, icon, title, description }) {
 function FeatureCard({ icon, title, description }) {
   return (
     <motion.div 
-      className="group relative p-10 rounded-2xl bg-white border border-black/5 hover:border-black/10 transition-all duration-300 hover:shadow-lg"
+      className="glass-card group relative p-10 transition-all duration-300"
       variants={{
         hidden: { opacity: 0, y: 50 },
         visible: { 

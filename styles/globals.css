@@ -245,7 +245,7 @@ body {
 /* Glassmorphism card used in "How It Works" section */
 .glass-card {
   /* Force over Tailwind bg utilities from MagicCard */
-  background: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
   background-clip: padding-box;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
@@ -275,6 +275,17 @@ body {
   );
 }
 
+/* Small pill-style glass badge (no decorative edge lines) */
+.glass-badge {
+  background: rgba(255, 255, 255, 0.12);
+  background-clip: padding-box;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
 .glass-card::after {
   content: '';
   position: absolute;
@@ -288,6 +299,11 @@ body {
     transparent,
     rgba(255, 255, 255, 0.2)
   );
+}
+
+/* Optional modifier to enforce a solid black border on specific glass cards */
+.glass-card--black-border {
+  border: 2px solid #000 !important;
 }
 
 /* Retro grid animation */
