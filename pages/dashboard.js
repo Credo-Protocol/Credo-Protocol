@@ -23,6 +23,7 @@ import { AuroraText } from '@/components/ui/aurora-text';
 import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
 import Iridescence from '@/components/ui/iridescence';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -227,7 +228,7 @@ export default function Dashboard() {
               score={creditScore}
               credentialCount={scoreDetails?.credentialCount || 0}
               lastUpdated={scoreDetails?.lastUpdated || 0}
-              loading={loading}
+              loading={loading || !scoreDetails}
             />
           </div>
 
@@ -235,26 +236,35 @@ export default function Dashboard() {
           <Card className="glass-card glass-strong hover-expand hover:shadow-lg transition-shadow flex flex-col">
             <CardContent className="flex-1 flex flex-col items-center justify-center py-12 px-6 text-center">
               <p className="text-sm text-black/60 mb-6">Your Collateral Factor</p>
-              <AuroraText 
-                className={`text-8xl font-bold mb-6 leading-none ${
-                  creditScore >= 900 ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500' : 
-                  creditScore >= 800 ? 'bg-gradient-to-r from-green-500 via-lime-500 to-emerald-500' :
-                  creditScore >= 700 ? 'bg-gradient-to-r from-lime-500 via-yellow-500 to-green-500' :
-                  creditScore >= 600 ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500' :
-                  creditScore >= 500 ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
-                  'bg-gradient-to-r from-red-500 via-rose-500 to-pink-500'
-                }`}
-              >
-                {creditScore >= 900 ? '50%' : 
-                 creditScore >= 800 ? '60%' :
-                 creditScore >= 700 ? '75%' :
-                 creditScore >= 600 ? '90%' :
-                 creditScore >= 500 ? '100%' :
-                 creditScore >= 400 ? '110%' : '125%'}
-              </AuroraText>
-              <p className="text-sm text-black/70 font-medium">
-                Required collateral for borrowing
-              </p>
+              {loading || !scoreDetails ? (
+                <div className="flex flex-col items-center justify-center w-full">
+                  <Skeleton className="h-24 w-40 rounded-lg mb-6" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+              ) : (
+                <>
+                  <AuroraText 
+                    className={`text-8xl font-bold mb-6 leading-none ${
+                      creditScore >= 900 ? 'bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500' : 
+                      creditScore >= 800 ? 'bg-gradient-to-r from-green-500 via-lime-500 to-emerald-500' :
+                      creditScore >= 700 ? 'bg-gradient-to-r from-lime-500 via-yellow-500 to-green-500' :
+                      creditScore >= 600 ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500' :
+                      creditScore >= 500 ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500' :
+                      'bg-gradient-to-r from-red-500 via-rose-500 to-pink-500'
+                    }`}
+                  >
+                    {creditScore >= 900 ? '50%' : 
+                     creditScore >= 800 ? '60%' :
+                     creditScore >= 700 ? '75%' :
+                     creditScore >= 600 ? '90%' :
+                     creditScore >= 500 ? '100%' :
+                     creditScore >= 400 ? '110%' : '125%'}
+                  </AuroraText>
+                  <p className="text-sm text-black/70 font-medium">
+                    Required collateral for borrowing
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -262,17 +272,27 @@ export default function Dashboard() {
           <Card className="glass-card glass-strong hover-expand hover:shadow-lg transition-shadow flex flex-col">
             <CardContent className="flex-1 flex flex-col items-center justify-center py-12 px-6 text-center">
               <p className="text-sm text-black/60 mb-6">Login Method</p>
-              <h3 className="text-6xl font-bold text-black mb-6 leading-tight">
-                {userInfo?.user?.email ? 'Email / Google' : 'Moca ID'}
-              </h3>
-              <div className="space-y-1">
-                <p className="text-sm text-black/70 font-medium">
-                  AIR Kit SSO
-                </p>
-                <p className="text-xs text-black/50">
-                  Moca Chain Devnet
-                </p>
-              </div>
+              {(!userInfo) ? (
+                <div className="flex flex-col items-center justify-center w-full">
+                  <Skeleton className="h-12 w-56 rounded-lg mb-6" />
+                  <Skeleton className="h-4 w-28 mb-2" />
+                  <Skeleton className="h-3 w-36" />
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-6xl font-bold text-black mb-6 leading-tight">
+                    {userInfo?.user?.email ? 'Email / Google' : 'Moca ID'}
+                  </h3>
+                  <div className="space-y-1">
+                    <p className="text-sm text-black/70 font-medium">
+                      AIR Kit SSO
+                    </p>
+                    <p className="text-xs text-black/50">
+                      Moca Chain Devnet
+                    </p>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
