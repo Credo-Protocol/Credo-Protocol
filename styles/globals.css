@@ -295,6 +295,11 @@ body {
   background: rgba(255, 255, 255, 0.6);
 }
 
+/* Slight dark glow utility for selective elements */
+.glass-dark-glow {
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.14));
+}
+
 .glass-card::after {
   content: '';
   position: absolute;
@@ -405,6 +410,16 @@ body {
   100% {
     background-position: 200% 50%;
   }
+}
+
+/* Subtle hover expand for cards */
+.hover-expand {
+  transition: transform 200ms ease;
+  transform: translateZ(0);
+}
+
+.hover-expand:hover {
+  transform: scale(1.02);
 }
 
 /* Notification slide-in animation */
