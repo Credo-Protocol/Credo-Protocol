@@ -250,7 +250,7 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
 
   return (
     <>
-    <Card>
+    <Card className="glass-card glass-strong hover-expand">
       <CardHeader>
         <CardTitle>Your Position</CardTitle>
         <CardDescription>Current lending position overview</CardDescription>
@@ -303,7 +303,7 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">Credit Score</p>
               {creditScore > 0 && !loading ? (
-                <p className={`text-2xl font-bold ${scoreColor}`}>{creditScore}</p>
+                <p className={`text-3xl font-bold ${scoreColor}`}>{creditScore}</p>
               ) : (
                 <Skeleton className="h-8 w-full" />
               )}
@@ -319,9 +319,9 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
               )}
             </div>
 
-            {/* Interest Rate */}
+            {/* Borrow APR - clearer label for users */}
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Interest Rate</p>
+              <p className="text-xs text-muted-foreground">Borrow APR (est.)</p>
               {creditScore > 0 && !loading ? (
                 <p className="text-2xl font-bold">{interestRate}%</p>
               ) : (
