@@ -7,15 +7,15 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 
 ## 📍 Quick Reference - Latest Deployment
 
-**Deployed:** October 29, 2025, 3:58 PM UTC (FIXED: LendingPool accounting overflow)  
+**Deployed:** November 1, 2025 (Production deployment with updated infrastructure)  
 **Network:** Moca Chain Devnet (Chain ID: 5151)  
 **Deployer:** `0x32F91E4E2c60A9C16cAE736D3b42152B331c147F`
 
 | Contract | Address |
 |----------|---------|
-| CreditScoreOracle v2 | `0xe1eF0424D6a6603B69e04848B2a0Fc180097914f` |
-| LendingPool v2 (FIXED) | `0xC1E8Fd7C208D9D944E180174484B7f16d4deb086` |
-| MockUSDC | `0x521BB742701caE06576485897987c57E87C7f6C8` |
+| CreditScoreOracle v2 | `0x4D4f92947b0E500E981EC8aC482daBAEeD2bA7F6` |
+| LendingPool v2 | `0x1AEC6B0AB34aEDB64FcFbe2beb79F7EE6F67980a` |
+| MockUSDC | `0x8F8447EfF8E7d32ae1c89569Fa229FcC796cC036` |
 
 💡 *See `contracts/deployed-addresses.json` for complete deployment details including issuer addresses.*
 
@@ -80,17 +80,6 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 - **Integration Guide**: Docs for third-party developers
 - **True MOCA Participant**: Full integration with AIR Kit credential services
 
-### Updated Contracts (Moca Devnet - Chain ID: 5151)
-
-| Contract | Devnet Address | Version |
-|----------|----------------|---------|
-| **CreditScoreOracle v2** | `0xe1eF0424D6a6603B69e04848B2a0Fc180097914f` | Wave 3 |
-| **LendingPool v2 (FIXED)** | `0xC1E8Fd7C208D9D944E180174484B7f16d4deb086` | Wave 3 |
-| **MockUSDC** | `0x521BB742701caE06576485897987c57E87C7f6C8` | Wave 3 |
-
-**Deployed:** October 29, 2025  
-[View on Explorer](https://devnet-scan.mocachain.org)
-
 ### What's Different from Wave 2
 
 **Wave 2 (Devnet)** → **Wave 3 (Devnet)**
@@ -116,63 +105,6 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 
 ---
 
-## 📊 Wave 3 Highlights
-
-### For Users
-- 💰 **$50 USDC Welcome Bonus**: Instant reward for verifying employment credentials
-- 🎯 **2x Better Terms**: Income credentials unlock up to 50% collateral (vs 150% standard)
-- 🔒 **Privacy Protected**: Prove creditworthiness without revealing sensitive data
-- 📈 **Clear Path**: Know exactly which credentials unlock better rates
-- ⚡ **Real-Time Feedback**: Watch your score and interest update live
-
-### For Developers
-- 🔌 **Plug & Play**: Public API returns credit scores in one request
-- 📚 **Well Documented**: Integration guide + code examples
-- 🏗️ **Composable**: Use Credo scores in any dApp (DAOs, GameFi, NFTs)
-- 🔗 **On-Chain**: All logic transparent and verifiable
-- 🔐 **MOCA Native**: Uses official Issuer DIDs and credential schemas
-- 🌐 **Discoverable**: Credentials appear in AIR Kit wallet
-
-### For the Ecosystem
-- 🚀 **Moca ID Adoption**: Requires Moca login, drives identity usage
-- 🛠️ **Complete AIR Kit Integration**: All 3 services - Account, Issuance & Verification
-- 🎯 **True Integration**: Official MOCA infrastructure (not just SSO)
-- 🔐 **Zero-Knowledge Verification**: Demonstrates privacy-preserving credential verification
-- 🧱 **Infrastructure Primitive**: Foundational layer for DeFi identity
-- 💡 **Innovation**: Brings TradFi credit concepts to Web3
-- 🎁 **User Acquisition**: $50 USDC reward system drives onboarding and engagement
-- ⚡ **Paymaster Ready**: Infrastructure for gas-sponsored transactions (configuration ready)
-
----
-
-## 📊 Project Status & Maturity
-
-**Current Status: Devnet Demo (Wave 3)**
-
-✅ **What This Project IS:**
-- Feature-complete devnet demonstration
-- Official MOCA ecosystem integration
-- Comprehensive smart contract testing (104+ tests passing)
-- Professional UI/UX for showcasing
-- Fully functional on Moca Devnet
-- Great for hackathons and proof-of-concept
-
-⚠️ **What This Project is NOT (Yet):**
-- Using real financial data (still simulated credentials)
-- Economically secure (no liquidation mechanism, price oracles needed)
-- Battle-tested with real liquidity
-- Regulatory compliant
-
-**To Become Production-Ready, Would Need:**
-1. Professional smart contract audit ($15k-50k)
-2. Real credential integrations (Plaid, Experian, etc.)
-3. Liquidation mechanism with keeper network
-4. Price oracles for collateral valuation
-5. Insurance fund for protocol solvency
-6. Legal/compliance review
-7. Gradual mainnet rollout with caps
-
-**Current Best Use:** Educational demo, hackathon showcase, testnet experimentation
 
 ---
 
@@ -200,48 +132,6 @@ Credo Protocol bridges this gap by creating an **identity-backed lending model**
 
 **Traditional DeFi**: Borrow $100 → Need $150 collateral  
 **Credo Protocol**: Borrow $100 → Need $50-$150 collateral (based on your credit score)
-
-## ✨ Features
-
-### Core Functionality
-- **🔐 Seamless Login** - One-click Web3 SSO via Moca AIR Kit (Google/Email/Wallet)
-- **🎫 Verifiable Credentials** - Privacy-preserving bucketed credentials via official AIR Kit
-- **📊 On-Chain Credit Scoring** - Transparent 0-1000 scale with diversity bonuses
-- **⚡ Dynamic Collateral** - 50-150% requirements based on your score
-- **💰 Complete Lending Flow** - Supply, borrow, and repay USDC with real-time interest
-- **🎁 Rewards System** - $50 USDC instant reward for employment verification
-- **📈 Score Builder** - Interactive wizard with real-time simulation
-- **🏆 Leaderboard** - Top credit scores across the network
-
-### Why Credo Protocol?
-
-**For Users:**
-- 🎯 Borrow **2x-3x more** with the same collateral compared to Aave/Compound
-- 🔒 Keep your data **private** - prove creditworthiness without revealing sensitive information
-- 🌍 Access DeFi **without crypto wealth** - your real-world reputation matters
-- 📈 Build **portable credit history** that works across all dApps
-
-**For the Moca Ecosystem:**
-- 🚀 **Killer App** for Moca ID adoption (requires Moca login)
-- 🛠️ **AIR Kit Showcase** - demonstrates both Account + Credential Services
-- 🧱 **Composable Primitive** - other dApps can use Credo credit scores
-- 💡 **Web3 Innovation** - shifts DeFi from "how much you have" to "who you are"
-
-**For DeFi:**
-- 💰 Unlocks **trillions in capital** currently locked due to over-collateralization
-- 🌊 Brings **real-world identity** to on-chain finance
-- 🔗 Creates **interoperability** between TradFi credentials and DeFi protocols
-- 🎪 Enables **new primitives** (credit-gated DAOs, reputation-based insurance, etc.)
-
-## 🚀 Deployed Contracts (Moca Chain Devnet)
-
-**Latest Deployment:** October 29, 2025, 3:58 PM UTC (FIXED: LendingPool accounting overflow)
-
-| Contract | Address | Explorer |
-|----------|---------|----------|
-| **CreditScoreOracle v2** | `0xe1eF0424D6a6603B69e04848B2a0Fc180097914f` | [View](https://devnet-scan.mocachain.org/address/0xe1eF0424D6a6603B69e04848B2a0Fc180097914f) |
-| **LendingPool v2 (FIXED)** | `0xC1E8Fd7C208D9D944E180174484B7f16d4deb086` | [View](https://devnet-scan.mocachain.org/address/0xC1E8Fd7C208D9D944E180174484B7f16d4deb086) |
-| **MockUSDC** | `0x521BB742701caE06576485897987c57E87C7f6C8` | [View](https://devnet-scan.mocachain.org/address/0x521BB742701caE06576485897987c57E87C7f6C8) |
 
 ## 📋 How It Works
 
@@ -469,41 +359,13 @@ npm run dev
 
 ### ✅ Wave 2 Deliverables (COMPLETED - Oct 15, 2025)
 
-**What's New This Wave:** The entire foundational infrastructure - from zero to a working, on-chain proof-of-concept demonstrating identity-based lending on Moca Chain.
+**Summary:** Foundational infrastructure - from zero to working proof-of-concept.
 
-#### 1. Smart Contracts (Deployed on Moca Devnet)
-- ✅ **CreditScoreOracle.sol** - Verifies credentials & calculates credit scores (0-1000)
-- ✅ **LendingPool.sol** - Dynamic collateral lending pool with 8 credit tiers
-- ✅ **MockUSDC.sol** - Test token with faucet functionality
-- ✅ Comprehensive test suite with 100% pass rate
-- ✅ Deployed and verified on Moca Chain Devnet
-
-#### 2. Backend Services (Live on Render)
-- ✅ Express API server for credential issuance
-- ✅ 3 Mock issuers (CEX, Employer, Bank)
-- ✅ EIP-191 signature generation for verifiable credentials
-- ✅ RESTful API endpoints for credential types and requests
-- ✅ Production deployment with CORS configuration
-
-#### 3. Frontend Application (Live on Vercel)
-- ✅ **AIR Account Services Integration** - Seamless login with Google/Email/Wallet
-- ✅ **AIR Credential Services Framework** - Request and submit verifiable credentials
-- ✅ Beautiful landing page with animations (shadcn/ui + Framer Motion)
-- ✅ Dashboard with real-time credit score display
-- ✅ Credential marketplace (3 credential types)
-- ✅ Lending interface (Supply/Borrow/Repay flows)
-- ✅ Faucet page for test USDC tokens
-- ✅ Real-time position monitoring & health factor tracking
-- ✅ Fully responsive design (mobile-optimized)
-- ✅ Comprehensive error handling & loading states
-- ✅ Transaction feedback & confirmations
-
-#### 4. Deployment & Infrastructure
-- ✅ Frontend deployed to Vercel
-- ✅ Backend deployed to Render
-- ✅ Environment configuration for devnet
-- ✅ CORS and security headers configured
-- ✅ Public GitHub repository with documentation
+**Key Achievements:**
+- ✅ **Smart Contracts** - CreditScoreOracle, LendingPool, MockUSDC deployed on Moca Devnet
+- ✅ **Backend Services** - Express API with 3 mock issuers (CEX, Employer, Bank)
+- ✅ **Frontend Application** - AIR Kit integration, dashboard, lending interface
+- ✅ **Full Deployment** - Vercel (frontend), Render (backend)
 
 ---
 
@@ -732,13 +594,6 @@ npm run dev
 - Composable credit score as infrastructure primitive
 - Cross-chain credit score portability
 - DAO governance and $CREDO token launch
-
-## 📖 Additional Documentation
-
-- **[Gas Fees Explained](./GAS-FEES-EXPLAINED.md)** - Complete guide to gas sponsorship (DEVNET vs MAINNET)
-- **[Integration Guide](./INTEGRATION-GUIDE.md)** - For third-party developers
-- **[Deployment Checklist](./DEPLOYMENT-CHECKLIST.md)** - Production deployment steps
-- **[Wave 3 Documentation](./documents/wave%203/)** - Detailed phase-by-phase implementation
 
 ## 👥 Team
 
