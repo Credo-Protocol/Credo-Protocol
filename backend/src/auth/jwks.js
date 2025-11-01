@@ -15,9 +15,17 @@ const path = require('path');
  */
 function getJWKS() {
   try {
-    // Load public key from file
-    const publicKeyPath = path.join(__dirname, '../../public.key');
-    const publicKeyPem = fs.readFileSync(publicKeyPath, 'utf8');
+    // Load public key from environment variable or file
+    let publicKeyPem;
+    
+    if (process.env.PUBLIC_KEY) {
+      // Production: Read from environment variable
+      publicKeyPem = process.env.PUBLIC_KEY.replace(/\\n/g, '\n');
+    } else {
+      // Development: Read from file
+      const publicKeyPath = path.join(__dirname, '../../public.key');
+      publicKeyPem = fs.readFileSync(publicKeyPath, 'utf8');
+    }
     
     // Convert PEM to JWK (JSON Web Key) format
     const publicKey = crypto.createPublicKey(publicKeyPem);
