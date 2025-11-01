@@ -4,70 +4,69 @@
  * Main lending interface with tabs for:
  * - Supply: Deposit collateral
  * - Borrow: Borrow against collateral
- * - Repay: Pay back borrowed funds
  * 
- * Also displays user's position with health factor
+ * Displays user's position with health factor and repay functionality
  */
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import PositionCard from '@/components/PositionCard';
 import BorrowInterface from '@/components/BorrowInterface';
 import SupplyModal from '@/components/SupplyModal';
-import RepayModal from '@/components/RepayModal';
 import { TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 
-export default function LendingInterface({ userAddress, creditScore, provider }) {
+export default function LendingInterface({ userAddress, creditScore, provider, onPoolRefresh }) {
   const [supplyModalOpen, setSupplyModalOpen] = useState(false);
-  const [repayModalOpen, setRepayModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Refresh position data when transactions complete
+  // Refresh position data and pool stats when transactions complete
   const handleTransactionSuccess = () => {
-    console.log('Transaction successful, refreshing position...');
+    console.log('Transaction successful, refreshing position and pool...');
     setRefreshKey(prev => prev + 1);
+    
+    // Refresh pool liquidity stats on parent page
+    if (onPoolRefresh) {
+      onPoolRefresh();
+    }
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold">Lending Pool</h2>
-        <p className="text-muted-foreground mt-1">
-          Supply collateral and borrow based on your credit score
-        </p>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Left Side: Position Overview - Always visible */}
+      <div className="lg:sticky lg:top-6 lg:self-start">
+        <PositionCard 
+          userAddress={userAddress} 
+          creditScore={creditScore}
+          refresh={refreshKey}
+          provider={provider}
+        />
       </div>
 
-      {/* Position Overview */}
-      <PositionCard 
-        userAddress={userAddress} 
-        creditScore={creditScore}
-        refresh={refreshKey}
-        provider={provider}
-      />
-
-      {/* Main Interface with Tabs */}
-      <Tabs defaultValue="supply" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="supply" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Supply
-          </TabsTrigger>
-          <TabsTrigger value="borrow" className="flex items-center gap-2">
-            <TrendingDown className="h-4 w-4" />
-            Borrow
-          </TabsTrigger>
-        </TabsList>
+      {/* Right Side: Supply/Borrow Interface */}
+      <div className="space-y-6">
+        {/* Main Interface with Tabs */}
+        <Tabs defaultValue="supply" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="supply" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Supply
+            </TabsTrigger>
+            <TabsTrigger value="borrow" className="flex items-center gap-2">
+              <TrendingDown className="h-4 w-4" />
+              Borrow
+            </TabsTrigger>
+          </TabsList>
 
         {/* Supply Tab */}
         <TabsContent value="supply" className="space-y-4">
-          <Card>
+          <Card className="glass-card glass-strong hover-expand">
             <CardHeader>
               <CardTitle>Supply Collateral</CardTitle>
-              <CardDescription>
-                Deposit USDC to use as collateral for borrowing
+              <CardDescription className="flex items-center gap-1.5">
+                Deposit <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC to use as collateral for borrowing
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -79,7 +78,7 @@ export default function LendingInterface({ userAddress, creditScore, provider })
                     <ul className="text-sm text-muted-foreground space-y-2">
                       <li className="flex items-start">
                         <span className="mr-2">1.</span>
-                        <span>Get test USDC from the faucet (10,000 max)</span>
+                        <span className="flex items-center gap-1.5 flex-wrap">Get test <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC from the faucet (10,000 <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC)</span>
                       </li>
                       <li className="flex items-start">
                         <span className="mr-2">2.</span>
@@ -87,7 +86,7 @@ export default function LendingInterface({ userAddress, creditScore, provider })
                       </li>
                       <li className="flex items-start">
                         <span className="mr-2">3.</span>
-                        <span>Supply USDC as collateral to start borrowing</span>
+                        <span className="flex items-center gap-1.5">Supply <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={14} height={14} className="inline" /> USDC as collateral to start borrowing</span>
                       </li>
                       <li className="flex items-start">
                         <span className="mr-2">4.</span>
@@ -99,11 +98,11 @@ export default function LendingInterface({ userAddress, creditScore, provider })
               </div>
 
               <button 
-                className="w-full h-12 text-base bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md" 
+                className="w-full h-12 text-base bg-green-600 text-white rounded-md transition-all duration-300 hover:bg-green-700 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md" 
                 onClick={() => setSupplyModalOpen(true)}
               >
                 <TrendingUp className="h-5 w-5" />
-                Supply USDC
+                <span className="flex items-center gap-1.5">Supply <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC</span>
               </button>
             </CardContent>
           </Card>
@@ -118,41 +117,14 @@ export default function LendingInterface({ userAddress, creditScore, provider })
             onSuccess={handleTransactionSuccess}
             provider={provider}
           />
-
-          {/* Repay Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Repay Debt</CardTitle>
-              <CardDescription>
-                Pay back your borrowed USDC to reduce debt and improve health factor
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <button 
-                className="w-full h-12 text-base bg-black text-white rounded-md transition-all duration-300 hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md" 
-                onClick={() => setRepayModalOpen(true)}
-              >
-                <TrendingUp className="h-5 w-5" />
-                Repay USDC
-              </button>
-            </CardContent>
-          </Card>
         </TabsContent>
-      </Tabs>
-
+        </Tabs>
+      </div>
+      
       {/* Supply Modal */}
       <SupplyModal
         isOpen={supplyModalOpen}
         onClose={() => setSupplyModalOpen(false)}
-        userAddress={userAddress}
-        onSuccess={handleTransactionSuccess}
-        provider={provider}
-      />
-
-      {/* Repay Modal */}
-      <RepayModal
-        isOpen={repayModalOpen}
-        onClose={() => setRepayModalOpen(false)}
         userAddress={userAddress}
         onSuccess={handleTransactionSuccess}
         provider={provider}

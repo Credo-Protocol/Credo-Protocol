@@ -45,6 +45,16 @@ yarn-error.log*
 !.env.example
 !.env*.example
 
+# Phase 5.1 Environment Tracker (contains sensitive MOCA credentials)
+**/PHASE5.1-ENV-VARIABLES.env
+PHASE5.1-ENV-VARIABLES.env
+
+# RSA Keys for JWT signing (NEVER commit private keys!)
+*.key
+backend/*.key
+**/private.key
+**/public.key
+
 # vercel
 .vercel
 

@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
 import { Button } from '@/components/ui/button';
-import { Loader2, LogOut, User, Copy, Check, Mail, Wallet, Coins, DollarSign } from 'lucide-react';
+import { Loader2, LogOut, User, Copy, Check, Mail, Wallet, Coins, DollarSign, Gift } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,19 +29,24 @@ import {
   loginWithAirKit,
   logout,
   getUserInfo,
-  isUserLoggedIn
+  isUserLoggedIn,
+  isInitialized as isAirKitInitialized,
+  getCachedUserInfo
 } from '@/lib/airkit';
 import { CONTRACTS, ERC20_ABI } from '@/lib/contracts';
 import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 
 export default function ConnectButton({ onConnectionChange, size = 'default', variant = 'default' }) {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userInfo, setUserInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const cachedInfo = getCachedUserInfo();
+  const initialLoggedIn = isUserLoggedIn();
+  const [isLoggedIn, setIsLoggedIn] = useState(initialLoggedIn);
+  const [userInfo, setUserInfo] = useState(cachedInfo);
+  const [loading, setLoading] = useState(() => !isAirKitInitialized() || (initialLoggedIn && !cachedInfo));
   const [loggingIn, setLoggingIn] = useState(false);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [airIdCopied, setAirIdCopied] = useState(false);
   
   // Balance states
   const [mocaBalance, setMocaBalance] = useState(null);
@@ -58,18 +63,20 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
    */
   async function initAirKit() {
     try {
-      setLoading(true);
       setError(null);
 
-      // Initialize AIR Kit
-      await initializeAirKit({
-        skipRehydration: false, // Enable automatic re-login (30-day sessions)
-        enableLogging: true, // Enable for development
-      });
+      // Skip re-initialization if already initialized
+      if (!isAirKitInitialized()) {
+        setLoading(true);
+        await initializeAirKit({
+          skipRehydration: false, // Enable automatic re-login (30-day sessions)
+          enableLogging: true, // Enable for development
+        });
+      }
 
       // Check if user is already logged in (session rehydration)
       if (isUserLoggedIn()) {
-        const info = await getUserInfo();
+        const info = getCachedUserInfo() || await getUserInfo();
         setUserInfo(info);
         setIsLoggedIn(true);
 
@@ -207,6 +214,17 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
   }
 
   /**
+   * Copy AIR ID to clipboard
+   */
+  function copyAirId() {
+    if (userInfo?.user?.id) {
+      navigator.clipboard.writeText(userInfo.user.id);
+      setAirIdCopied(true);
+      setTimeout(() => setAirIdCopied(false), 2000);
+    }
+  }
+
+  /**
    * Fetch user's balances (MOCA and USDC)
    * Called when dropdown opens
    */
@@ -291,12 +309,12 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
     }
   }
 
-  // Loading state
-  if (loading) {
+  // Loading or resolving session state
+  if (loading || (isLoggedIn && !userInfo)) {
     return (
       <Button disabled className="h-[44px] px-4">
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        <span className="text-sm">Initializing...</span>
+        <span className="text-sm">Restoring session...</span>
       </Button>
     );
   }
@@ -356,10 +374,14 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
           <div className="px-2 py-3 space-y-3">
             {/* MOCA Balance */}
             <div className="flex items-center gap-2">
-              <Coins className="h-4 w-4 text-muted-foreground" />
+              <img 
+                src="/moca.jpg" 
+                alt="MOCA" 
+                className="h-4 w-4 rounded-sm object-cover"
+              />
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-muted-foreground">MOCA Balance</p>
-                <p className="text-sm font-bold">
+                <p className="text-xs text-muted-foreground mb-1">MOCA Balance</p>
+                <p className="text-sm font-medium">
                   {balancesLoading ? (
                     <span className="text-muted-foreground">Loading...</span>
                   ) : (
@@ -371,10 +393,14 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
             
             {/* USDC Balance */}
             <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <img 
+                src="/usd-coin-usdc-logo.png" 
+                alt="USDC" 
+                className="h-4 w-4 rounded-sm object-cover"
+              />
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-muted-foreground">MockUSDC Balance</p>
-                <p className="text-sm font-bold">
+                <p className="text-xs text-muted-foreground mb-1">MockUSDC Balance</p>
+                <p className="text-sm font-medium">
                   {balancesLoading ? (
                     <span className="text-muted-foreground">Loading...</span>
                   ) : (
@@ -384,6 +410,17 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
               </div>
             </div>
           </div>
+          
+          <DropdownMenuSeparator />
+          
+          {/* Rewards Hub Link */}
+          <DropdownMenuItem
+            onClick={() => router.push('/rewards')}
+            className="cursor-pointer text-muted-foreground"
+          >
+            <Gift className="mr-2 h-4 w-4 text-muted-foreground" />
+            <span>Rewards Hub</span>
+          </DropdownMenuItem>
           
           <DropdownMenuSeparator />
           
@@ -434,9 +471,23 @@ export default function ConnectButton({ onConnectionChange, size = 'default', va
                 <User className="h-4 w-4 mt-0.5 text-muted-foreground" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground mb-1">AIR ID</p>
-                  <p className="text-xs font-mono text-muted-foreground truncate">
-                    {userInfo.user.id}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-mono text-muted-foreground truncate flex-1">
+                      {userInfo.user.id}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
+                      onClick={copyAirId}
+                    >
+                      {airIdCopied ? (
+                        <Check className="h-3 w-3 text-green-500" />
+                      ) : (
+                        <Copy className="h-3 w-3" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
