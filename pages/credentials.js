@@ -29,7 +29,7 @@ export default function CredentialsPage() {
   const { isConnected, userAddress, provider, loading: airKitLoading, refreshUserInfo } = useAirKit();
   const [isMounted, setIsMounted] = useState(true);
   const [creditScore, setCreditScore] = useState(0);
-  const [scoreLoading, setScoreLoading] = useState(false);
+  const [scoreLoading, setScoreLoading] = useState(true);
 
   const handleConnectionChange = useCallback((connectionData) => {
     if (connectionData.connected && refreshUserInfo) {
