@@ -71,8 +71,15 @@ Last Updated: Oct 27, 2025
 - [ ] Dashboard displays after login
 - [ ] Mobile layout responsive (test on phone or DevTools)
 - [ ] All navigation tabs work
-- [ ] Loading states display correctly
+- [ ] Loading states display correctly (skeletons, no flickering)
 - [ ] Error messages user-friendly (test by disconnecting wallet)
+- [ ] **Pool Statistics** display on lending page
+  - [ ] Total liquidity shows correctly
+  - [ ] Available to borrow calculates correctly
+  - [ ] Total borrowed displays
+  - [ ] Utilization rate percentage and bar display
+  - [ ] Moca Chain badge appears above pool card
+  - [ ] Updates after transactions (supply/borrow/repay/withdraw)
 
 #### Credit Score Display
 - [ ] Base score (500) displays for new users
@@ -80,6 +87,12 @@ Last Updated: Oct 27, 2025
 - [ ] Tier badge displays with correct color
 - [ ] Collateral factor shows correctly (e.g., "60%")
 - [ ] APR displays based on tier
+- [ ] **Credentials Page** credit score bar displays
+  - [ ] Shows loading state initially (not 0)
+  - [ ] Score number displays prominently above bar
+  - [ ] Progress bar fills correctly (score/10)
+  - [ ] Color coding matches tier (red/yellow/green)
+  - [ ] 0-100 labels on bar ends
 
 #### Score Builder Wizard (NEW)
 - [ ] Tab "Score Builder" appears in navigation
@@ -117,21 +130,40 @@ Last Updated: Oct 27, 2025
 - [ ] Can't borrow more than limit
 - [ ] Borrow transaction succeeds
 - [ ] Borrowed balance displays
-- [ ] Repay modal opens
+- [ ] Repay modal opens (from position card)
 - [ ] Repay includes accrued interest in total
 - [ ] Can repay partial amount
 - [ ] Can repay full amount
 - [ ] Balances update after repay
+- [ ] Withdraw modal opens (from position card)
+- [ ] Withdraw button disabled when no balance
+- [ ] Max button fills correct safe amount
+- [ ] Can't withdraw more than supplied
+- [ ] Can't withdraw amount that would make position unhealthy
+- [ ] Withdraw transaction succeeds
+- [ ] Balance updates after withdraw
 
 #### My Positions
-- [ ] Position card displays if user has borrowed
-- [ ] Shows principal amount
-- [ ] Shows accrued interest (updates every 5 seconds)
-- [ ] Shows total owed (principal + interest)
-- [ ] APR badge displays correct rate
-- [ ] Health factor displays and updates
-- [ ] Interest ticker animates/updates live
-- [ ] Repay button works from position card
+- [ ] Position card displays for users with supplied or borrowed amounts
+- [ ] **Earnings Overview** section displays when user has supplied
+  - [ ] Shows supplied amount correctly
+  - [ ] Supply APY badge displays
+  - [ ] Earned interest updates every 5 seconds
+  - [ ] Total balance = supplied + interest
+  - [ ] Withdraw button appears and works
+- [ ] **Debt Overview** section displays when user has borrowed
+  - [ ] Shows borrowed principal amount
+  - [ ] Shows accrued interest (updates every 5 seconds)
+  - [ ] Shows total owed (principal + interest)
+  - [ ] Borrow APR badge displays correct tier-based rate
+  - [ ] Repay button appears and works
+- [ ] **Net Interest** summary displays at bottom
+  - [ ] Shows earnings - debt correctly
+  - [ ] Color coded (green for positive, red for negative)
+- [ ] Both sections display even when one is zero (consistent layout)
+- [ ] Health factor displays and includes interest
+- [ ] Interest ticker animates/updates live for both supply and borrow
+- [ ] Credit score, collateral factor, and interest rate display in card header
 
 #### Leaderboard (NEW)
 - [ ] Leaderboard section appears on dashboard
@@ -182,6 +214,9 @@ Last Updated: Oct 27, 2025
 - [ ] Borrow exceeding limit rejected
 - [ ] Repay amount exceeding debt rejected
 - [ ] Division by zero handled in health factor calculation
+- [ ] **Withdraw** with 0 balance rejected
+- [ ] **Withdraw** amount exceeding supplied rejected
+- [ ] **Withdraw** that would cause liquidation rejected/prevented by UI
 
 ### Backend
 - [ ] Invalid address format returns 400 error
@@ -201,6 +236,12 @@ Last Updated: Oct 27, 2025
 - [ ] Loading states prevent double-submission
 - [ ] Can't submit same credential twice
 - [ ] Invalid form inputs prevented
+- [ ] **Supply interest** displays $0.00 when no supply (not error)
+- [ ] **Borrow interest** displays $0.00 when no debt (not error)
+- [ ] **Credit limit** shows loading skeleton until data loaded (no premature value)
+- [ ] **Pool stats** load in parallel with position (no double-fetch)
+- [ ] **Withdraw modal** calculates max safe amount correctly
+- [ ] **Withdraw modal** warns when withdrawal would be unsafe
 
 ---
 

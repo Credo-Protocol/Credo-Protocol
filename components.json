@@ -22,7 +22,8 @@
       "@shadcn": "https://ui.shadcn.com/registry/{name}.json",
       "@aceternity": "https://ui.aceternity.com/registry/{name}.json",
       "@magic-ui": "https://magicui.design/r/{name}.json",
-      "@originui": "https://originui.com/r/{name}.json"
+      "@originui": "https://originui.com/r/{name}.json",
+      "@react-bits": "https://reactbits.dev/r/{name}.json"
     }
   }
   

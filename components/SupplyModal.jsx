@@ -105,6 +105,16 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
     } catch (error) {
       const errorMessage = handleTransactionError('Approve USDC', error);
       setError(errorMessage);
+      
+      // Auto-dismiss user rejection messages after 4 seconds
+      if (error.code === 'ACTION_REJECTED' || 
+          error.code === 4001 || 
+          error.message?.includes('user rejected') ||
+          error.message?.includes('User rejected') ||
+          error.message?.includes('rejected the request') ||
+          error.message?.includes('User denied')) {
+        setTimeout(() => setError(''), 4000);
+      }
     } finally {
       setApproving(false);
     }
@@ -114,6 +124,23 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
     try {
       setSupplying(true);
       setError('');
+
+      // Pre-flight checks to prevent "missing revert data" errors
+      const supplyAmountNum = parseFloat(supplyAmount);
+      
+      // Check if user has enough balance
+      if (supplyAmountNum > balance) {
+        setError(`💰 Insufficient USDC balance. You have ${balance.toFixed(2)} USDC but are trying to supply ${supplyAmountNum.toFixed(2)} USDC.`);
+        setSupplying(false);
+        return;
+      }
+      
+      // Check if amount is valid
+      if (supplyAmountNum <= 0) {
+        setError('Please enter a valid supply amount greater than 0.');
+        setSupplying(false);
+        return;
+      }
 
       const signer = await provider.getSigner();
       
@@ -127,6 +154,7 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
       const amount = ethers.parseUnits(supplyAmount, 6);
       
       console.log('Supplying', supplyAmount, 'USDC to LendingPool');
+      console.log('User balance:', balance.toFixed(2), 'USDC');
       
       const tx = await lendingPool.supply(CONTRACTS.MOCK_USDC, amount);
       
@@ -150,6 +178,16 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
     } catch (error) {
       const errorMessage = handleTransactionError('Supply', error);
       setError(errorMessage);
+      
+      // Auto-dismiss user rejection messages after 4 seconds
+      if (error.code === 'ACTION_REJECTED' || 
+          error.code === 4001 || 
+          error.message?.includes('user rejected') ||
+          error.message?.includes('User rejected') ||
+          error.message?.includes('rejected the request') ||
+          error.message?.includes('User denied')) {
+        setTimeout(() => setError(''), 4000);
+      }
     } finally {
       setSupplying(false);
     }
@@ -232,7 +270,7 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-sm text-black/60">Your Balance</span>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-black">{balance.toFixed(2)} USDC</p>
+                    <p className="text-lg font-bold text-black">${balance.toFixed(2)} USDC</p>
                     {balance === 0 && (
                       <button
                         onClick={handleFaucet}
@@ -249,12 +287,15 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-black">Amount to Supply</label>
                   <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-lg text-black/40">
+                      $
+                    </div>
                     <input
                       type="number"
                       value={supplyAmount}
                       onChange={(e) => setSupplyAmount(e.target.value)}
                       placeholder="0.00"
-                      className="w-full px-4 py-3 pr-16 text-lg border border-black/20 rounded-md focus:outline-none focus:ring-2 focus:ring-black/20 bg-white text-black"
+                      className="w-full pl-8 pr-16 py-3 text-lg border border-black/20 rounded-md focus:outline-none focus:ring-2 focus:ring-black/20 bg-white text-black"
                       step="0.01"
                       min="0"
                       max={balance}
@@ -323,7 +364,7 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
               <div className="p-6 rounded-xl border border-black/10 bg-white">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-black/60">Amount to Supply</span>
-                  <span className="text-lg font-bold text-black">{supplyAmount} USDC</span>
+                  <span className="text-lg font-bold text-black">${supplyAmount} USDC</span>
                 </div>
               </div>
 
@@ -377,7 +418,7 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
               <div className="p-6 rounded-xl border border-black/10 bg-white">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-black/60">Amount to Supply</span>
-                  <span className="text-lg font-bold text-black">{supplyAmount} USDC</span>
+                  <span className="text-lg font-bold text-black">${supplyAmount} USDC</span>
                 </div>
               </div>
 
@@ -400,7 +441,7 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
                 ) : (
                   <>
                     <TrendingUp className="h-4 w-4" />
-                    Supply {supplyAmount} USDC
+                    Supply ${supplyAmount} USDC
                   </>
                 )}
               </button>
@@ -414,7 +455,7 @@ export default function SupplyModal({ isOpen, onClose, userAddress, onSuccess, p
               <div>
                 <h3 className="text-lg font-semibold text-black">Supply Successful!</h3>
                 <p className="text-sm text-black/60">
-                  You supplied {supplyAmount} USDC as collateral
+                  You supplied ${supplyAmount} USDC as collateral
                 </p>
               </div>
             </div>

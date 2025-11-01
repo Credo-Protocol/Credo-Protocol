@@ -242,6 +242,84 @@ body {
   animation: shimmer 3s ease-in-out infinite;
 }
 
+/* Glassmorphism card used in "How It Works" section */
+.glass-card {
+  /* Force over Tailwind bg utilities from MagicCard */
+  background: rgba(255, 255, 255, 0.12) !important;
+  background-clip: padding-box;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 7px 26px rgba(0, 0, 0, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+}
+
+/* Small pill-style glass badge (no decorative edge lines) */
+.glass-badge {
+  background: rgba(255, 255, 255, 0.12);
+  background-clip: padding-box;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Stronger opacity variants (apply selectively) */
+.glass-strong {
+  background: rgba(255, 255, 255, 0.6) !important;
+}
+
+.glass-badge--strong {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* Slight dark glow utility for selective elements */
+.glass-dark-glow {
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.14));
+}
+
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5),
+    transparent,
+    rgba(255, 255, 255, 0.2)
+  );
+}
+
+/* Optional modifier to enforce a solid black border on specific glass cards */
+.glass-card--black-border {
+  border: 2px solid #000 !important;
+}
+
 /* Retro grid animation */
 @keyframes grid {
   0% {
@@ -332,4 +410,30 @@ body {
   100% {
     background-position: 200% 50%;
   }
+}
+
+/* Subtle hover expand for cards */
+.hover-expand {
+  transition: transform 200ms ease;
+  transform: translateZ(0);
+}
+
+.hover-expand:hover {
+  transform: scale(1.02);
+}
+
+/* Notification slide-in animation */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
 }

@@ -14,17 +14,18 @@ import {
   getUserInfo,
   getProvider,
   isUserLoggedIn,
-  getSmartAccountAddress
+  getSmartAccountAddress,
+  isInitialized as isAirKitInitialized
 } from '@/lib/airkit';
 
 export function useAirKit() {
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(() => isAirKitInitialized());
+  const [isConnected, setIsConnected] = useState(() => isUserLoggedIn());
   const [userAddress, setUserAddress] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !isAirKitInitialized());
   const [error, setError] = useState(null);
 
   /**
@@ -39,8 +40,19 @@ export function useAirKit() {
    */
   const initialize = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
+
+      // If AIR Kit is already initialized globally, avoid re-initializing
+      if (isAirKitInitialized()) {
+        setIsInitialized(true);
+        setLoading(false);
+        if (isUserLoggedIn()) {
+          await updateUserState();
+        }
+        return;
+      }
+
+      setLoading(true);
 
       // Initialize AIR Kit
       await initializeAirKit({
@@ -84,7 +96,16 @@ export function useAirKit() {
         console.log('✅ AIR Provider obtained:', airProvider ? 'Yes' : 'No');
         
         if (airProvider) {
-          const ethersProvider = new ethers.BrowserProvider(airProvider);
+          // Wrap AIR Kit EIP-1193 provider with ethers.js
+          // Explicitly disable ENS - MOCA Chain doesn't support it
+          const ethersProvider = new ethers.BrowserProvider(
+            airProvider,
+            {
+              chainId: 5151,
+              name: 'moca-devnet',
+              ensAddress: null  // Disable ENS to prevent UNSUPPORTED_OPERATION errors
+            }
+          );
           const ethersSigner = await ethersProvider.getSigner();
           
           setProvider(ethersProvider);

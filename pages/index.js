@@ -8,7 +8,9 @@ import { ArrowRight, Shield, TrendingUp, CheckCircle, Lock, BarChart3, Sparkles,
 import { Button } from '@/components/ui/button';
 import { TextGenerateEffect } from '@/components/ui/text-generate-effect';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
+import { LiquidChrome } from '@/components/ui/liquid-chrome';
 import { RetroGrid } from '@/components/ui/retro-grid';
+import { StickyRetroBackground } from '@/components/ui/sticky-retro-background';
 import { MagicCard } from '@/components/ui/magic-card';
 import { NumberTicker } from '@/components/ui/number-ticker';
 import { Marquee } from '@/components/ui/marquee';
@@ -25,7 +27,7 @@ export default function Home() {
             {/* Logo and Brand */}
             <Link href="/" className="flex items-center gap-1 group">
               <img 
-                src="/credo.jpg" 
+                src="/credo.png" 
                 alt="Credo Protocol" 
                 className="w-8 h-8 rounded-lg object-cover transition-transform group-hover:scale-105" 
               />
@@ -46,15 +48,25 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Retro Grid Background */}
-        <RetroGrid className="opacity-50" />
+      <div 
+        className="relative min-h-screen flex items-center justify-center overflow-hidden group"
+      >
+        {/* Liquid Chrome Background */}
+        <div className="absolute inset-0 opacity-70 pointer-events-none">
+          <LiquidChrome
+            baseColor={[0.85, 0.85, 0.85]}
+            speed={0.3}
+            amplitude={0.3}
+            vibrancy={0.12}
+            interactive={true}
+          />
+        </div>
         
-        <div className="container mx-auto px-4 py-32 relative z-10">
+        <div className="container mx-auto px-4 py-32 relative z-10 pointer-events-auto">
           <div className="max-w-6xl mx-auto text-center space-y-12">
             {/* Badge */}
             <div className="flex justify-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 backdrop-blur-sm">
+              <div className="glass-badge glass-badge--strong glass-dark-glow inline-flex items-center gap-2 px-4 py-2">
                 <img src="/moca.jpg" alt="Moca Chain" className="w-4 h-4 rounded-sm object-cover" />
                 <span className="text-sm font-medium">Built on Moca Chain</span>
               </div>
@@ -121,7 +133,7 @@ export default function Home() {
                 description="Transparent on-chain scoring"
               />
               <StatCard
-                value={3}
+                value={10}
                 label="Credential Types"
                 description="Build your reputation"
               />
@@ -131,136 +143,189 @@ export default function Home() {
       </div>
 
       {/* Social Proof / Marquee */}
-      <div className="py-16 border-y border-black/10">
-        <p className="text-center text-sm text-black/50 mb-8 uppercase tracking-wide">Trusted Credential Issuers</p>
-        <Marquee pauseOnHover className="[--duration:30s]">
-          <MarqueeItem text="Banks" />
-          <MarqueeItem text="Employers" />
-          <MarqueeItem text="Exchanges" />
-          <MarqueeItem text="DeFi Protocols" />
-          <MarqueeItem text="Identity Providers" />
-          <MarqueeItem text="Credit Bureaus" />
-        </Marquee>
-      </div>
-
-      {/* How It Works Section */}
-      <div className="container mx-auto px-4 py-32">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2 
-            className="text-5xl md:text-6xl font-bold text-center mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            How It Works
-          </motion.h2>
-          
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-4 gap-6 items-stretch"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.15
-                }
-              }
-            }}
-          >
-            <StepCard
-              number="01"
-              icon={<Shield className="w-6 h-6" />}
-              title="Login with Moca ID"
-              description="Connect via Google, Email, or Wallet. No complex setup required."
-            />
-            <StepCard
-              number="02"
-              icon={<CheckCircle className="w-6 h-6" />}
-              title="Get Credentials"
-              description="Request verifiable credentials from trusted issuers."
-            />
-            <StepCard
-              number="03"
-              icon={<BarChart3 className="w-6 h-6" />}
-              title="Build Score"
-              description="Your credit score updates on-chain based on credentials."
-            />
-            <StepCard
-              number="04"
-              icon={<TrendingUp className="w-6 h-6" />}
-              title="Borrow More"
-              description="Higher scores unlock lower collateral requirements."
-            />
-          </motion.div>
+      <div className="relative py-16 border-y border-black/10 overflow-hidden">
+        <RetroGrid className="opacity-20" />
+        <div className="relative z-10">
+          <p className="text-center text-sm text-black/50 mb-8 uppercase tracking-wide">Trusted Credential Issuers</p>
+          <Marquee pauseOnHover className="[--duration:30s]">
+            <MarqueeItem text="Banks" />
+            <MarqueeItem text="Employers" />
+            <MarqueeItem text="Exchanges" />
+            <MarqueeItem text="DeFi Protocols" />
+            <MarqueeItem text="Identity Providers" />
+            <MarqueeItem text="Credit Bureaus" />
+          </Marquee>
         </div>
       </div>
 
-      {/* Features Section with Magic Cards */}
-      <div className="container mx-auto px-4 py-32">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2 
-            className="text-5xl md:text-6xl font-bold text-center mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            Key Features
-          </motion.h2>
-          
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.15
-                }
-              }
-            }}
-          >
-            <FeatureCard
-              icon={<TrendingUp className="w-10 h-10" />}
-              title="Dynamic Collateral"
-              description="Collateral requirements from 50-150% based on your credit score. High scores mean better terms and more capital efficiency."
-            />
-            <FeatureCard
-              icon={<Lock className="w-10 h-10" />}
-              title="Privacy-Preserving"
-              description="Zero-Knowledge Proofs keep your data private while proving creditworthiness on-chain."
-            />
-            <FeatureCard
-              icon={<Shield className="w-10 h-10" />}
-              title="Verifiable Credentials"
-              description="Credentials from trusted issuers are cryptographically verified and stored securely."
-            />
-            <FeatureCard
-              icon={<Zap className="w-10 h-10" />}
-              title="Instant Loans"
-              description="Once your score is built, borrow instantly with transparent terms and no hidden fees."
-            />
-          </motion.div>
-        </div>
-      </div>
+      {/* Persistent RetroGrid for sections below - appears after Marquee */}
+      <div className="relative">
+        <StickyRetroBackground targetOpacity={0.25} triggerRatio={0.55} />
 
-      {/* Comparison Section */}
-      <div className="container mx-auto px-4 py-32">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2 
-            className="text-5xl md:text-6xl font-bold text-center mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            Better Than Traditional DeFi
-          </motion.h2>
-          
-          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 items-stretch">
+        {/* How It Works Section */}
+        <div className="container mx-auto px-4 py-32">
+          <div className="max-w-7xl mx-auto">
+            <motion.h2 
+              className="text-5xl md:text-6xl font-bold text-center mb-20"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              How It Works
+            </motion.h2>
+            
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] gap-6 items-center"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.15
+                  }
+                }
+              }}
+            >
+              <StepCard
+                number="01"
+                icon={<Shield className="w-6 h-6" />}
+                title="Login with Moca ID"
+                description="Connect via Google, Email, or Wallet. No complex setup required."
+              />
+              
+              {/* Arrow 1 */}
+              <motion.div 
+                className="hidden md:flex items-center justify-center"
+                variants={{
+                  hidden: { opacity: 0, x: -20 },
+                  visible: { opacity: 1, x: 0, transition: { duration: 0.5 } }
+                }}
+              >
+                <ArrowRight className="w-8 h-8 text-black" />
+              </motion.div>
+              
+              <StepCard
+                number="02"
+                icon={<CheckCircle className="w-6 h-6" />}
+                title="Get Credentials"
+                description="Request verifiable credentials from trusted issuers."
+              />
+              
+              {/* Arrow 2 */}
+              <motion.div 
+                className="hidden md:flex items-center justify-center"
+                variants={{
+                  hidden: { opacity: 0, x: -20 },
+                  visible: { opacity: 1, x: 0, transition: { duration: 0.5 } }
+                }}
+              >
+                <ArrowRight className="w-8 h-8 text-black" />
+              </motion.div>
+              
+              <StepCard
+                number="03"
+                icon={<BarChart3 className="w-6 h-6" />}
+                title="Build Score"
+                description="Your credit score updates on-chain based on credentials."
+              />
+              
+              {/* Arrow 3 */}
+              <motion.div 
+                className="hidden md:flex items-center justify-center"
+                variants={{
+                  hidden: { opacity: 0, x: -20 },
+                  visible: { opacity: 1, x: 0, transition: { duration: 0.5 } }
+                }}
+              >
+                <ArrowRight className="w-8 h-8 text-black" />
+              </motion.div>
+              
+              <StepCard
+                number="04"
+                icon={<TrendingUp className="w-6 h-6" />}
+                title="Borrow More"
+                description="Higher scores unlock lower collateral requirements."
+              />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Features Section with Magic Cards */}
+        <div className="container mx-auto px-4 py-32">
+          <div className="max-w-7xl mx-auto">
+            <motion.h2 
+              className="text-5xl md:text-6xl font-bold text-center mb-20"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              Key Features
+            </motion.h2>
+            
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.1
+                  }
+                }
+              }}
+            >
+              <FeatureCard
+                icon={<TrendingUp className="w-10 h-10" />}
+                title="Score Builder Wizard"
+                description="Simulate score changes before submitting. See what unlocks next tier in real-time."
+              />
+              <FeatureCard
+                icon={<Lock className="w-10 h-10" />}
+                title="Privacy-Preserving Buckets"
+                description="Prove income/balance ranges without exact amounts. Only brackets disclosed."
+              />
+              <FeatureCard
+                icon={<Shield className="w-10 h-10" />}
+                title="Official AIR Kit Integration"
+                description="W3C credentials with registered DIDs. MCSP storage. MOCA ecosystem discoverable."
+              />
+              <FeatureCard
+                icon={<BarChart3 className="w-10 h-10" />}
+                title="Time-Based Interest"
+                description="5-18% APR by tier. Interest accrues every 5 seconds with full transparency."
+              />
+              <FeatureCard
+                icon={<Sparkles className="w-10 h-10" />}
+                title="Live Leaderboard"
+                description="Track top scores and rankings. Trophy rewards for top 3."
+              />
+              <FeatureCard
+                icon={<Zap className="w-10 h-10" />}
+                title="Composable Credit API"
+                description="Public API for dApps to query scores. Use in GameFi, DAOs, NFTs."
+              />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Comparison Section */}
+        <div className="container mx-auto px-4 py-32">
+          <div className="max-w-7xl mx-auto">
+            <motion.h2 
+              className="text-5xl md:text-6xl font-bold text-center mb-20"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              Better Than Traditional DeFi
+            </motion.h2>
+            
+            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 items-stretch">
             {/* Traditional DeFi Card - Faded */}
             <motion.div 
               className="relative group"
@@ -269,8 +334,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative p-12 rounded-3xl border-2 border-black/10 bg-neutral-50/50 backdrop-blur-sm hover:bg-neutral-100/50 transition-all duration-300">
+              <div className="glass-card relative p-12 transition-all duration-300">
                 <h3 className="text-3xl font-bold mb-10 text-black/40 group-hover:text-black/50 transition-colors">
                   Traditional DeFi
                 </h3>
@@ -321,13 +385,13 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="relative p-12 rounded-3xl border-2 border-black bg-white shadow-2xl overflow-hidden">
+              <div className="glass-card glass-card--black-border relative p-12 overflow-hidden">
                 {/* Border Beam Animation */}
                 <BorderBeam size={250} duration={10} borderWidth={2} />
                 
                 <h3 className="relative text-3xl font-bold mb-10 text-black flex items-center gap-3">
                   Credo Protocol
-                  <Sparkles className="w-6 h-6" />
+                  <img src="/credo.png" alt="Credo" className="w-10 h-10 rounded-lg object-cover" />
                 </h3>
                 <ul className="relative space-y-6">
                   <li className="flex items-start gap-3 text-lg">
@@ -357,13 +421,13 @@ export default function Home() {
               </ul>
             </div>
           </motion.div>
+            </div>
+          </div>
         </div>
-      </div>
-      </div>
 
-      {/* CTA Section */}
-      <div className="container mx-auto px-4 py-32 relative">
-        <div className="max-w-5xl mx-auto">
+        {/* CTA Section */}
+        <div className="container mx-auto px-4 py-32 relative">
+          <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.95 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -371,9 +435,9 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <MagicCard 
-              className="rounded-3xl border border-black/10 p-16 text-center"
+              className="glass-card p-16 text-center"
               gradientColor="#000000" 
-              gradientOpacity={0.06}
+              gradientOpacity={0.02}
             >
               <motion.h2 
                 className="text-5xl md:text-6xl font-bold mb-6"
@@ -424,6 +488,7 @@ export default function Home() {
               </motion.div>
             </MagicCard>
           </motion.div>
+          </div>
         </div>
       </div>
 
@@ -436,7 +501,7 @@ export default function Home() {
               {/* Brand Section */}
               <div className="md:col-span-2">
                 <div className="flex items-center gap-3 mb-4">
-                  <img src="/credo.jpg" alt="Credo Protocol" className="w-8 h-8 rounded-lg object-cover" />
+                  <img src="/credo.png" alt="Credo Protocol" className="w-8 h-8 rounded-lg object-cover" />
                   <h3 className="text-2xl font-bold">Credo Protocol</h3>
                 </div>
                 <p className="text-white/70 text-lg leading-relaxed max-w-md">
@@ -460,10 +525,10 @@ export default function Home() {
               <div>
                 <h4 className="font-semibold text-lg mb-4">Resources</h4>
                 <ul className="space-y-3">
-                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">How It Works</a></li>
-                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Security</a></li>
-                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Privacy Policy</a></li>
-                  <li><a href="#" className="text-white/70 hover:text-white transition-colors">Terms of Service</a></li>
+                  <li><a href="https://github.com/marcusmattus/Credo-Protocol" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">GitHub</a></li>
+                  <li><a href="https://devnet-scan.mocachain.org" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">Block Explorer</a></li>
+                  <li><a href="https://www.youtube.com/watch?v=l05PbqsKPZY" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">Demo Video</a></li>
+                  <li><a href="https://x.com/marcustan1337" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">Contact</a></li>
                 </ul>
               </div>
             </div>
@@ -472,10 +537,10 @@ export default function Home() {
             <div className="border-t border-white/10 pt-8">
               <div className="text-center">
                 <p className="text-white/60">
-                  © 2025 Credo Protocol. Built on Moca Chain.
+                  © 2025 Credo Protocol. Built on Moca Chain • Wave 3 Live
                 </p>
                 <p className="text-white/40 text-sm mt-1">
-                  Transforming trust into capital, one credential at a time.
+                  Privacy-preserving credit • Official MOCA integration • Composable for the ecosystem
                 </p>
               </div>
             </div>
@@ -489,7 +554,7 @@ export default function Home() {
 // Component: Stat Card with Number Ticker
 function StatCard({ value, suffix = "", label, description }) {
   return (
-    <MagicCard className="p-8 text-center space-y-3 border border-black/10" gradientColor="#000000" gradientOpacity={0.05}>
+    <MagicCard className="glass-card glass-strong glass-dark-glow p-8 text-center space-y-3" gradientColor="#000000" gradientOpacity={0.02}>
       <div className="text-6xl font-bold flex items-center justify-center gap-1">
         <NumberTicker value={value} />
         {suffix && <span>{suffix}</span>}
@@ -526,7 +591,7 @@ function StepCard({ number, icon, title, description }) {
         }
       }}
     >
-      <MagicCard className="p-8 relative h-full flex flex-col" gradientColor="#000000" gradientOpacity={0.05}>
+      <MagicCard className="glass-card p-8 relative h-full flex flex-col" gradientColor="#000000" gradientOpacity={0.02}>
         <div className="absolute top-6 right-6 text-7xl font-bold text-black/5">
           {number}
         </div>
@@ -546,7 +611,7 @@ function StepCard({ number, icon, title, description }) {
 function FeatureCard({ icon, title, description }) {
   return (
     <motion.div 
-      className="group relative p-10 rounded-2xl bg-white border border-black/5 hover:border-black/10 transition-all duration-300 hover:shadow-lg"
+      className="glass-card group relative p-10 transition-all duration-300"
       variants={{
         hidden: { opacity: 0, y: 50 },
         visible: { 

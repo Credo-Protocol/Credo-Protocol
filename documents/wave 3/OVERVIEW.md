@@ -1,8 +1,8 @@
 # Credo Protocol - Wave 3 Implementation Plan
 
-**Timeline**: Oct 25-27, 2025 (3 days)  
-**Status**: Ready for Execution  
-**Objective**: Transform MVP into production-ready protocol with advanced credentials, clear user journey, and demonstrated path to adoption
+**Timeline**: Oct 25-28, 2025 (4 days)  
+**Status**: Phases 1-4 Complete ✅ | Phase 5 (MOCA Migration) In Progress  
+**Objective**: Transform MVP into production-ready protocol with advanced credentials, clear user journey, official MOCA ecosystem integration, and demonstrated path to adoption
 
 ---
 
@@ -36,7 +36,11 @@ By end of Wave 3, judges should be able to:
 ✅ **Watch interest accrue** in real-time on borrowed positions  
 ✅ **Access a public API** to pull any user's credit score (composability)  
 ✅ **Use the protocol on Moca testnet** (production-ready signal)  
-✅ **Understand the adoption path** via leaderboard and partnerships
+✅ **Understand the adoption path** via leaderboard and partnerships  
+🔥 **Request credentials without native gas tokens** (ERC-20 Paymaster uses USDC/MOCA)  
+🔥 **View issued credentials in AIR Kit Dashboard** (official MOCA integration)  
+🔥 **Verify credentials are stored on MCSP** (decentralized storage)  
+🔥 **See official Issuer DIDs registered** in AIR Kit Dashboard
 
 ---
 
@@ -94,14 +98,59 @@ By end of Wave 3, judges should be able to:
 
 ---
 
-### Phase 5: Documentation & Demo Prep (Day 3 Evening)
-**Duration**: 4-6 hours  
-**Document**: [PHASE5-DOCS-DEMO.md](./PHASE5-DOCS-DEMO.md)
+### Phase 5: MOCA Official Integration & Migration (Day 4 - Oct 28)
+**Duration**: 6-8 hours  
+**Document**: [PHASE5-MOCA-MIGRATION.md](./PHASE5-MOCA-MIGRATION.md)
 
-- Update README with Wave 3 features
-- Create 4-minute demo script
+**🚨 CRITICAL PHASE - This transforms your project from "using MOCA for login" to "true MOCA ecosystem participant"**
+
+#### Sub-Phases:
+- **Phase 5.1**: [AIR Kit Dashboard Setup](./PHASE5.1-DASHBOARD-SETUP.md) (2-3 hours)
+  - Register official Issuer DIDs (Bank, Employment, CEX)
+  - Register Verifier DID (Credo Protocol)
+  - Create 10 credential schemas (bucketed data)
+  - Configure gas sponsorship (ERC-20 Paymaster active by default)
+
+- **Phase 5.2**: [Backend Refactor](./PHASE5.2-BACKEND-REFACTOR.md) (2-3 hours)
+  - Replace custom mock issuers with Partner JWT generation
+  - Refactor credential routes to return metadata (not signatures)
+  - Delete old issuer files
+
+- **Phase 5.3**: [Frontend Integration](./PHASE5.3-FRONTEND-INTEGRATION.md) (2-3 hours)
+  - Enable gas sponsorship in AIR Kit init
+  - Refactor credential issuance to use `airService.credential.issue()`
+  - Add credential verification UI (AIR Kit wallet display)
+
+- **Phase 5.5**: [AIR Verification Services & Rewards](./PHASE5.5%20VERIFIER_FLOW_COMPLETE_SUMMARY.md) (4-6 hours)
+  - Implement $50 USDC verification faucet
+  - Create verification programs via AIR Kit Dashboard
+  - Zero-knowledge proof validation for employment credentials
+  - Dashboard banner and dedicated rewards page
+
+- **Phase 5.6**: [Lending UI/UX Improvements](./PHASE5.6_UI_UX_IMPROVEMENTS.md) (4-6 hours)
+  - Supply interest tracking for lenders
+  - Withdraw functionality with health factor checks
+  - Pool transparency metrics (Aave-style)
+  - Unified earnings/debt position view
+  - Credit score integration on credentials page
+
+**Why Fifth**: You've been bypassing MOCA's official credential infrastructure. This migration makes your credentials interoperable, gas-sponsored, and stored on MCSP (decentralized storage).
+
+**Impact**:
+- ❌ Before: Custom signatures, users pay gas, isolated credentials
+- ✅ After: Official AIR Kit DIDs, gas-sponsored, MOCA ecosystem interoperability
+
+---
+
+### Phase 6: Documentation & Demo Prep (Day 4 Evening - Oct 28)
+**Duration**: 4-6 hours  
+**Document**: [PHASE6-DOCS-DEMO.md](./PHASE6-DOCS-DEMO.md)
+
+- Update README with MOCA integration highlights
+- Create 4-minute demo script (emphasize gas sponsorship!)
 - Integration guide for other dApps
 - Complete testing checklist
+- Verify credentials appear in AIR Kit Dashboard
 
 **Why Last**: Polish and preparation after everything works.
 
@@ -109,9 +158,16 @@ By end of Wave 3, judges should be able to:
 
 ## 🔗 Supporting Documents
 
+### Core Implementation Docs
 - **[DEMO-SCRIPT.md](./DEMO-SCRIPT.md)**: 4-minute demo flow for judges
-- **[INTEGRATION-GUIDE.md](./INTEGRATION-GUIDE.md)**: How other dApps can use Credo scores
 - **[TESTING-CHECKLIST.md](./TESTING-CHECKLIST.md)**: Pre-submission verification
+
+### Phase 5 Migration Docs (CRITICAL) 🔥
+- **[PHASE5-MOCA-MIGRATION.md](./PHASE5-MOCA-MIGRATION.md)**: Migration overview
+- **[PHASE5.1-DASHBOARD-SETUP.md](./PHASE5.1-DASHBOARD-SETUP.md)**: AIR Kit Dashboard configuration
+- **[PHASE5.2-BACKEND-REFACTOR.md](./PHASE5.2-BACKEND-REFACTOR.md)**: Backend Partner JWT implementation
+- **[PHASE5.3-FRONTEND-INTEGRATION.md](./PHASE5.3-FRONTEND-INTEGRATION.md)**: Frontend AIR Kit integration
+- **[MIGRATION-SUMMARY.md](./MIGRATION-SUMMARY.md)**: Executive migration summary
 
 ---
 
@@ -129,8 +185,12 @@ By end of Wave 3, judges should be able to:
 
 ### Day 3 (Oct 27)
 **Morning**: [PHASE3-LENDING-UX.md](./PHASE3-LENDING-UX.md) (finish)  
-**Afternoon**: [PHASE4-DEPLOYMENT.md](./PHASE4-DEPLOYMENT.md)  
-**Evening**: [PHASE5-DOCS-DEMO.md](./PHASE5-DOCS-DEMO.md)
+**Afternoon**: [PHASE4-DEPLOYMENT.md](./PHASE4-DEPLOYMENT.md)
+
+### Day 4 (Oct 28) - MOCA MIGRATION DAY
+**Morning**: [PHASE5.1-DASHBOARD-SETUP.md](./PHASE5.1-DASHBOARD-SETUP.md)  
+**Afternoon**: [PHASE5.2-BACKEND-REFACTOR.md](./PHASE5.2-BACKEND-REFACTOR.md) + [PHASE5.3-FRONTEND-INTEGRATION.md](./PHASE5.3-FRONTEND-INTEGRATION.md)  
+**Evening**: [PHASE6-DOCS-DEMO.md](./PHASE6-DOCS-DEMO.md)
 
 ---
 
@@ -145,11 +205,18 @@ Phase 3 (Lending v2 + UX)
     ↓ MUST COMPLETE THIRD
 Phase 4 (Testnet Deployment)
     ↓ MUST COMPLETE FOURTH
-Phase 5 (Documentation)
+Phase 5 (MOCA Migration) 🚨 CRITICAL
+    ├─ Phase 5.1 (Dashboard Setup)
+    ├─ Phase 5.2 (Backend Refactor)
+    └─ Phase 5.3 (Frontend Integration)
+    ↓ MUST COMPLETE FIFTH
+Phase 6 (Documentation & Demo)
     ↓ READY FOR SUBMISSION
 ```
 
 **Critical**: Do NOT skip ahead. Each phase builds on the previous.
+
+**🚨 Extra Critical**: Phase 5 transforms mock credentials → official MOCA ecosystem credentials. Without it, you're not truly integrated with MOCA.
 
 ---
 
@@ -179,6 +246,16 @@ Phase 5 (Documentation)
 - Integration guide for dApps
 - Composability demonstration
 
+### New MOCA Integration Features (Phase 5) 🔥
+- **Official Issuer DIDs**: 3 registered issuers (Bank, Employment, CEX)
+- **Verifier DID**: Credo Protocol as official verifier
+- **Gas Sponsorship**: Users don't pay for credential issuance
+- **Decentralized Storage**: Credentials stored on MCSP (not local DB)
+- **Interoperability**: Credentials work across MOCA ecosystem
+- **Partner JWT Auth**: Secure backend ↔ AIR Kit communication
+- **Public Schema Registry**: 10 credential schemas on AIR Kit
+- **AIR Kit Wallet Integration**: Users can view credentials in AIR Wallet
+
 ---
 
 ## 🚨 Risk Mitigation
@@ -190,16 +267,19 @@ Phase 5 (Documentation)
 - ✅ 1 advanced credential (Bank Balance)
 - ✅ Score Builder Wizard (basic)
 - ✅ Testnet deployment
+- 🚨 **Phase 5 MOCA Migration (ALL 3 sub-phases)**
 
 **Should Ship (P1)**:
 - ✅ 2nd advanced credential (Income)
 - ✅ Interest accrual display
 - ✅ Leaderboard
+- ✅ ERC-20 Paymaster (users pay gas with USDC/MOCA automatically)
 
 **Nice-to-Have (P2)**:
 - ⭕ Score API
 - ⭕ Integration guide
 - ⭕ Historical charts
+- ⭕ Credential verification UI
 
 ### If You Encounter Blockers
 
@@ -247,21 +327,36 @@ Phase 5 (Documentation)
 
 ---
 
-## 🚀 Let's Build
+## 🚀 Where You Are Now
 
 You have:
 - ✅ Solid Wave 2 foundation
-- ✅ Clear feedback from judges
-- ✅ 3 days to execute
-- ✅ Detailed specs for every component
+- ✅ Phases 1-4 complete (Oracle v2, Advanced Credentials, Lending UX, Testnet Deployment)
+- ✅ Working project with mock credentials
+- 🚨 **CRITICAL**: Phase 5 (MOCA Migration) ahead
 
-**The key**: Follow phases in order. Test as you go. Ship working code > perfect code.
+**The key**: Follow Phase 5 sub-phases in order. Test as you go. This migration is what makes you a true MOCA ecosystem participant.
 
-Start with **[PHASE1-ORACLE.md](./PHASE1-ORACLE.md)** right now. 💪
+**Your Next Steps**:
+1. 📖 Read **[PHASE5-MOCA-MIGRATION.md](./PHASE5-MOCA-MIGRATION.md)** (Overview)
+2. 🎯 Complete **[PHASE5.1-DASHBOARD-SETUP.md](./PHASE5.1-DASHBOARD-SETUP.md)** (2-3 hours)
+3. 🔧 Complete **[PHASE5.2-BACKEND-REFACTOR.md](./PHASE5.2-BACKEND-REFACTOR.md)** (2-3 hours)
+4. ⚛️ Complete **[PHASE5.3-FRONTEND-INTEGRATION.md](./PHASE5.3-FRONTEND-INTEGRATION.md)** (2-3 hours)
+5. 📝 Finish with **[PHASE6-DOCS-DEMO.md](./PHASE6-DOCS-DEMO.md)** (4-6 hours)
+
+**Why Phase 5 is Critical**:
+- Transforms mock credentials → official MOCA ecosystem credentials
+- Enables gas sponsorship (users don't pay for credentials!)
+- Stores credentials on MCSP (decentralized storage)
+- Makes credentials interoperable across MOCA ecosystem
+- Shows judges you truly understand MOCA's vision
+
+💪 **Start with [PHASE5.1-DASHBOARD-SETUP.md](./PHASE5.1-DASHBOARD-SETUP.md) right now!**
 
 ---
 
-**Document Version**: 1.0  
+**Document Version**: 2.0  
 **Created**: Oct 25, 2025  
-**Next Step**: Read PHASE1-ORACLE.md
+**Updated**: Oct 28, 2025 (Added Phase 5 MOCA Migration)  
+**Next Step**: Read PHASE5.1-DASHBOARD-SETUP.md
 
