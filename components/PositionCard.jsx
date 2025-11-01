@@ -35,10 +35,16 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
     borrowedAmount: 0,
   });
   
-  // Phase 3: Real-time interest tracking
+  // Phase 3: Real-time interest tracking (Borrow)
   const [accruedInterest, setAccruedInterest] = useState(0);
   const [totalOwed, setTotalOwed] = useState(0);
   const [userAPR, setUserAPR] = useState(0);
+  
+  // Phase 3: Supply interest tracking (NEW!)
+  const [supplyAPY, setSupplyAPY] = useState(0);
+  const [earnedInterest, setEarnedInterest] = useState(0);
+  const [totalBalance, setTotalBalance] = useState(0);
+  const [supplyTimestamp, setSupplyTimestamp] = useState(0);
 
   // Calculate credit limit reactively based on current credit score
   // This updates when creditScore changes without needing to refetch position data
@@ -50,6 +56,15 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
   // Calculate interest rate and score color
   const interestRate = calculateInterestRate(creditScore);
   const scoreColor = getScoreColor(creditScore);
+  
+  // Derived net interest summary (annualized)
+  // userAPR is in basis points (e.g., 1100 = 11%), supplyAPY is a percent number
+  const borrowAPRPercent = userAPR / 100; // e.g., 11.0
+  const netAnnualInterest = 
+    position.suppliedAmount * (supplyAPY / 100) -
+    position.borrowedAmount * (borrowAPRPercent / 100);
+  
+  // Display helpers declared later (after hasMeaningfulDebt)
 
   // Fetch position data
   // Note: creditScore is NOT in dependencies because it's only used for display calculations
@@ -60,14 +75,14 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
     }
   }, [userAddress, refresh, provider]);
   
-  // Phase 3: Auto-refresh interest every 5 seconds
+  // Phase 3: Auto-refresh borrow interest every 5 seconds
   // Only run when there's meaningful debt (>= $0.01), not dust amounts
   useEffect(() => {
     if (!userAddress || !provider || position.borrowedAmount < 0.0001) {
       return;
     }
     
-    const fetchInterest = async () => {
+    const fetchBorrowInterest = async () => {
       try {
         const reliableProvider = await getBestProvider(null);
         const lendingPool = new ethers.Contract(
@@ -101,18 +116,83 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
         setUserAPR(Number(apr));
         
       } catch (error) {
-        console.error('Error fetching interest:', error);
+        console.error('Error fetching borrow interest:', error);
       }
     };
     
     // Fetch immediately
-    fetchInterest();
+    fetchBorrowInterest();
     
     // Then update every 5 seconds
-    const interval = setInterval(fetchInterest, 5000);
+    const interval = setInterval(fetchBorrowInterest, 5000);
     
     return () => clearInterval(interval);
   }, [userAddress, provider, position.borrowedAmount]);
+
+  // Phase 3: Auto-refresh supply interest every 5 seconds (NEW!)
+  // Only run when user has supplied collateral
+  useEffect(() => {
+    if (!userAddress || !provider || position.suppliedAmount < 0.0001) {
+      return;
+    }
+    
+    const fetchSupplyInterest = async () => {
+      try {
+        const reliableProvider = await getBestProvider(null);
+        const lendingPool = new ethers.Contract(
+          CONTRACTS.LENDING_POOL,
+          LENDING_POOL_ABI,
+          reliableProvider
+        );
+        
+        // Get pool data to calculate supply APY
+        const assetData = await callWithTimeout(
+          () => lendingPool.assets(CONTRACTS.MOCK_USDC),
+          { timeout: 10000, retries: 1 }
+        );
+        
+        const totalSupply = parseFloat(ethers.formatUnits(assetData.totalSupply, 6));
+        const totalBorrowed = parseFloat(ethers.formatUnits(assetData.totalBorrowed, 6));
+        const utilizationRate = totalSupply > 0 ? (totalBorrowed / totalSupply) : 0;
+        
+        // Calculate average borrow APR (simplified - using 12% as base)
+        // In production, you'd calculate weighted average of all borrowers
+        const avgBorrowAPR = 12; // 12% (matches contract's accrueInterest function)
+        
+        // Supply APY = Borrow APR × Utilization Rate
+        // This is the standard DeFi lending formula
+        const calculatedSupplyAPY = avgBorrowAPR * utilizationRate;
+        
+        // Calculate time elapsed since supply (in seconds)
+        // Note: Using current timestamp as approximation
+        // In production, track actual supply timestamp on-chain
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+        const timeElapsed = supplyTimestamp > 0 ? currentTimestamp - supplyTimestamp : 0;
+        
+        // Calculate earned interest: principal × APY × (time / year)
+        // Formula: interest = principal × (APY / 100) × (seconds / 31557600)
+        const secondsPerYear = 31557600; // 365.25 days
+        const calculatedInterest = timeElapsed > 0 
+          ? position.suppliedAmount * (calculatedSupplyAPY / 100) * (timeElapsed / secondsPerYear)
+          : 0;
+        
+        setSupplyAPY(calculatedSupplyAPY);
+        setEarnedInterest(calculatedInterest);
+        setTotalBalance(position.suppliedAmount + calculatedInterest);
+        
+      } catch (error) {
+        console.error('Error fetching supply interest:', error);
+      }
+    };
+    
+    // Fetch immediately
+    fetchSupplyInterest();
+    
+    // Then update every 5 seconds
+    const interval = setInterval(fetchSupplyInterest, 5000);
+    
+    return () => clearInterval(interval);
+  }, [userAddress, provider, position.suppliedAmount, supplyTimestamp]);
 
   const fetchPosition = async () => {
     try {
@@ -159,6 +239,12 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
 
       // Convert to JavaScript numbers (MockUSDC uses 6 decimals)
       const suppliedFormatted = Number(ethers.formatUnits(supplied, 6));
+      
+      // Get last update timestamp for supply interest calculation
+      // Note: For now, we'll calculate from current timestamp
+      // In production, you'd want to track the actual supply timestamp on-chain
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+      setSupplyTimestamp(currentTimestamp);
       
       // Use totalDebt from getUserAccountData instead of getUserBorrowed
       // to avoid caching issues and ensure consistency
@@ -213,6 +299,11 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
   const hasSuppliedCollateral = position.suppliedAmount > 0;
   const hasMeaningfulDebt = position.borrowedAmount >= 0.01;
   const hasPosition = hasSuppliedCollateral || hasMeaningfulDebt;
+  
+  // Display helpers for consistent UI when values are zero
+  const displayBorrowAPR = (userAPR && userAPR > 0) ? (userAPR / 100) : interestRate; // percent number
+  const displayedAccruedInterest = hasMeaningfulDebt ? accruedInterest : 0;
+  const displayedTotalOwed = hasMeaningfulDebt ? totalOwed : 0;
 
   if (loading) {
     return (
@@ -275,6 +366,11 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-green-500" />
                 <p className="text-base text-muted-foreground">Supplied</p>
+                {supplyAPY > 0 && (
+                  <Badge variant="outline" className="text-green-700 border-green-400 text-xs font-medium">
+                    {supplyAPY.toFixed(2)}% APY
+                  </Badge>
+                )}
               </div>
               <p className="text-4xl font-bold">${position.suppliedAmount.toFixed(2)}</p>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -287,6 +383,11 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
               <div className="flex items-center gap-2">
                 <TrendingDown className="h-5 w-5 text-red-500" />
                 <p className="text-base text-muted-foreground">Borrowed</p>
+                {userAPR > 0 && (
+                  <Badge variant="outline" className="text-orange-700 border-orange-400 text-xs font-medium">
+                    {(userAPR / 100).toFixed(2)}% APR
+                  </Badge>
+                )}
               </div>
               <p className="text-4xl font-bold">${position.borrowedAmount.toFixed(2)}</p>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -331,61 +432,123 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
           </div>
         </div>
 
-        {/* Phase 3: Real-Time Interest Display (NEW!) */}
-        {/* Only show when there's meaningful debt (>= $0.01), not dust amounts */}
-        {hasMeaningfulDebt && (
-          <div className="p-5 bg-gray-50 border border-gray-200 rounded-lg space-y-4">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-gray-200">
-              <span className="text-base font-semibold text-gray-900">Debt Overview</span>
-              <Badge variant="outline" className="text-orange-700 border-orange-400 font-medium">
-                {(userAPR / 100).toFixed(2)}% APR
-              </Badge>
-            </div>
-            
-            {/* Current Borrowed Amount */}
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Current Borrowed Amount</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-gray-900">
-                    ${position.borrowedAmount.toFixed(2)}
-                  </span>
-                  <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={20} height={20} className="inline" />
+        {/* Supply Earnings + Debt Overview in a clear two-column layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Earnings Overview */}
+          <div className="p-5 bg-gray-50 border border-gray-200 rounded-lg space-y-4 h-full">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+                  <span className="text-base font-semibold text-gray-900">Earnings Overview</span>
+                  <Badge variant="outline" className="text-green-700 border-green-400 font-medium">
+                    {supplyAPY.toFixed(2)}% APY
+                  </Badge>
                 </div>
-              </div>
 
-              {/* Interest Section */}
-              <div className="p-3 bg-orange-50 border border-orange-200 rounded-md space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-orange-700 font-medium uppercase tracking-wide">Accrued Interest</span>
-                  <div className="flex items-center gap-1 text-xs text-orange-600">
-                    <Clock className="w-3 h-3" />
-                    <span>Live</span>
+                {/* Supplied Amount */}
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Supplied Amount</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-bold text-gray-900">
+                        ${position.suppliedAmount.toFixed(2)}
+                      </span>
+                      <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={20} height={20} className="inline" />
+                    </div>
+                  </div>
+
+                  {/* Interest Earned */}
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-md space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-green-700 font-medium uppercase tracking-wide">Interest Earned</span>
+                      <div className="flex items-center gap-1 text-xs text-green-600">
+                        <Clock className="w-3 h-3" />
+                        <span>Live</span>
+                      </div>
+                    </div>
+                    <p className="text-xl font-bold text-green-700">
+                      +${earnedInterest.toFixed(6)}
+                    </p>
+                  </div>
+
+                  {/* Total Balance */}
+                  <div className="pt-3 border-t-2 border-gray-300">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-sm font-semibold text-gray-900">Total Balance:</span>
+                      <span className="text-2xl font-bold text-gray-900">${totalBalance.toFixed(2)}</span>
+                    </div>
                   </div>
                 </div>
-                <p className="text-xl font-bold text-orange-700">
-                  +${accruedInterest.toFixed(6)}
-                </p>
-              </div>
+          </div>
 
-              {/* Total Owed */}
-              <div className="pt-3 border-t-2 border-gray-300">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm font-semibold text-gray-900">Total Amount to Repay:</span>
-                  <span className="text-2xl font-bold text-gray-900">${totalOwed.toFixed(2)}</span>
+          {/* Debt Overview */}
+          <div className="p-5 bg-gray-50 border border-gray-200 rounded-lg space-y-4 h-full">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+                  <span className="text-base font-semibold text-gray-900">Debt Overview</span>
+                  <Badge variant="outline" className="text-orange-700 border-orange-400 font-medium">
+                    {displayBorrowAPR.toFixed(2)}% APR
+                  </Badge>
                 </div>
-              </div>
-            </div>
 
-            {/* Repay Button */}
-            <button 
-              className="w-full h-12 text-base bg-green-600 text-white rounded-md transition-all duration-300 hover:bg-green-700 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md"
-              onClick={() => setRepayModalOpen(true)}
-            >
-              <TrendingUp className="h-5 w-5" />
-              <span className="flex items-center gap-1.5">Repay <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC</span>
-            </button>
+                {/* Current Borrowed Amount */}
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Current Borrowed Amount</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-bold text-gray-900">
+                        ${position.borrowedAmount.toFixed(2)}
+                      </span>
+                      <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={20} height={20} className="inline" />
+                    </div>
+                  </div>
+
+                  {/* Accrued Interest */}
+                  <div className="p-3 bg-orange-50 border border-orange-200 rounded-md space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-orange-700 font-medium uppercase tracking-wide">Accrued Interest</span>
+                      <div className="flex items-center gap-1 text-xs text-orange-600">
+                        <Clock className="w-3 h-3" />
+                        <span>Live</span>
+                      </div>
+                    </div>
+                    <p className="text-xl font-bold text-orange-700">
+                      +${displayedAccruedInterest.toFixed(6)}
+                    </p>
+                  </div>
+
+                  {/* Total Owed */}
+                  <div className="pt-3 border-t-2 border-gray-300">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-sm font-semibold text-gray-900">Total Amount to Repay:</span>
+                      <span className="text-2xl font-bold text-gray-900">${displayedTotalOwed.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Repay Button */}
+                <button 
+                  className="w-full h-12 text-base bg-green-600 text-white rounded-md transition-all duration-300 hover:bg-green-700 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  onClick={() => setRepayModalOpen(true)}
+                  disabled={position.borrowedAmount <= 0}
+                >
+                  <TrendingUp className="h-5 w-5" />
+                  <span className="flex items-center gap-1.5">Repay <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC</span>
+                </button>
+          </div>
+        </div>
+
+        {/* Net Interest Summary (shows only when both sides exist) */}
+        {hasSuppliedCollateral && hasMeaningfulDebt && (
+          <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-gray-900">Net Interest (est. annual)</span>
+              <span className={`text-lg font-bold ${netAnnualInterest >= 0 ? 'text-green-700' : 'text-orange-700'}`}>
+                ${netAnnualInterest.toFixed(2)}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              ({supplyAPY.toFixed(2)}% APY on ${position.suppliedAmount.toFixed(2)} - {(borrowAPRPercent).toFixed(2)}% APR on ${position.borrowedAmount.toFixed(2)})
+            </p>
           </div>
         )}
 
