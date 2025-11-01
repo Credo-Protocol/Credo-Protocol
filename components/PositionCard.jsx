@@ -431,7 +431,7 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
                 {/* Header */}
                 <div className="flex items-center justify-between pb-3 border-b border-gray-200">
                   <span className="text-base font-semibold text-gray-900">Earnings Overview</span>
-                  <Badge variant="outline" className="text-green-700 border-green-400 font-medium">
+                  <Badge variant="outline" className="text-green-700 border-green-400 font-medium text-[10px] px-2 py-0.5 h-5">
                     {supplyAPY.toFixed(2)}% APY
                   </Badge>
                 </div>
@@ -487,7 +487,7 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
                 {/* Header */}
                 <div className="flex items-center justify-between pb-3 border-b border-gray-200">
                   <span className="text-base font-semibold text-gray-900">Debt Overview</span>
-                  <Badge variant="outline" className="text-orange-700 border-orange-400 font-medium">
+                  <Badge variant="outline" className="text-orange-700 border-orange-400 font-medium text-[10px] px-2 py-0.5 h-5">
                     {displayBorrowAPR.toFixed(2)}% APR
                   </Badge>
                 </div>

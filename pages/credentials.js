@@ -9,6 +9,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
+import { ethers } from 'ethers';
 import AppNav from '@/components/layout/AppNav';
 import CredentialWallet from '@/components/CredentialWallet';
 import CredentialMarketplace from '@/components/CredentialMarketplace';
@@ -19,11 +20,16 @@ import { RetroGrid } from '@/components/ui/retro-grid';
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
 import Iridescence from '@/components/ui/iridescence';
 import { Lock, Database, Clock } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { CONTRACTS, CREDIT_ORACLE_ABI, getScoreColor } from '@/lib/contracts';
+import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 
 export default function CredentialsPage() {
   const router = useRouter();
   const { isConnected, userAddress, provider, loading: airKitLoading, refreshUserInfo } = useAirKit();
   const [isMounted, setIsMounted] = useState(true);
+  const [creditScore, setCreditScore] = useState(0);
+  const [scoreLoading, setScoreLoading] = useState(false);
 
   const handleConnectionChange = useCallback((connectionData) => {
     if (connectionData.connected && refreshUserInfo) {
@@ -42,6 +48,41 @@ export default function CredentialsPage() {
     setIsMounted(true);
     return () => setIsMounted(false);
   }, []);
+
+  // Fetch credit score for display on this page
+  useEffect(() => {
+    if (isConnected && userAddress && provider) {
+      fetchCreditScore();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, userAddress, provider]);
+
+  const fetchCreditScore = async () => {
+    try {
+      setScoreLoading(true);
+      const reliableProvider = await getBestProvider(provider);
+      const oracleContract = new ethers.Contract(
+        CONTRACTS.CREDIT_ORACLE,
+        CREDIT_ORACLE_ABI,
+        reliableProvider
+      );
+      const raw = await callWithTimeout(
+        () => oracleContract.getCreditScore(userAddress),
+        { timeout: 20000, retries: 2 }
+      );
+      const value = Number(raw);
+      if (Number.isFinite(value) && value >= 0 && value <= 1000) {
+        setCreditScore(value);
+      } else {
+        setCreditScore(0);
+      }
+    } catch (err) {
+      console.error('Error fetching credit score:', err);
+      setCreditScore(0);
+    } finally {
+      setScoreLoading(false);
+    }
+  };
 
   // If already connected, render the page immediately (no loading screen)
   // Only show loading/connect screens if not connected
@@ -104,6 +145,30 @@ export default function CredentialsPage() {
           <p className="text-black/60">
             Manage your verifiable credentials and build your on-chain reputation
           </p>
+        </div>
+
+        {/* Credit Score Summary */}
+        <div className="mb-8 p-5 rounded-lg border border-black/10 bg-white">
+          <div className="mb-2">
+            <span className="text-sm text-black/60 font-medium">Your Credit Score</span>
+          </div>
+          
+          {/* Score number */}
+          <div className="mb-4 text-center">
+            {scoreLoading ? (
+              <span className="text-sm text-black/50">Loading...</span>
+            ) : (
+              <span className={`text-5xl font-extrabold ${getScoreColor(creditScore)}`}>
+                {creditScore}
+              </span>
+            )}
+          </div>
+
+          <Progress value={Math.min(creditScore / 10, 100)} className="h-2" />
+          <div className="mt-1 text-xs text-black/50 flex items-center justify-between">
+            <span>0</span>
+            <span>100</span>
+          </div>
         </div>
 
         {/* Tabs: Wallet and Marketplace */}
