@@ -21,10 +21,12 @@ import { AlertTriangle, TrendingUp, TrendingDown, Clock } from 'lucide-react';
 import { CONTRACTS, LENDING_POOL_ABI, ERC20_ABI, calculateCollateralFactor, calculateInterestRate, getScoreColor } from '@/lib/contracts';
 import { getBestProvider, callWithTimeout } from '@/lib/rpcProvider';
 import RepayModal from '@/components/RepayModal';
+import WithdrawModal from '@/components/WithdrawModal';
 
 export default function PositionCard({ userAddress, creditScore, refresh, provider }) {
   const [loading, setLoading] = useState(true);
   const [repayModalOpen, setRepayModalOpen] = useState(false);
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [position, setPosition] = useState({
     totalCollateralInUSD: 0,
     totalDebtInUSD: 0,
@@ -366,11 +368,6 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-green-500" />
                 <p className="text-base text-muted-foreground">Supplied</p>
-                {supplyAPY > 0 && (
-                  <Badge variant="outline" className="text-green-700 border-green-400 text-xs font-medium">
-                    {supplyAPY.toFixed(2)}% APY
-                  </Badge>
-                )}
               </div>
               <p className="text-4xl font-bold">${position.suppliedAmount.toFixed(2)}</p>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -383,11 +380,6 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
               <div className="flex items-center gap-2">
                 <TrendingDown className="h-5 w-5 text-red-500" />
                 <p className="text-base text-muted-foreground">Borrowed</p>
-                {userAPR > 0 && (
-                  <Badge variant="outline" className="text-orange-700 border-orange-400 text-xs font-medium">
-                    {(userAPR / 100).toFixed(2)}% APR
-                  </Badge>
-                )}
               </div>
               <p className="text-4xl font-bold">${position.borrowedAmount.toFixed(2)}</p>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -478,6 +470,16 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
                     </div>
                   </div>
                 </div>
+
+                {/* Withdraw Button */}
+                <button 
+                  className="w-full h-12 text-base bg-blue-600 text-white rounded-md transition-all duration-300 hover:bg-blue-700 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  onClick={() => setWithdrawModalOpen(true)}
+                  disabled={position.suppliedAmount <= 0}
+                >
+                  <TrendingDown className="h-5 w-5" />
+                  <span className="flex items-center gap-1.5">Withdraw <Image src="/usd-coin-usdc-logo.png" alt="USDC" width={16} height={16} className="inline" /> USDC</span>
+                </button>
           </div>
 
           {/* Debt Overview */}
@@ -592,6 +594,19 @@ export default function PositionCard({ userAddress, creditScore, refresh, provid
       userAddress={userAddress}
       onSuccess={() => {
         setRepayModalOpen(false);
+        // Trigger refresh by updating the key
+        window.location.reload();
+      }}
+      provider={provider}
+    />
+
+    {/* Withdraw Modal */}
+    <WithdrawModal
+      isOpen={withdrawModalOpen}
+      onClose={() => setWithdrawModalOpen(false)}
+      userAddress={userAddress}
+      onSuccess={() => {
+        setWithdrawModalOpen(false);
         // Trigger refresh by updating the key
         window.location.reload();
       }}
