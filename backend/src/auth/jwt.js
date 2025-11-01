@@ -55,9 +55,17 @@ function generatePartnerJWT(userId, email, scope = 'issue', expiresIn = 3600) {
     exp: now + 300             // 5 minutes expiry (MOCA recommendation)
   };
   
-  // Load private key for RS256 signing
-  const privateKeyPath = path.join(__dirname, '../../private.key');
-  const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
+  // Load private key for RS256 signing from environment variable or file
+  let privateKey;
+  
+  if (process.env.PRIVATE_KEY) {
+    // Production: Read from environment variable
+    privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n');
+  } else {
+    // Development: Read from file
+    const privateKeyPath = path.join(__dirname, '../../private.key');
+    privateKey = fs.readFileSync(privateKeyPath, 'utf8');
+  }
   
   // Get consistent kid (Key ID) - must match JWKS
   const kid = getKid();
@@ -82,9 +90,17 @@ function generatePartnerJWT(userId, email, scope = 'issue', expiresIn = 3600) {
  */
 function verifyPartnerJWT(token) {
   try {
-    // Load public key for verification
-    const publicKeyPath = path.join(__dirname, '../../public.key');
-    const publicKey = fs.readFileSync(publicKeyPath, 'utf8');
+    // Load public key for verification from environment variable or file
+    let publicKey;
+    
+    if (process.env.PUBLIC_KEY) {
+      // Production: Read from environment variable
+      publicKey = process.env.PUBLIC_KEY.replace(/\\n/g, '\n');
+    } else {
+      // Development: Read from file
+      const publicKeyPath = path.join(__dirname, '../../public.key');
+      publicKey = fs.readFileSync(publicKeyPath, 'utf8');
+    }
     
     const decoded = jwt.verify(token, publicKey, {
       algorithms: ['RS256']
