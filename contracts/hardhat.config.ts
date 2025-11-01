@@ -24,7 +24,7 @@ module.exports = {
     },
     // Moca Chain Devnet - Official Configuration
     "moca-devnet": {
-      url: "http://devnet-rpc.mocachain.org",
+      url: "https://devnet-rpc.mocachain.org",
       chainId: 5151, // 0x141F in hex
       accounts: process.env.DEPLOYER_PRIVATE_KEY
         ? [process.env.DEPLOYER_PRIVATE_KEY]
