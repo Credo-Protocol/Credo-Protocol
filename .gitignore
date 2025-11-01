@@ -70,6 +70,13 @@ backend/build/
 # Keep example env
 !backend/.env.example
 
+# RSA Keys (IMPORTANT: Never commit private keys!)
+*.key
+private.key
+public.key
+backend/private.key
+backend/public.key
+
 # Cursor/IDE
 .cursorignore
 .cursor
@@ -78,3 +85,7 @@ backend/build/
 *.swp
 *.swo
 *~
+
+# Documentation with sensitive env variables
+documents/**/*.env
+documents/**/ENV-VARIABLES.env
