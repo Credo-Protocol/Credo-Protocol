@@ -227,7 +227,7 @@ export default function CredentialsPage() {
                   <div className="flex-1">
                     <p className="text-sm">
                       <strong className="text-black font-medium">Validity Period:</strong>{' '}
-                      <span className="text-black/70">Credentials expire after 1 year. You'll see warnings 30 days before expiry.</span>
+                      <span className="text-black/70">Credentials expire after 1 year. You&apos;ll see warnings 30 days before expiry.</span>
                     </p>
                   </div>
                 </div>
