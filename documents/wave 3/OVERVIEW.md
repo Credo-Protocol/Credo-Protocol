@@ -121,6 +121,19 @@ By end of Wave 3, judges should be able to:
   - Refactor credential issuance to use `airService.credential.issue()`
   - Add credential verification UI (AIR Kit wallet display)
 
+- **Phase 5.5**: [AIR Verification Services & Rewards](./PHASE5.5%20VERIFIER_FLOW_COMPLETE_SUMMARY.md) (4-6 hours)
+  - Implement $50 USDC verification faucet
+  - Create verification programs via AIR Kit Dashboard
+  - Zero-knowledge proof validation for employment credentials
+  - Dashboard banner and dedicated rewards page
+
+- **Phase 5.6**: [Lending UI/UX Improvements](./PHASE5.6_UI_UX_IMPROVEMENTS.md) (4-6 hours)
+  - Supply interest tracking for lenders
+  - Withdraw functionality with health factor checks
+  - Pool transparency metrics (Aave-style)
+  - Unified earnings/debt position view
+  - Credit score integration on credentials page
+
 **Why Fifth**: You've been bypassing MOCA's official credential infrastructure. This migration makes your credentials interoperable, gas-sponsored, and stored on MCSP (decentralized storage).
 
 **Impact**:

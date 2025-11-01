@@ -291,8 +291,12 @@ Act 2: Journey (2 min)
 - [ ] **Show AIR Kit issuance flow (official integration)**
 - [ ] **Show credential in wallet (stored on MCSP)**
 - [ ] Navigate to Lending Pool
+- [ ] **Point out pool transparency metrics (Aave-style)**
+- [ ] **Show position card with earnings/debt overview**
 - [ ] Show borrowing power comparison
 - [ ] Borrow action (pre-prepared)
+- [ ] **Highlight real-time interest accruing for both lender and borrower**
+- [ ] **Optional: Demo withdraw functionality with safety checks**
 
 Act 3: Ecosystem (1 min)
 - [ ] Open API endpoint in new tab
@@ -321,8 +325,12 @@ Backup Plan:
    - Landing page
    - Score Builder with simulation
    - Credential cards with privacy badges
+   - Credentials page with credit score bar
+   - Lending interface with pool transparency metrics
    - Lending interface showing dynamic limits
-   - Position card with live interest
+   - Position card with earnings/debt overview
+   - Position card with live interest (supply and borrow)
+   - Withdraw modal with safety checks
    - Leaderboard
    - API response
    - Testnet explorer
@@ -734,6 +742,10 @@ If any of these fail, **go back** to the relevant sub-phase and fix it before pr
 9. "Privacy-preserving bucketed credentials (ranges, not exact amounts)"
 10. "Real-time interest accrual on loans (5-18% APR based on score)"
 11. "Public API for credit scores - any dApp can integrate"
+12. "**Supply interest tracking - lenders earn yield in real-time**"
+13. "**Flexible withdrawals with health factor protection**"
+14. "**Pool transparency metrics like major DeFi platforms (Aave, Compound)**"
+15. "**Unified position view - earnings and debt side-by-side**"
 
 **This separates you from projects that only use MOCA for login!**
 

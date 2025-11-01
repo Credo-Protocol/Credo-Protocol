@@ -67,6 +67,10 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 - **Interest Accrual**: Time-based interest (5-18% APR based on credit tier)
 - **Live Interest Display**: Watch interest accrue every 5 seconds in real-time
 - **Dynamic APR**: Lower rates for higher scores (5% vs 18%)
+- **Supply Interest Tracking**: Real-time earnings for lenders with live APY calculation
+- **Flexible Withdrawals**: Withdraw supplied collateral with health factor protection
+- **Comprehensive Position Views**: Earnings Overview and Debt Overview side-by-side
+- **Pool Transparency**: Real-time liquidity stats (total liquidity, available, borrowed, utilization)
 - **Devnet Deployment**: Live on Moca Devnet for testing and demonstration
 
 #### 🌐 Ecosystem Integration
@@ -588,12 +592,15 @@ npm run dev
 - ✅ **Privacy badges**: Highlights privacy-preserving credentials
 - ✅ **Smart navigation**: Auto-switches to credential request flow
 
-**Position Monitoring** - Live interest tracking
-- ✅ **Real-time interest display**: Updates every 5 seconds
-- ✅ **Breakdown view**: Principal + Interest + Total Owed
-- ✅ **APR badge**: Shows your tier-based rate (5-18%)
+**Position Monitoring** - Live interest tracking for borrowers & lenders
+- ✅ **Real-time interest display**: Updates every 5 seconds for both supply and borrow
+- ✅ **Earnings Overview**: Track supplied amount, earned interest, and total balance
+- ✅ **Debt Overview**: Monitor borrowed amount, accrued interest, and total owed
+- ✅ **Net Interest Summary**: See overall earnings vs debt at a glance
+- ✅ **Supply APY calculation**: Frontend-calculated based on utilization and borrow APR
+- ✅ **Withdraw functionality**: Safely withdraw collateral with health factor checks
+- ✅ **APR badges**: Shows tier-based rates (5-18% for borrowing)
 - ✅ **Health factor**: Includes accrued interest for accuracy
-- ✅ **Yellow highlight box**: Visually prominent interest section
 
 **Leaderboard** - Network effects visualization
 - ✅ **Top 10 rankings**: Live credit score leaderboard
@@ -610,6 +617,9 @@ npm run dev
 - ✅ **Loading states**: Clear feedback for all async operations
 - ✅ **Error handling**: User-friendly messages with retry options
 - ✅ **Responsive layout**: Works on mobile and desktop
+- ✅ **Pool transparency**: Liquidity stats display on lending page
+- ✅ **Organized lending layout**: Position card on left, supply/borrow tabs on right
+- ✅ **Credit score integration**: Score bars and numbers on credentials page
 
 #### 5. Composable Credit Infrastructure (Phase 4)
 
