@@ -392,9 +392,9 @@ npm run dev
 - ✅ **38 tests including interest scenarios** - all passing
 
 **Contract Addresses** (Moca Devnet - Chain ID: 5151)
-- CreditScoreOracle v2: `0xe1eF0424D6a6603B69e04848B2a0Fc180097914f`
-- LendingPool v2 (FIXED): `0xC1E8Fd7C208D9D944E180174484B7f16d4deb086`
-- MockUSDC: `0x521BB742701caE06576485897987c57E87C7f6C8`
+- CreditScoreOracle v2: `0x4D4f92947b0E500E981EC8aC482daBAEeD2bA7F6`
+- LendingPool v2: `0x1AEC6B0AB34aEDB64FcFbe2beb79F7EE6F67980a`
+- MockUSDC: `0x8F8447EfF8E7d32ae1c89569Fa229FcC796cC036`
 
 #### 2. Privacy-Preserving Credentials System
 
