@@ -112,7 +112,7 @@ Credo Protocol is an undercollateralized lending platform on Moca Chain Devnet, 
 
 - **🌐 Live Application**: [https://credo-protocol.vercel.app](https://credo-protocol.vercel.app)
 - **🔗 Backend API**: [https://credo-protocol.onrender.com](https://credo-protocol.onrender.com)
-- **📹 Demo Video**: [Watch on YouTube](https://www.youtube.com/watch?v=l05PbqsKPZY)
+- **📹 Demo Video**: [Watch on YouTube](https://www.youtube.com/watch?v=sH4u5iK-jhA)
 - **📊 Smart Contracts**: [Moca Chain Devnet Explorer](https://devnet-scan.mocachain.org)
 
 ---
